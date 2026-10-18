@@ -1,0 +1,380 @@
+# SpeakQuest
+
+**Your Words Change The Story**
+
+SpeakQuest, İngilizce öğrenmeyi interaktif bir macera oyununa dönüştüren, yapay zekâ destekli,
+web tabanlı bir dil öğrenme platformudur. Oyuncu kurgusal bir şehre yeni taşınmış bir karakteri
+canlandırır, yapay zekâ destekli karakterlerle (NPC) İngilizce konuşur, görevleri tamamlar ve
+verdiği kararlarla hikâyenin gidişatını değiştirir.
+
+Sistem oyuncunun dil hatalarını takip eder ve sonraki görevleri bu hatalara göre seçer.
+Örneğin oyuncu geçmiş zamanda sürekli hata yapıyorsa, hikâyenin doğal akışı içinde geçmiş zaman
+kullanmayı gerektiren yeni bir görev açılır.
+
+> **Proje durumu:** Geliştirme aşamasında. Bu README proje ilerledikçe güncellenecektir.
+
+---
+
+## İçindekiler
+
+- [Projenin Amacı](#projenin-amacı)
+- [Hedef Kitle](#hedef-kitle)
+- [Nasıl Çalışır](#nasıl-çalışır)
+- [Temel Sistemler](#temel-sistemler)
+- [Kapsam (MVP)](#kapsam-mvp)
+- [Teknolojiler](#teknolojiler)
+- [Mimari](#mimari)
+- [Klasör Yapısı](#klasör-yapısı)
+- [Kurulum ve Çalıştırma](#kurulum-ve-çalıştırma)
+- [Kullanım](#kullanım)
+- [API Özeti](#api-özeti)
+- [Test](#test)
+- [Geliştirme Süreci](#geliştirme-süreci)
+- [Yol Haritası](#yol-haritası)
+- [Ekip](#ekip)
+
+---
+
+## Projenin Amacı
+
+Geleneksel dil öğrenme uygulamaları çoğunlukla kelime ezberine, testlere ve birbirinden bağımsız
+alıştırmalara dayanır. SpeakQuest şu problemlere çözüm getirmeyi hedefler:
+
+- İngilizce konuşma pratiği yapacak bir ortam bulamamak.
+- Öğrenme sürecinin monotonlaşması ve motivasyon kaybı.
+- Sürekli tekrarlanan hataların takip edilmemesi.
+- İçeriğin öğrencinin ihtiyaçlarına göre değişmemesi.
+- Öğrenilen İngilizcenin gündelik hayat senaryolarına aktarılamaması.
+
+Temel fikir: Kullanıcı yalnızca İngilizce öğrenmez; İngilizceyi kullanarak hikâyenin içinde
+yaşar ve hikâyeyi değiştirir. SpeakQuest bir chatbot değil, öğrencinin eksiklerini analiz eden,
+görevleri kişiselleştiren ve kararlarını hatırlayan bir öğrenme oyunudur.
+
+## Hedef Kitle
+
+- A1–B2 seviyesinde İngilizce öğrenenler (ilk sürüm **A2–B1** seviyesine odaklanır).
+- Üniversite öğrencileri.
+- İngilizce konuşma pratiği yapmak isteyenler.
+- Oyunlaştırılmış öğrenmeyi tercih eden kullanıcılar.
+
+## Nasıl Çalışır
+
+1. Kullanıcı kayıt olur ve karakterini oluşturur (ad, avatar, İngilizce seviyesi, öğrenme hedefi).
+2. Başlangıç görevini tamamlar ve 2D şehir haritasına erişir.
+3. Haritadan bir mekâna girer (Café, Apartment, Office) ve oradaki NPC ile İngilizce yazışır.
+4. Yapay zekâ NPC'nin cevabını üretir ve kullanıcının mesajını dil bilgisi açısından analiz eder.
+5. Backend hataları kaydeder, beceri puanlarını ve hikâye durumunu günceller.
+6. Görev tamamlandığında XP kazanılır ve sistem, oyuncunun zayıf olduğu konuya göre sonraki görevi seçer.
+
+**Örnek:** _The Job Interview_ görevinde mülakatçı sorar:
+
+> **NPC:** Can you tell me about your previous experience?
+> **Oyuncu:** Last year I work in a restaurant.
+
+Sistem hatayı **Past Simple** olarak işaretler ve _"Last year I worked in a restaurant."_ önerisini
+gösterir. Ancak mesaj anlaşılır olduğu için görev başarısız sayılmaz: **iletişim başarısı ile dil
+bilgisi doğruluğu ayrı değerlendirilir.** Daha sonra oyuncuya _The Missing Backpack_ görevi açılabilir:
+bir arkadaşın çantası kaybolmuştur ve oyuncu dün olanları anlatarak yardım eder. Böylece geçmiş zaman
+pratiği hikâyenin içine yerleşir.
+
+## Temel Sistemler
+
+### Learning Engine (Adaptif Öğrenme)
+
+Kullanıcının mesajlarındaki hataları kategorilere ayırır, hangi hataların tekrarlandığını takip eder,
+güçlü ve zayıf becerileri belirler ve zaman içindeki gelişimi ölçer. İlk sürümde desteklenen kategoriler:
+
+| Kategori | Örnek hata | Düzeltme |
+|---|---|---|
+| Present Simple | She go to work every day. | She goes to work every day. |
+| Past Simple | Yesterday I go to school. | Yesterday I went to school. |
+| Question Formation | Where you live? | Where do you live? |
+| Prepositions | I am good in English. | I am good at English. |
+| Vocabulary Usage | Can you make me a favor? | Can you do me a favor? |
+
+Yapay zekâ hataları **tespit eder**; hata sıklığı, önceliklendirme, gelişim takibi ve sonraki öğrenme
+hedefinin seçimi Python ile yazılan Learning Engine tarafından yapılır.
+
+### Story Engine (Dinamik Hikâye)
+
+Oyuncunun konumunu, aktif ve tamamlanmış görevlerini, NPC'lerle ilişkisini (güven puanı), verdiği
+kararları ve hikâyenin hangi bölümde olduğunu yönetir. Yeni görevlerin açılma koşullarını kontrol
+eder ve farklı hikâye sonlarını belirler. Örneğin bir karaktere yardım etmek güven puanını artırır ve
+yeni bir görevin kilidini açar; yardım etmemek farklı bir olaya yol açar.
+
+### Adaptive Quest Engine
+
+Learning Engine ve Story Engine'i birleştirerek bir sonraki görevi seçer. Seçim rastgele değildir;
+şu kriterlere bakılır: dil seviyesi, tekrar eden hata kategorileri, önceki görevler, hikâye durumu,
+görev ön koşulları, NPC ilişkileri ve son çalışılan konular. İlk sürümde görevler önceden hazırlanmış
+şablonlardan seçilir; yapay zekâ bu şablonların diyaloglarını kişiselleştirir.
+
+### Yapay Zekânın Rolü ve Sınırları
+
+Yapay zekâ NPC diyaloglarını üretir, kullanıcı mesajını anlar ve dil hatalarını analiz eder. Cevaplar
+yapılandırılmış JSON olarak alınır ve backend tarafından doğrulanır:
+
+```json
+{
+  "npc_reply": "That sounds great! What did you do there?",
+  "communication_success": true,
+  "detected_errors": [
+    {
+      "category": "past_simple",
+      "original": "Last year I work in a restaurant.",
+      "corrected": "Last year I worked in a restaurant.",
+      "explanation": "Geçmişte tamamlanmış olaylarda fiilin geçmiş zaman biçimi kullanılır."
+    }
+  ],
+  "feedback": "Good answer! Remember to use the past form of the verb.",
+  "suggested_story_action": "interview_positive"
+}
+```
+
+Güvenlik ve tutarlılık için şu kurallar uygulanır:
+
+- XP, seviye, görev tamamlama ve hikâye durumu **yalnızca backend** tarafından hesaplanır.
+  Yapay zekâ oyun durumunu doğrudan değiştiremez.
+- `suggested_story_action` yalnızca bir öneridir; nihai kararı Story Engine verir.
+- Doğrulanmamış AI cevabı veritabanına veya oyun durumuna uygulanmaz.
+- API anahtarları frontend kodunda bulunmaz, backend ortam değişkenlerinde saklanır.
+- AI servisi hata verdiğinde uygulama çökmez, kullanıcıya anlaşılır bir mesaj gösterilir.
+
+## Kapsam (MVP)
+
+İlk sürüm küçük ama uçtan uca çalışan bir oyun olarak hedeflenmiştir.
+
+**MVP'de olacaklar**
+
+- Kayıt, giriş ve oturum yönetimi
+- Karakter oluşturma
+- Ana dashboard (profil, seviye, XP, aktif görev, gelişim)
+- 2D şehir haritası ve 3 mekân: **Café, Apartment, Office**
+- 3 NPC ve 5 temel görev
+- Yapay zekâ destekli yazılı diyalog ve İngilizce hata analizi
+- Learning Engine ve Story Engine
+- Kullanıcıya göre görev seçimi
+- XP ve seviye sistemi
+- Öğrenme gelişimi (Learning Progress) ekranı
+- Quest Journal (aktif, tamamlanan ve kilitli görevler)
+- İki farklı hikâye sonu
+
+**MVP dışında bırakılanlar** (sonraki sürümlere)
+
+- 3D oyun dünyası ve serbest karakter hareketi
+- Gerçek zamanlı çok oyunculu sistem
+- Sesli konuşma ve mikrofon entegrasyonu
+- Gelişmiş karakter animasyonları
+- Mobil uygulama
+- Kendi dil modelimizi eğitmek
+- Ödeme sistemi
+
+## Teknolojiler
+
+| Katman | Teknoloji |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript, Bootstrap |
+| Backend | Python, FastAPI, REST API |
+| Veritabanı | PostgreSQL, SQLAlchemy ORM |
+| Yapay Zekâ | Gemini API veya OpenAI API (karar verilecek) |
+| Araçlar | Git, GitHub, VS Code, Postman, pytest |
+
+Frontend bilinçli olarak framework kullanmadan (React, Vue vb. olmadan) saf HTML, CSS, JavaScript ve
+Bootstrap ile geliştirilir.
+
+## Mimari
+
+```mermaid
+flowchart LR
+    U[Kullanıcı<br/>Tarayıcı] -->|REST / JSON| API[FastAPI Backend]
+    API --> AUTH[Auth & Player]
+    API --> DLG[Dialogue Service]
+    DLG -->|kontrollü bağlam| AI[(LLM API<br/>Gemini / OpenAI)]
+    AI -->|yapılandırılmış JSON| VAL[Cevap Doğrulama]
+    VAL --> LE[Learning Engine]
+    VAL --> SE[Story Engine]
+    LE --> QE[Adaptive Quest Engine]
+    SE --> QE
+    AUTH --> DB[(PostgreSQL)]
+    LE --> DB
+    SE --> DB
+    QE --> DB
+```
+
+Bir mesajın yolculuğu:
+
+1. Frontend, kullanıcının mesajını `POST /dialogue/message` ile gönderir.
+2. Backend aktif görevi, NPC'yi ve hikâye durumunu veritabanından alır.
+3. Yapay zekâya yalnızca gerekli bağlam gönderilir.
+4. Gelen JSON doğrulanır; geçersizse güvenli bir varsayılan cevap kullanılır.
+5. Learning Engine hataları kaydeder ve beceri puanlarını günceller.
+6. Story Engine önerilen aksiyonun kurallara uygun olup olmadığını kontrol eder ve durumu günceller.
+7. Frontend NPC cevabını ve varsa geri bildirimi gösterir.
+
+## Klasör Yapısı
+
+Planlanan yapı (proje ilerledikçe güncellenecektir):
+
+```
+SPEAKQUEST/
+├── .github/
+│   ├── CODEOWNERS                  # klasör sorumluları
+│   └── pull_request_template.md
+├── src/
+│   ├── api/                        # FastAPI backend
+│   │   ├── app/
+│   │   │   ├── main.py
+│   │   │   ├── core/               # ayarlar, güvenlik, veritabanı bağlantısı
+│   │   │   ├── models/             # SQLAlchemy modelleri
+│   │   │   ├── schemas/            # Pydantic şemaları
+│   │   │   ├── routers/            # REST endpointleri
+│   │   │   ├── services/ai/        # LLM istemcisi ve prompt'lar
+│   │   │   └── engines/            # learning, story, quest motorları
+│   │   └── tests/                  # pytest testleri
+│   └── frontend/                   # HTML, CSS, JS, Bootstrap
+│       ├── pages/
+│       ├── css/
+│       ├── js/
+│       └── assets/
+├── docs/                           # teknik kararlar ve diyagramlar
+├── .env.example                    # örnek ortam değişkenleri (gerçek anahtar içermez)
+├── requirements.txt
+└── README.md
+```
+
+## Kurulum ve Çalıştırma
+
+> Aşağıdaki adımlar planlanan kurulumu tarif eder. Kod eklendikçe komutlar kesinleştirilecektir.
+
+**Gereksinimler:** Python 3.11+, PostgreSQL 15+, Git, bir Gemini veya OpenAI API anahtarı.
+
+1. Depoyu klonlayın:
+
+   ```bash
+   git clone https://github.com/emirulasozdag/SPEAKQUEST.git
+   cd SPEAKQUEST
+   ```
+
+2. Sanal ortam oluşturup bağımlılıkları kurun:
+
+   ```bash
+   python -m venv venv
+   source venv/bin/activate      # Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+
+3. PostgreSQL'de bir veritabanı oluşturun:
+
+   ```sql
+   CREATE DATABASE speakquest;
+   ```
+
+4. `.env.example` dosyasını `.env` olarak kopyalayıp değerleri doldurun:
+
+   ```env
+   DATABASE_URL=postgresql://kullanici:sifre@localhost:5432/speakquest
+   SECRET_KEY=uzun-rastgele-bir-deger
+   AI_PROVIDER=gemini
+   AI_API_KEY=buraya-api-anahtari
+   ```
+
+   `.env` dosyası `.gitignore` içindedir ve asla commitlenmez.
+
+5. Backend'i başlatın:
+
+   ```bash
+   uvicorn src.api.app.main:app --reload
+   ```
+
+   API varsayılan olarak `http://localhost:8000` adresinde çalışır. Otomatik oluşturulan API
+   dokümantasyonu `http://localhost:8000/docs` adresindedir.
+
+6. Frontend'i tarayıcıda açın (backend üzerinden servis edilir ya da
+   `src/frontend/` klasöründe basit bir statik sunucu ile çalıştırılabilir).
+
+## Kullanım
+
+1. **Landing Page** üzerinden _Start Adventure_ ile başlayın, kayıt olun veya giriş yapın.
+2. **Character Creation** ekranında karakter adınızı, avatarınızı, İngilizce seviyenizi ve öğrenme
+   hedefinizi seçin.
+3. **Dashboard** üzerinden seviyenizi, XP'nizi, aktif görevinizi ve öğrenme gelişiminizi görün.
+   _Continue Adventure_ ile kaldığınız yerden devam edin.
+4. **City Map** üzerinden bir mekâna tıklayın.
+5. **Dialogue** ekranında NPC ile İngilizce yazışın. Görev hedefi ve ilerleme göstergesi ekranda yer
+   alır; hata yaptığınızda düzeltme ve kısa açıklama gösterilir.
+6. **Quest Journal** ekranında aktif, tamamlanan ve kilitli görevleri ve ödüllerini inceleyin.
+7. **Learning Progress** ekranında hata kategorilerinizi, sık yaptığınız hataları ve zaman içindeki
+   gelişiminizi takip edin.
+
+## API Özeti
+
+| Alan | Endpoint |
+|---|---|
+| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` |
+| Player | `GET /player/profile`, `PUT /player/profile`, `GET /player/progress` |
+| Locations | `GET /locations`, `GET /locations/{id}` |
+| Quests | `GET /quests`, `GET /quests/active`, `POST /quests/{id}/start`, `POST /quests/{id}/complete` |
+| Dialogue | `POST /dialogue/message`, `GET /dialogue/history/{quest_id}` |
+| Learning | `GET /learning/errors`, `GET /learning/skills`, `GET /learning/recommendations` |
+| Story | `GET /story/state`, `POST /story/decision` |
+
+Tüm endpointler kimlik doğrulama, yetkilendirme ve girdi doğrulaması içerir. Her kullanıcı yalnızca
+kendi verisine erişebilir. Görev tamamlama gibi kritik işlemler istemciden gelen değerlere güvenilerek
+değil, backend kurallarıyla doğrulanarak yapılır.
+
+## Test
+
+Backend testleri `pytest` ile yazılır ve çalıştırılır:
+
+```bash
+pytest
+```
+
+Testlerde öncelik verilen alanlar:
+
+- Kayıt, giriş ve yetkilendirme
+- Görev başlatma ve tamamlama kuralları
+- XP ve seviye hesaplaması
+- Learning Engine'in hata sayımı ve öğrenme hedefi seçimi
+- Story Engine'in karar ve görev açma kuralları
+- Hatalı veya eksik AI JSON cevaplarının güvenli şekilde ele alınması
+
+**Demo senaryosu:** İki kullanıcı aynı başlangıç görevini oynar. Birincisi Past Simple'da, ikincisi
+Question Formation'da zorlanır. Sistem bu farkı kaydeder ve iki kullanıcıya farklı sonraki görevler
+önerir. Kullanıcıların farklı kararları da NPC ilişkilerini ve hikâye sonunu değiştirir.
+
+## Geliştirme Süreci
+
+Proje GitHub Flow ile geliştirilir:
+
+- `main` dalı her zaman çalışır durumdadır; doğrudan `main`'e commit yapılmaz.
+- Her görev bir GitHub Issue olarak açılır ve kısa ömürlü bir dalda (`feature/...`, `fix/...`) yapılır.
+- Değişiklikler Pull Request ile, en az bir ekip üyesinin incelemesinden sonra `main`'e birleştirilir.
+- Commitler küçük ve tek amaçlıdır; mesajlar [Conventional Commits](https://www.conventionalcommits.org/)
+  biçimini izler (ör. `feat(api): add quest start endpoint`).
+- API anahtarları ve `.env` dosyaları asla commitlenmez.
+- Sürümler semantic versioning ile etiketlenir (`v0.1.0`, `v1.0.0`) ve GitHub Releases üzerinden yayınlanır.
+
+## Yol Haritası
+
+- [ ] **Aşama 1 – Altyapı:** klasör yapısı, FastAPI projesi, PostgreSQL bağlantısı, ortam değişkenleri
+- [ ] **Aşama 2 – Veritabanı ve kullanıcı sistemi:** SQLAlchemy modelleri, kayıt/giriş, karakter profili
+- [ ] **Aşama 3 – Frontend:** ortak tasarım sistemi, temel sayfalar, responsive tasarım, harita ve görev ekranları
+- [ ] **Aşama 4 – Temel oyun sistemi:** mekânlar, NPC'ler, görev kuralları, XP, hikâye durumu
+- [ ] **Aşama 5 – AI entegrasyonu:** AI servis katmanı, NPC diyalogları, hata analizi, JSON doğrulama
+- [ ] **Aşama 6 – Learning Engine:** hata kategorileri, beceri puanları, gelişim verileri
+- [ ] **Aşama 7 – Adaptive Story Engine:** kararlar, NPC ilişkileri, kişiye göre görev seçimi, farklı sonlar
+- [ ] **Aşama 8 – Test ve tamamlama:** unit ve API testleri, demo senaryoları, dokümantasyon
+
+**Sonraki sürümler için fikirler:** sesli konuşma modu, yeni şehirler ve karakterler, premium hikâye
+paketleri, gelişmiş öğrenme analizi, eğitim kurumlarına özel kullanım.
+
+## Ekip
+
+| Ad Soyad | GitHub | Sorumluluk |
+|---|---|---|
+| _eklenecek_ | _eklenecek_ | _eklenecek_ |
+
+---
+
+Bu proje **SENG461 – Web Programming with Python and Git** dersi kapsamında geliştirilmektedir.
