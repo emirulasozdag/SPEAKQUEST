@@ -1,0 +1,361 @@
+/* SpeakQuest design tokens and shared components (on top of Bootstrap 5) */
+
+:root {
+  --sq-ink: #1e2a47;
+  --sq-ink-soft: #4a5672;
+  --sq-paper: #f3f5f9;
+  --sq-surface: #ffffff;
+  --sq-line: #d9dfe9;
+
+  /* Each city line has its own colour, like a transit map */
+  --sq-cafe: #c47812;
+  --sq-apartment: #2f8a5f;
+  --sq-office: #3a62c9;
+
+  --sq-error: #c2412d;
+  --sq-fix: #1f7a4d;
+
+  --sq-font-display: "Bricolage Grotesque", system-ui, sans-serif;
+  --sq-font-body: "Atkinson Hyperlegible", system-ui, sans-serif;
+
+  --bs-body-font-family: var(--sq-font-body);
+  --bs-body-color: var(--sq-ink);
+  --bs-body-bg: var(--sq-paper);
+  --bs-primary: var(--sq-office);
+  --bs-primary-rgb: 58, 98, 201;
+  --bs-link-color: var(--sq-office);
+  --bs-border-color: var(--sq-line);
+}
+
+body {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+h1,
+h2,
+h3,
+.sq-display {
+  font-family: var(--sq-font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+h1 { font-size: clamp(2rem, 4vw + 1rem, 3.5rem); }
+h2 { font-size: clamp(1.5rem, 2vw + 0.75rem, 2rem); }
+h3 { font-size: 1.25rem; }
+
+.sq-lead {
+  font-size: 1.2rem;
+  color: var(--sq-ink-soft);
+  max-width: 60ch;
+}
+
+.sq-readable {
+  max-width: 70ch;
+}
+
+:focus-visible {
+  outline: 3px solid var(--sq-cafe);
+  outline-offset: 2px;
+}
+
+/* ---------- Header / navigation ---------- */
+
+.sq-header {
+  background: var(--sq-ink);
+}
+
+.sq-header .navbar-brand {
+  font-family: var(--sq-font-display);
+  font-weight: 800;
+  color: #fff;
+}
+
+.sq-header .nav-link {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.sq-header .nav-link:hover,
+.sq-header .nav-link[aria-current="page"] {
+  color: #fff;
+}
+
+.sq-header .nav-link[aria-current="page"] {
+  box-shadow: inset 0 -3px 0 var(--sq-cafe);
+}
+
+.sq-status {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.sq-status::before {
+  content: "";
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-right: 0.4rem;
+  border-radius: 50%;
+  background: #8a93a8;
+}
+
+.sq-status[data-state="ok"]::before { background: #4cc38a; }
+.sq-status[data-state="down"]::before { background: var(--sq-error); }
+
+/* ---------- Footer ---------- */
+
+.sq-footer {
+  border-top: 1px solid var(--sq-line);
+  color: var(--sq-ink-soft);
+  font-size: 0.9rem;
+}
+
+/* ---------- Panels ---------- */
+
+.sq-panel {
+  background: var(--sq-surface);
+  border: 1px solid var(--sq-line);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+.sq-panel-title {
+  font-family: var(--sq-font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+/* Places and quests carry their city line as a station dot, like on the map */
+.sq-line-tag {
+  position: relative;
+  padding-left: 3.25rem;
+}
+
+.sq-line-tag::before {
+  content: "";
+  position: absolute;
+  left: 1.25rem;
+  top: 1.85rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--sq-surface);
+  border: 4px solid var(--sq-line-color, var(--sq-ink));
+}
+
+.sq-cafe { --sq-line-color: var(--sq-cafe); }
+.sq-apartment { --sq-line-color: var(--sq-apartment); }
+.sq-office { --sq-line-color: var(--sq-office); }
+
+/* ---------- Speech bubbles (the core mechanic) ---------- */
+
+.sq-bubble {
+  max-width: 34rem;
+  padding: 0.9rem 1.15rem;
+  border-radius: 1.1rem;
+  background: var(--sq-surface);
+  border: 1px solid var(--sq-line);
+}
+
+.sq-bubble-npc {
+  border-bottom-left-radius: 0.25rem;
+}
+
+.sq-bubble-player {
+  margin-left: auto;
+  background: var(--sq-ink);
+  color: #fff;
+  border-color: var(--sq-ink);
+  border-bottom-right-radius: 0.25rem;
+}
+
+.sq-speaker {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--sq-ink-soft);
+  margin-bottom: 0.25rem;
+}
+
+.sq-correction {
+  max-width: 34rem;
+  margin-left: auto;
+  font-size: 0.95rem;
+  color: var(--sq-ink-soft);
+}
+
+.sq-wrong {
+  text-decoration: line-through;
+  text-decoration-color: var(--sq-error);
+  text-decoration-thickness: 2px;
+  color: var(--sq-error);
+}
+
+.sq-right {
+  color: var(--sq-fix);
+  font-weight: 700;
+}
+
+.sq-bubble-player .sq-wrong { color: #ffb4a6; text-decoration-color: #ffb4a6; }
+.sq-bubble-player .sq-right { color: #9be7bf; }
+
+/* ---------- Landing hero ---------- */
+
+.sq-hero {
+  background: var(--sq-ink);
+  color: #fff;
+  padding: 3rem 1rem;
+}
+
+.sq-hero .sq-lead {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.sq-hero .sq-bubble-npc {
+  color: var(--sq-ink);
+}
+
+.sq-hero .sq-correction {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.sq-hero-title {
+  font-size: clamp(2.5rem, 6vw + 1rem, 4.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.sq-steps {
+  counter-reset: step;
+  list-style: none;
+  padding: 0;
+}
+
+.sq-steps li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 3.25rem;
+}
+
+.sq-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sq-ink);
+  color: #fff;
+  font-family: var(--sq-font-display);
+  font-weight: 700;
+}
+
+/* ---------- City map (transit diagram) ---------- */
+
+.sq-map {
+  width: 100%;
+  height: auto;
+}
+
+.sq-map .sq-track {
+  fill: none;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sq-map .sq-station circle {
+  fill: #fff;
+  stroke: var(--sq-ink);
+  stroke-width: 5;
+}
+
+.sq-map .sq-station text {
+  font-family: var(--sq-font-display);
+  font-weight: 700;
+  font-size: 22px;
+  fill: var(--sq-ink);
+}
+
+.sq-map .sq-station.is-locked circle {
+  stroke: #a3abbd;
+  stroke-dasharray: 6 5;
+}
+
+.sq-map .sq-station.is-locked text {
+  fill: #8a93a8;
+}
+
+.sq-map a:focus-visible circle {
+  stroke: var(--sq-cafe);
+  stroke-width: 8;
+}
+
+/* ---------- Progress ---------- */
+
+.sq-xp {
+  height: 0.75rem;
+  background: var(--sq-line);
+}
+
+.sq-xp .progress-bar {
+  background: var(--sq-cafe);
+}
+
+.sq-skill-row {
+  padding-block: 0.75rem;
+}
+
+.sq-skill-row + .sq-skill-row {
+  border-top: 1px solid var(--sq-line);
+}
+
+/* ---------- Placeholder notice ---------- */
+
+.sq-draft-note {
+  background: #fff7e8;
+  border: 1px dashed var(--sq-cafe);
+  color: #7a4d0f;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* ---------- Avatar choices ---------- */
+
+.sq-avatar {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--sq-font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: #fff;
+  background: var(--sq-line-color, var(--sq-ink));
+}
+
+.btn-check:checked + .sq-avatar-option .sq-avatar {
+  outline: 4px solid var(--sq-ink);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

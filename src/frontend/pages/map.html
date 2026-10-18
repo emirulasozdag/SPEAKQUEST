@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The SpeakQuest city map. Choose a place to visit.">
+  <title>City map – SpeakQuest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&amp;display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <header data-component="navbar" data-variant="game"></header>
+
+  <main class="container py-5">
+    <h1 class="h2 mb-2">Where to next?</h1>
+    <p class="text-secondary mb-4">Each line is a part of the city. Places unlock as the story moves on.</p>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="sq-panel">
+          <svg class="sq-map" viewBox="0 0 800 460" role="group" aria-label="City map with three lines">
+            <path class="sq-track" stroke="var(--sq-cafe)" d="M60 120 H360 L460 220" />
+            <path class="sq-track" stroke="var(--sq-apartment)" d="M460 220 L360 320 H120" />
+            <path class="sq-track" stroke="var(--sq-office)" d="M460 220 H740" />
+
+            <a href="/pages/dialogue.html" aria-label="Café, 2 quests available">
+              <g class="sq-station">
+                <circle cx="220" cy="120" r="22" />
+                <text x="190" y="80">Café</text>
+              </g>
+            </a>
+            <a href="/pages/dialogue.html" aria-label="Apartment, 1 quest available">
+              <g class="sq-station">
+                <circle cx="240" cy="320" r="22" />
+                <text x="185" y="375">Apartment</text>
+              </g>
+            </a>
+            <a href="/pages/dialogue.html" aria-label="Office, 2 quests available">
+              <g class="sq-station">
+                <circle cx="620" cy="220" r="22" />
+                <text x="585" y="180">Office</text>
+              </g>
+            </a>
+            <g class="sq-station" aria-hidden="true">
+              <circle cx="460" cy="220" r="14" />
+            </g>
+            <a href="#" data-feature="District unlocking" aria-label="Harbour, locked">
+              <g class="sq-station is-locked">
+                <circle cx="740" cy="220" r="18" />
+                <text x="690" y="270">Harbour</text>
+              </g>
+            </a>
+          </svg>
+        </div>
+      </div>
+
+      <aside class="col-lg-4" aria-labelledby="places-title">
+        <h2 id="places-title" class="sq-panel-title">Places</h2>
+        <div class="d-grid gap-3">
+          <a class="sq-panel sq-line-tag sq-cafe text-decoration-none text-body" href="/pages/dialogue.html">
+            <h3 class="mb-1">Café</h3>
+            <p class="mb-0 small text-secondary">Sam the barista · 2 quests</p>
+          </a>
+          <a class="sq-panel sq-line-tag sq-apartment text-decoration-none text-body" href="/pages/dialogue.html">
+            <h3 class="mb-1">Apartment</h3>
+            <p class="mb-0 small text-secondary">Mrs. Novak, landlord · 1 quest</p>
+          </a>
+          <a class="sq-panel sq-line-tag sq-office text-decoration-none text-body" href="/pages/dialogue.html">
+            <h3 class="mb-1">Office</h3>
+            <p class="mb-0 small text-secondary">Ms. Carter, interviewer · 2 quests</p>
+          </a>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer data-component="footer"></footer>
+</body>
+</html>

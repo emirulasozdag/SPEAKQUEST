@@ -1,0 +1,41 @@
+# Local development stack: PostgreSQL + FastAPI (which also serves the frontend).
+# Start with: docker compose up --build   ->  http://localhost:8000
+# Values come from .env when present, otherwise the development defaults below are used.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-speakquest}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-speakquest}
+      POSTGRES_DB: ${POSTGRES_DB:-speakquest}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./src/api
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-speakquest}:${POSTGRES_PASSWORD:-speakquest}@db:5432/${POSTGRES_DB:-speakquest}
+      SECRET_KEY: ${SECRET_KEY:-dev-only-change-me}
+      AI_PROVIDER: ${AI_PROVIDER:-}
+      AI_API_KEY: ${AI_API_KEY:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    # Mount the source so code changes reload without rebuilding the image
+    volumes:
+      - ./src/api:/app
+      - ./src/frontend:/frontend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  db-data:

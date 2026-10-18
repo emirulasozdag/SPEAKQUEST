@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Talk to characters in English and complete your quest.">
+  <title>The Job Interview – SpeakQuest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&amp;display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <header data-component="navbar" data-variant="game"></header>
+
+  <main class="container py-4">
+    <p class="sq-draft-note px-3 py-2 mb-4">UI draft: this conversation is sample content. AI replies arrive in the AI integration phase.</p>
+
+    <div class="row g-4">
+      <aside class="col-lg-3 order-lg-1" aria-labelledby="objective-title">
+        <div class="sq-panel sq-line-tag sq-office">
+          <p class="small text-secondary mb-1">Office · Ms. Carter</p>
+          <h1 class="h4 mb-3">The Job Interview</h1>
+          <h2 id="objective-title" class="sq-panel-title mb-2">Your goal</h2>
+          <p class="mb-3">Tell the interviewer about your previous job and why you want this one.</p>
+          <div class="progress sq-xp mb-1" role="progressbar" aria-label="Quest progress" aria-valuenow="1" aria-valuemin="0" aria-valuemax="3">
+            <div class="progress-bar" style="width: 33%"></div>
+          </div>
+          <p class="small text-secondary mb-0">Step 1 of 3</p>
+        </div>
+      </aside>
+
+      <section class="col-lg-6 order-lg-2" aria-labelledby="conversation-title">
+        <h2 id="conversation-title" class="visually-hidden">Conversation</h2>
+        <div class="d-flex flex-column gap-3 mb-4" aria-live="polite">
+          <div class="sq-bubble sq-bubble-npc">
+            <p class="sq-speaker">Ms. Carter</p>
+            <p class="mb-0">Good morning! Thanks for coming in. Please, have a seat.</p>
+          </div>
+          <div class="sq-bubble sq-bubble-player">
+            <p class="mb-0">Good morning. Thank you for inviting me.</p>
+          </div>
+          <div class="sq-bubble sq-bubble-npc">
+            <p class="sq-speaker">Ms. Carter</p>
+            <p class="mb-0">Can you tell me about your previous experience?</p>
+          </div>
+          <div class="sq-bubble sq-bubble-player">
+            <p class="mb-0">Last year I <span class="sq-wrong">work</span> <span class="sq-right">worked</span> in a restaurant.</p>
+          </div>
+          <p class="sq-correction text-end mb-0">She understood you, so the interview goes on.</p>
+        </div>
+
+        <form class="sq-panel p-3" data-feature="Sending messages to characters">
+          <label for="player-message" class="form-label">Your reply</label>
+          <textarea class="form-control mb-3" id="player-message" name="message" rows="2" placeholder="Write your answer in English"></textarea>
+          <div class="d-flex justify-content-between gap-2">
+            <button type="button" class="btn btn-outline-secondary" data-feature="Leaving a quest">Leave quest</button>
+            <button type="submit" class="btn btn-primary">Send</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="col-lg-3 order-lg-3" aria-labelledby="feedback-title">
+        <div class="sq-panel">
+          <h2 id="feedback-title" class="sq-panel-title">Feedback</h2>
+          <p class="small text-secondary mb-1">Past Simple</p>
+          <p class="mb-2"><span class="sq-wrong">I work</span> → <span class="sq-right">I worked</span></p>
+          <p class="small mb-3">"Last year" is a finished time, so the verb takes its past form.</p>
+          <hr>
+          <p class="small text-secondary mb-0">Communication: understood ✓</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer data-component="footer"></footer>
+</body>
+</html>

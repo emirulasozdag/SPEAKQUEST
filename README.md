@@ -11,7 +11,7 @@ Sistem oyuncunun dil hatalarını takip eder ve sonraki görevleri bu hatalara g
 Örneğin oyuncu geçmiş zamanda sürekli hata yapıyorsa, hikâyenin doğal akışı içinde geçmiş zaman
 kullanmayı gerektiren yeni bir görev açılır.
 
-> **Proje durumu:** Geliştirme aşamasında. Bu README proje ilerledikçe güncellenecektir.
+> **Proje durumu:** Proje iskeleti hazır (FastAPI, PostgreSQL, Docker, UI taslağı). Bu README proje ilerledikçe güncellenecektir.
 
 ---
 
@@ -177,6 +177,7 @@ Güvenlik ve tutarlılık için şu kurallar uygulanır:
 | Backend | Python, FastAPI, REST API |
 | Veritabanı | PostgreSQL, SQLAlchemy ORM |
 | Yapay Zekâ | Gemini API veya OpenAI API (karar verilecek) |
+| Altyapı | Docker, Docker Compose, Alembic (migration), GitHub Actions (CI) |
 | Araçlar | Git, GitHub, VS Code, Postman, pytest |
 
 Frontend bilinçli olarak framework kullanmadan (React, Vue vb. olmadan) saf HTML, CSS, JavaScript ve
@@ -213,84 +214,87 @@ Bir mesajın yolculuğu:
 
 ## Klasör Yapısı
 
-Planlanan yapı (proje ilerledikçe güncellenecektir):
-
 ```
 SPEAKQUEST/
 ├── .github/
-│   ├── CODEOWNERS                  # klasör sorumluları
+│   ├── workflows/ci.yml            # her PR'da pytest çalıştıran GitHub Actions
+│   ├── ISSUE_TEMPLATE/             # görev ve hata şablonları
 │   └── pull_request_template.md
 ├── src/
 │   ├── api/                        # FastAPI backend
 │   │   ├── app/
-│   │   │   ├── main.py
-│   │   │   ├── core/               # ayarlar, güvenlik, veritabanı bağlantısı
+│   │   │   ├── main.py             # uygulama girişi, router'lar ve frontend servisi
+│   │   │   ├── core/               # ayarlar, veritabanı bağlantısı, yardımcılar
 │   │   │   ├── models/             # SQLAlchemy modelleri
 │   │   │   ├── schemas/            # Pydantic şemaları
-│   │   │   ├── routers/            # REST endpointleri
+│   │   │   ├── routers/            # REST endpointleri (/api/...)
 │   │   │   ├── services/ai/        # LLM istemcisi ve prompt'lar
 │   │   │   └── engines/            # learning, story, quest motorları
-│   │   └── tests/                  # pytest testleri
+│   │   ├── alembic/                # veritabanı migration'ları
+│   │   ├── tests/                  # pytest testleri
+│   │   ├── Dockerfile
+│   │   ├── requirements.txt        # çalışma bağımlılıkları
+│   │   └── requirements-dev.txt    # test bağımlılıkları
 │   └── frontend/                   # HTML, CSS, JS, Bootstrap
-│       ├── pages/
-│       ├── css/
-│       ├── js/
+│       ├── index.html              # landing sayfası
+│       ├── pages/                  # diğer sayfalar
+│       ├── css/main.css            # tasarım değişkenleri ve ortak bileşenler
+│       ├── js/                     # api istemcisi, durum yönetimi, ortak bileşenler
 │       └── assets/
-├── docs/                           # teknik kararlar ve diyagramlar
+├── docker-compose.yml              # PostgreSQL + API geliştirme ortamı
 ├── .env.example                    # örnek ortam değişkenleri (gerçek anahtar içermez)
-├── requirements.txt
 └── README.md
 ```
 
 ## Kurulum ve Çalıştırma
 
-> Aşağıdaki adımlar planlanan kurulumu tarif eder. Kod eklendikçe komutlar kesinleştirilecektir.
+> **Proje durumu:** İskelet hazır. Sayfalar UI taslağıdır; backend endpointleri tanımlıdır ancak
+> henüz `501 Not Implemented` döner. Özellikler yol haritasındaki sırayla eklenecektir.
 
-**Gereksinimler:** Python 3.11+, PostgreSQL 15+, Git, bir Gemini veya OpenAI API anahtarı.
+### Docker ile (önerilen)
 
-1. Depoyu klonlayın:
+**Gereksinimler:** Git ve [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
-   ```bash
-   git clone https://github.com/emirulasozdag/SPEAKQUEST.git
-   cd SPEAKQUEST
-   ```
+```bash
+git clone https://github.com/emirulasozdag/SPEAKQUEST.git
+cd SPEAKQUEST
+docker compose up --build
+```
 
-2. Sanal ortam oluşturup bağımlılıkları kurun:
+| Adres | İçerik |
+|---|---|
+| http://localhost:8000 | Uygulama (frontend) |
+| http://localhost:8000/api/docs | Otomatik API dokümantasyonu (Swagger) |
+| http://localhost:8000/api/health | API ve veritabanı durumu |
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate      # Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+`.env` dosyası olmadan da geliştirme varsayılanlarıyla çalışır. Değerleri değiştirmek için
+`.env.example` dosyasını `.env` olarak kopyalayın. `.env` dosyası `.gitignore` içindedir ve asla
+commitlenmez. Kod ve sayfa değişiklikleri container yeniden başlatılmadan yansır. Durdurmak için
+`docker compose down` kullanılır.
 
-3. PostgreSQL'de bir veritabanı oluşturun:
+PostgreSQL bilgisayarınızda **5433** portundan erişilebilir (yerel bir PostgreSQL ile çakışmaması
+için). Gerekirse `.env` içindeki `POSTGRES_PORT` ile değiştirilebilir.
 
-   ```sql
-   CREATE DATABASE speakquest;
-   ```
+### Docker olmadan (yalnızca backend geliştirme)
 
-4. `.env.example` dosyasını `.env` olarak kopyalayıp değerleri doldurun:
+**Gereksinimler:** Python 3.12+ ve çalışan bir PostgreSQL (örneğin `docker compose up db`).
 
-   ```env
-   DATABASE_URL=postgresql://kullanici:sifre@localhost:5432/speakquest
-   SECRET_KEY=uzun-rastgele-bir-deger
-   AI_PROVIDER=gemini
-   AI_API_KEY=buraya-api-anahtari
-   ```
+```bash
+cd src/api
+python -m venv .venv
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
+pip install -r requirements-dev.txt
+uvicorn app.main:app --reload
+```
 
-   `.env` dosyası `.gitignore` içindedir ve asla commitlenmez.
+### Veritabanı migration'ları
 
-5. Backend'i başlatın:
+Modeller `src/api/app/models/` altına eklendikçe Alembic ile migration oluşturulur:
 
-   ```bash
-   uvicorn src.api.app.main:app --reload
-   ```
-
-   API varsayılan olarak `http://localhost:8000` adresinde çalışır. Otomatik oluşturulan API
-   dokümantasyonu `http://localhost:8000/docs` adresindedir.
-
-6. Frontend'i tarayıcıda açın (backend üzerinden servis edilir ya da
-   `src/frontend/` klasöründe basit bir statik sunucu ile çalıştırılabilir).
+```bash
+docker compose exec api alembic revision --autogenerate -m "create users table"
+docker compose exec api alembic upgrade head
+```
 
 ## Kullanım
 
@@ -324,11 +328,15 @@ değil, backend kurallarıyla doğrulanarak yapılır.
 
 ## Test
 
-Backend testleri `pytest` ile yazılır ve çalıştırılır:
+Backend testleri `pytest` ile yazılır. Her Pull Request'te GitHub Actions üzerinde otomatik çalışır.
+Yerelde çalıştırmak için:
 
 ```bash
-pytest
+docker compose exec api pip install -r requirements-dev.txt
+docker compose exec api python -m pytest
 ```
+
+ya da Docker olmadan `src/api` klasöründe `pytest`.
 
 Testlerde öncelik verilen alanlar:
 
@@ -357,7 +365,8 @@ Proje GitHub Flow ile geliştirilir:
 
 ## Yol Haritası
 
-- [ ] **Aşama 1 – Altyapı:** klasör yapısı, FastAPI projesi, PostgreSQL bağlantısı, ortam değişkenleri
+- [x] **Aşama 1 – Altyapı:** klasör yapısı, FastAPI projesi, PostgreSQL bağlantısı, ortam değişkenleri,
+  Docker, CI ve tüm sayfaların UI taslağı
 - [ ] **Aşama 2 – Veritabanı ve kullanıcı sistemi:** SQLAlchemy modelleri, kayıt/giriş, karakter profili
 - [ ] **Aşama 3 – Frontend:** ortak tasarım sistemi, temel sayfalar, responsive tasarım, harita ve görev ekranları
 - [ ] **Aşama 4 – Temel oyun sistemi:** mekânlar, NPC'ler, görev kuralları, XP, hikâye durumu
