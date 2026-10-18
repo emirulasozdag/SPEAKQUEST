@@ -3,10 +3,9 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
-class RegisterRequest(BaseModel):
+class _Credentials(BaseModel):
     email: EmailStr
-    # bcrypt only uses the first 72 bytes of a password, so longer ones are rejected
-    password: str = Field(min_length=8, max_length=72)
+    password: str
 
     @field_validator("email")
     @classmethod
@@ -16,9 +15,24 @@ class RegisterRequest(BaseModel):
     @field_validator("password")
     @classmethod
     def fits_bcrypt_limit(cls, value: str) -> str:
+        # bcrypt only uses the first 72 bytes of a password, so longer ones are rejected
         if len(value.encode("utf-8")) > 72:
             raise ValueError("Password must be at most 72 bytes long")
         return value
+
+
+class RegisterRequest(_Credentials):
+    password: str = Field(min_length=8, max_length=72)
+
+
+class LoginRequest(_Credentials):
+    password: str = Field(min_length=1, max_length=72)
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    expires_in: int
 
 
 class UserResponse(BaseModel):

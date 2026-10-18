@@ -248,8 +248,10 @@ SPEAKQUEST/
 
 ## Kurulum ve Çalıştırma
 
-> **Proje durumu:** İskelet hazır ve **kayıt olma** çalışıyor (`POST /api/auth/register`, kayıt
-> sayfası). Diğer sayfalar UI taslağıdır; henüz yazılmamış endpointler `501 Not Implemented` döner.
+> **Proje durumu:** İskelet hazır; **kayıt olma** ve **giriş yapma** çalışıyor
+> (`POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`, kayıt ve giriş
+> sayfaları). Giriş başarılı olunca 24 saat geçerli bir erişim token'ı (JWT) verilir. Diğer
+> sayfalar UI taslağıdır; henüz yazılmamış endpointler `501 Not Implemented` döner.
 > Özellikler yol haritasındaki sırayla eklenecektir.
 
 ### Docker ile (önerilen)
