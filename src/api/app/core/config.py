@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     database_url: str = "postgresql+psycopg://speakquest:speakquest@localhost:5433/speakquest"
     secret_key: str = "dev-only-change-me"
+    access_token_expire_minutes: int = 60 * 24
 
     ai_provider: str = ""
     ai_api_key: str = ""

@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
   <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/pages/register.js"></script>
 </head>
 <body>
   <header data-component="navbar" data-variant="public"></header>
@@ -22,25 +23,29 @@
         <h1 class="h2 mb-2">Create your account</h1>
         <p class="text-secondary mb-4">Next, you will create the character who moves to the city.</p>
 
-        <form class="sq-panel" data-feature="Registration" novalidate>
+        <div id="register-alert" role="alert" hidden></div>
+
+        <form id="register-form" class="sq-panel" novalidate>
           <div class="mb-3">
             <label for="register-email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="register-email" name="email" autocomplete="email" required>
+            <input type="email" class="form-control" id="register-email" name="email" autocomplete="email" required aria-describedby="register-email-error">
+            <div id="register-email-error" class="invalid-feedback"></div>
           </div>
           <div class="mb-3">
             <label for="register-password" class="form-label">Password</label>
-            <input type="password" class="form-control" id="register-password" name="password" autocomplete="new-password" minlength="8" required aria-describedby="register-password-help">
+            <input type="password" class="form-control" id="register-password" name="password" autocomplete="new-password" minlength="8" maxlength="72" required aria-describedby="register-password-help register-password-error">
             <div id="register-password-help" class="form-text">At least 8 characters.</div>
+            <div id="register-password-error" class="invalid-feedback"></div>
           </div>
           <div class="mb-4">
             <label for="register-password-confirm" class="form-label">Repeat password</label>
-            <input type="password" class="form-control" id="register-password-confirm" name="password_confirm" autocomplete="new-password" required>
+            <input type="password" class="form-control" id="register-password-confirm" name="password_confirm" autocomplete="new-password" required aria-describedby="register-password-confirm-error">
+            <div id="register-password-confirm-error" class="invalid-feedback"></div>
           </div>
           <button type="submit" class="btn btn-primary w-100">Create account</button>
         </form>
 
         <p class="mt-4 text-center">Already playing? <a href="/pages/login.html">Log in</a></p>
-        <p class="text-center small"><a href="/pages/character.html">Preview character creation</a></p>
       </div>
     </div>
   </main>
