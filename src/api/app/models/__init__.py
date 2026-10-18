@@ -5,5 +5,6 @@ and must be imported below, so Alembic can detect it when generating migrations.
 """
 
 from app.core.database import Base
+from app.models.user import User
 
-__all__ = ["Base"]
+__all__ = ["Base", "User"]

@@ -16,10 +16,25 @@ export async function apiRequest(path, { method = "GET", body, token } = {}) {
 
   const data = await response.json().catch(() => null);
   if (!response.ok) {
-    const message = data?.detail ?? `Request failed with status ${response.status}`;
-    throw new Error(message);
+    throw new ApiError(response.status, data?.detail);
   }
   return data;
+}
+
+// detail is a string for most errors, or a list of field errors for validation (422) responses
+export class ApiError extends Error {
+  constructor(status, detail) {
+    const message = Array.isArray(detail)
+      ? detail.map((error) => error.msg).join(" ")
+      : detail ?? `Request failed with status ${status}`;
+    super(message);
+    this.status = status;
+    this.fieldErrors = Array.isArray(detail) ? detail : [];
+  }
+}
+
+export function registerUser(email, password) {
+  return apiRequest("/auth/register", { method: "POST", body: { email, password } });
 }
 
 export function getHealth() {

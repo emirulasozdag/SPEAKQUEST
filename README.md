@@ -248,8 +248,9 @@ SPEAKQUEST/
 
 ## Kurulum ve Çalıştırma
 
-> **Proje durumu:** İskelet hazır. Sayfalar UI taslağıdır; backend endpointleri tanımlıdır ancak
-> henüz `501 Not Implemented` döner. Özellikler yol haritasındaki sırayla eklenecektir.
+> **Proje durumu:** İskelet hazır ve **kayıt olma** çalışıyor (`POST /api/auth/register`, kayıt
+> sayfası). Diğer sayfalar UI taslağıdır; henüz yazılmamış endpointler `501 Not Implemented` döner.
+> Özellikler yol haritasındaki sırayla eklenecektir.
 
 ### Docker ile (önerilen)
 
@@ -289,12 +290,16 @@ uvicorn app.main:app --reload
 
 ### Veritabanı migration'ları
 
-Modeller `src/api/app/models/` altına eklendikçe Alembic ile migration oluşturulur:
+Bekleyen migration'lar API container'ı her başladığında otomatik uygulanır (`alembic upgrade head`).
+Yeni bir model `src/api/app/models/` altına eklenince migration şöyle oluşturulur:
 
 ```bash
-docker compose exec api alembic revision --autogenerate -m "create users table"
-docker compose exec api alembic upgrade head
+docker compose exec api alembic revision --autogenerate -m "create player_profiles table"
+docker compose restart api
 ```
+
+Mevcut tablolar: `users` (id, email, password_hash, created_at). Şifreler yalnızca bcrypt hash'i
+olarak saklanır.
 
 ## Kullanım
 
