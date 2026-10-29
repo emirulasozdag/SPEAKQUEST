@@ -4,7 +4,7 @@ Bu doküman SpeakQuest MVP'sinin veritabanı sözleşmesidir. Bir tabloyu ekleye
 bu dosyayı da günceller. Tablolar SQLAlchemy modelleri olarak `src/api/app/models/` altında yazılır
 ve her değişiklik tek bir Alembic migration zincirine eklenir.
 
-**Durum:** `users` ve `player_profiles` uygulandı. Diğer tablolar önerilen tasarımdır; sahibi olan
+**Durum:** `users`, `player_profiles`, `locations`, `npcs` ve `quest_templates` uygulandı. Diğer tablolar önerilen tasarımdır; sahibi olan
 iş paketi uygularken alanları netleştirir ve bu dosyayı günceller.
 
 ## Genel kurallar
@@ -70,7 +70,7 @@ Oyuncunun karakteri. Her hesabın en fazla bir profili olur.
 Mevcut bölüm ve konum `story_states`'te, aktif görev `quest_progress`'te tutulur. Profil bunları
 kopyalamaz, API cevabında bir araya getirilir.
 
-### `locations` · #9
+### `locations` · uygulandı (#9)
 
 | Alan | Tip | Not |
 |---|---|---|
@@ -82,7 +82,7 @@ kopyalamaz, API cevabında bir araya getirilir.
 
 Mekânın kilitli olup olmadığı saklanmaz. Story Engine bunu oyuncunun durumuna göre hesaplar.
 
-### `npcs` · #9
+### `npcs` · uygulandı (#9)
 
 | Alan | Tip | Not |
 |---|---|---|
@@ -95,7 +95,7 @@ Mekânın kilitli olup olmadığı saklanmaz. Story Engine bunu oyuncunun durumu
 | speaking_style | text | prompt'a girer |
 | knows | JSON | NPC'nin bildiği hikâye bilgileri; prompt'a girer |
 
-### `quest_templates` · #9 (içerik formatı #5)
+### `quest_templates` · uygulandı (#9, içerik formatı #5)
 
 | Alan | Tip | Not |
 |---|---|---|
@@ -120,6 +120,20 @@ Mekânın kilitli olup olmadığı saklanmaz. Story Engine bunu oyuncunun durumu
 İçerik dosyalarında mekân ve NPC slug ile gösterilir; seed komutu (#9) bunları id'lere çevirir ve
 `app/content/schema.py` içindeki `load_content()` ile doğrulanmış içeriği okur. Tablo, bu
 dosyaların sorgulanabilir kopyasıdır.
+
+**Seed (`python -m app.content.seed`):** satırları `slug` ile eşler. Yeni slug eklenir, değişen satır
+aynı `id` ile yerinde güncellenir (oyuncu ilerlemesi geçerli kalır), değişmeyen satıra dokunulmaz;
+ikinci çalıştırma hiçbir şeyi değiştirmez. İçerik dosyasından silinen satır **silinmez**, çünkü
+oyuncunun o görevde ilerlemesi olabilir; içerik kaldırmak bilinçli bir migration işidir. Docker
+başlangıcında `alembic upgrade head`'den sonra çalışır.
+
+**API:** `GET /api/locations` ve `GET /api/locations/{id}` mekânı, NPC'lerini (`id, slug, name, role`)
+ve görevleri (`id, slug, title, chapter, summary, npc_slug, status`) döner. `personality`,
+`speaking_style`, `knows`, `npc_opening`, `rewards` ve `prerequisites` oyuncuya hiç gönderilmez
+(hikâye bilgisi içerebilirler, yalnızca sunucuda ve AI prompt'unda kullanılırlar). Görev `status`
+değeri `services/quests.py` içindeki `quest_statuses()` ile hesaplanır; ön koşulsuz görev `available`,
+diğerleri `locked` döner. Oyuncu ilerlemesi (`active`, `completed`) #7 ile, bayrak ve güven
+koşulları #13 ile bu fonksiyona eklenir; endpoint değişmez.
 
 Hikâye sonları (`endings.json`) tabloya yazılmaz; Story Engine onları doğrudan içerik
 dosyasından okur. Oyuncunun ulaştığı son `story_states.ending` alanında slug olarak tutulur.
