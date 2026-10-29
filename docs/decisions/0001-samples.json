@@ -1,0 +1,12 @@
+[
+  {"id": 1, "category": "present_simple", "context": "Morning at the Café; the barista asks what the player does every morning.", "player": "She go to work every day and I drink coffee."},
+  {"id": 2, "category": "present_simple", "context": "Meet Your Neighbor; the neighbor asks about the player's routine.", "player": "My brother work in a bank and he don't like it."},
+  {"id": 3, "category": "past_simple", "context": "The Job Interview; the interviewer asks about previous experience.", "player": "Last year I work in a restaurant."},
+  {"id": 4, "category": "past_simple", "context": "The Missing Backpack; the friend asks what happened yesterday.", "player": "Yesterday I go to school and I leave my bag in the bus."},
+  {"id": 5, "category": "question_formation", "context": "Meet Your Neighbor; the player wants to know where the neighbor lives.", "player": "Where you live?"},
+  {"id": 6, "category": "question_formation", "context": "The Flat Viewing; the player asks the landlord about the rent.", "player": "How much costs the rent for this flat?"},
+  {"id": 7, "category": "prepositions", "context": "The Job Interview; the interviewer asks about the player's strengths.", "player": "I am good in English and I am interested on this job."},
+  {"id": 8, "category": "prepositions", "context": "Morning at the Café; the barista asks where the player is from.", "player": "I arrived to London last week and I live at a small flat."},
+  {"id": 9, "category": "vocabulary_usage", "context": "Meet Your Neighbor; the player asks the neighbor for help with boxes.", "player": "Can you make me a favor? I need help with my boxes."},
+  {"id": 10, "category": "none", "context": "Morning at the Café; the player orders a drink. The sentence is correct.", "player": "Hello, could I have a flat white and a croissant, please?"}
+]
