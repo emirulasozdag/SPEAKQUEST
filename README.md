@@ -250,8 +250,10 @@ SPEAKQUEST/
 
 > **Proje durumu:** İskelet hazır; **kayıt olma** ve **giriş yapma** çalışıyor
 > (`POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`, kayıt ve giriş
-> sayfaları). Giriş başarılı olunca 24 saat geçerli bir erişim token'ı (JWT) verilir. Diğer
-> sayfalar UI taslağıdır; henüz yazılmamış endpointler `501 Not Implemented` döner.
+> sayfaları). Giriş başarılı olunca 24 saat geçerli bir erişim token'ı (JWT) verilir. Oyuncu
+> profili API'si de hazır (`GET` ve `PUT /api/player/profile`); karakter oluşturma sayfasının bu
+> API'ye bağlanması #6'dadır. Diğer sayfalar UI taslağıdır; henüz yazılmamış endpointler
+> `501 Not Implemented` döner.
 > Özellikler yol haritasındaki sırayla eklenecektir.
 
 ### Docker ile (önerilen)
@@ -300,8 +302,9 @@ docker compose exec api alembic revision --autogenerate -m "create player_profil
 docker compose restart api
 ```
 
-Mevcut tablolar: `users` (id, email, password_hash, created_at). Şifreler yalnızca bcrypt hash'i
-olarak saklanır.
+Mevcut tablolar: `users` ve `player_profiles`. Şifreler yalnızca bcrypt hash'i olarak saklanır.
+Tüm MVP tabloları, ilişkileri ve hangi iş paketine ait oldukları [docs/data-model.md](docs/data-model.md)
+içinde anlatılır. Yeni bir tablo ekleyen PR bu dokümanı da günceller.
 
 ## Kullanım
 
@@ -328,6 +331,12 @@ olarak saklanır.
 | Dialogue | `POST /dialogue/message`, `GET /dialogue/history/{quest_id}` |
 | Learning | `GET /learning/errors`, `GET /learning/skills`, `GET /learning/recommendations` |
 | Story | `GET /story/state`, `POST /story/decision` |
+
+**Oyuncu profili:** `PUT /api/player/profile` gövdesi `character_name` (1–30 karakter), `avatar`
+(1–3), `english_level` (`A2`, `B1`) ve `learning_goal` (`everyday`, `work`, `grammar`) alır. İlk
+çağrı karakteri oluşturur (`201`), sonraki çağrılar günceller (`200`). `xp` ve `level` istemciden
+gönderilirse istek `422` ile reddedilir; bu değerleri yalnızca backend kuralları değiştirir.
+Karakter henüz oluşturulmadıysa `GET /api/player/profile` `404` döner.
 
 Tüm endpointler kimlik doğrulama, yetkilendirme ve girdi doğrulaması içerir. Her kullanıcı yalnızca
 kendi verisine erişebilir. Görev tamamlama gibi kritik işlemler istemciden gelen değerlere güvenilerek

@@ -1,0 +1,247 @@
+# Veri Modeli
+
+Bu doküman SpeakQuest MVP'sinin veritabanı sözleşmesidir. Bir tabloyu ekleyen veya değiştiren PR
+bu dosyayı da günceller. Tablolar SQLAlchemy modelleri olarak `src/api/app/models/` altında yazılır
+ve her değişiklik tek bir Alembic migration zincirine eklenir.
+
+**Durum:** `users` ve `player_profiles` uygulandı. Diğer tablolar önerilen tasarımdır; sahibi olan
+iş paketi uygularken alanları netleştirir ve bu dosyayı günceller.
+
+## Genel kurallar
+
+- Her tablonun `id` adında tam sayı birincil anahtarı vardır.
+- Oyuncuya ait her tablo `user_id` üzerinden `users.id`'ye bağlanır ve `ON DELETE CASCADE` kullanır.
+  Böylece bir hesap silinince tüm oyun verisi de silinir.
+- Endpoint'ler oyuncu verisini her zaman token'daki kullanıcının `user_id`'siyle süzer. Hiçbir endpoint
+  istemciden gelen bir `user_id`'ye güvenmez.
+- İçerik tabloları (`locations`, `npcs`, `quest_templates`) oyuncuya ait değildir. İçerik dosyalarından
+  seed komutuyla yüklenir ve `slug` ile tanımlanır, böylece seed tekrar çalıştırılabilir.
+- Sabit değer kümeleri (seviye, kategori, durum) `String` + `CheckConstraint` olarak saklanır. Bu hem
+  PostgreSQL'de hem de testlerdeki SQLite'ta aynı şekilde çalışır. Geçerli değerler Python'da tek bir
+  yerde tanımlanır ve kod oradan okur.
+- Zaman damgaları `DateTime(timezone=True)` ve `server_default=now()` kullanır.
+- XP, seviye, görev durumu, güven puanı ve hikâye durumu yalnızca backend kurallarıyla değişir.
+  AI çıktısı bu tablolara doğrudan yazılmaz.
+
+## İlişki şeması
+
+```
+users 1──1 player_profiles
+  │
+  ├──1 story_states
+  ├──* npc_relationships  *──1 npcs
+  ├──* story_decisions    *──1 quest_templates
+  ├──* quest_progress     *──1 quest_templates
+  │        └──* dialogue_messages
+  │                 ├──* language_errors
+  │                 └──* skill_observations
+  └──* skill_scores
+
+locations 1──* npcs 1──* quest_templates
+```
+
+## Tablolar
+
+### `users` · uygulandı (#1)
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| email | varchar(255) | unique, index, küçük harfe çevrilmiş |
+| password_hash | varchar(255) | bcrypt |
+| created_at | timestamptz | |
+
+### `player_profiles` · uygulandı (#3)
+
+Oyuncunun karakteri. Her hesabın en fazla bir profili olur.
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| user_id | int FK → users | unique, cascade |
+| character_name | varchar(30) | boş olamaz |
+| avatar | smallint | 1–3 |
+| english_level | varchar(2) | `A2`, `B1` (ileride A1–B2) |
+| learning_goal | varchar(20) | `everyday`, `work`, `grammar` |
+| xp | int | varsayılan 0, yalnızca backend değiştirir |
+| level | int | varsayılan 1, yalnızca backend değiştirir |
+| created_at, updated_at | timestamptz | |
+
+Mevcut bölüm ve konum `story_states`'te, aktif görev `quest_progress`'te tutulur. Profil bunları
+kopyalamaz, API cevabında bir araya getirilir.
+
+### `locations` · #9
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| slug | varchar(40) | unique (`cafe`, `apartment`, `office`) |
+| name | varchar(80) | |
+| description | text | |
+| sort_order | int | haritadaki sıra |
+
+Mekânın kilitli olup olmadığı saklanmaz. Story Engine bunu oyuncunun durumuna göre hesaplar.
+
+### `npcs` · #9
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| slug | varchar(40) | unique (`mia`, `alex`, `olivia`) |
+| location_id | int FK → locations | |
+| name | varchar(60) | |
+| role | varchar(80) | |
+| personality | text | prompt'a girer |
+| speaking_style | text | prompt'a girer |
+
+### `quest_templates` · #9 (içerik formatı #5)
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| slug | varchar(60) | unique |
+| title | varchar(120) | |
+| location_id | int FK → locations | |
+| npc_id | int FK → npcs | |
+| target_skills | JSON | hata kategorisi listesi |
+| min_level, max_level | varchar(2) | seviye aralığı |
+| objectives | JSON | `[{id, description}]`, tamamlama bunlara bakar |
+| prerequisites | JSON | görev, bayrak ve güven eşiği koşulları |
+| rewards | JSON | XP ve güven değişimi |
+| allowed_story_actions | JSON | AI'nın önerebileceği aksiyonların whitelist'i |
+| decision_points | JSON | oyuncu kararları ve seçenekleri |
+
+Şablonların içeriği `src/api/app/content/` altındaki dosyalardır. Tablo, bu dosyaların sorgulanabilir
+kopyasıdır.
+
+### `quest_progress` · #7
+
+Bir oyuncunun bir görevle ilişkisi. Ayrı bir `dialogue_sessions` tablosu yoktur: bir görev denemesi
+aynı zamanda o görevin diyalog oturumudur.
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| user_id | int FK → users | cascade |
+| quest_template_id | int FK → quest_templates | |
+| status | varchar(12) | `active`, `completed` |
+| objectives_met | JSON | backend'in doğruladığı hedef id'leri |
+| xp_awarded | int | tamamlanınca verilen XP, tekrar ödül vermeyi engeller |
+| started_at, completed_at | timestamptz | |
+
+`(user_id, quest_template_id)` unique'tir. Kullanıcı başına yalnızca bir `active` görev olabilir.
+`locked` ve `available` saklanmaz, Story Engine hesaplar.
+
+### `dialogue_messages` · #11
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| quest_progress_id | int FK → quest_progress | cascade, index |
+| role | varchar(6) | `player`, `npc` |
+| text | text | oyuncu mesajı en fazla 500 karakter |
+| communication_success | bool, null | yalnızca oyuncu mesajlarında |
+| created_at | timestamptz | |
+
+Prompt'a yalnızca son N mesaj girer. Tüm geçmiş sadece oyuncunun kendisine gösterilir.
+
+### `language_errors` · #12 (Learning Engine üzerinden yazılır)
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| user_id | int FK → users | cascade, `(user_id, category)` index |
+| message_id | int FK → dialogue_messages | cascade |
+| category | varchar(30) | `present_simple`, `past_simple`, `question_formation`, `prepositions`, `vocabulary_usage` |
+| original | text | |
+| corrected | text | |
+| explanation | text | |
+| created_at | timestamptz | |
+
+### `skill_observations` · #12 / #16
+
+Spec'in istediği "öğrenme fırsatı" kaydı. Bir mesaj bir beceriyi kullanma fırsatı verdiyse, kategori
+başına bir satır yazılır. Fırsat yoksa satır yoktur. Böylece geçmiş zaman içermeyen bir cümle
+Past Simple puanını artırmaz.
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| user_id | int FK → users | cascade, `(user_id, category, created_at)` index |
+| message_id | int FK → dialogue_messages | cascade |
+| category | varchar(30) | `language_errors` ile aynı enum |
+| result | varchar(9) | `correct`, `incorrect` |
+| created_at | timestamptz | |
+
+`skill_scores` bu kayıtlardan hesaplanır. "Son 10 fırsatta 3 hata" gibi tekrar eden hata kuralı da
+bu tabloya bakar.
+
+### `skill_scores` · #16
+
+Learning Engine'in her beceri için hesapladığı özet. `skill_observations`'tan yeniden üretilebilir.
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| user_id | int FK → users | cascade |
+| category | varchar(30) | `(user_id, category)` unique |
+| score | int | 0–100, formül `docs/learning-engine.md` içinde |
+| opportunities | int | |
+| correct_count | int | |
+| error_count | int | |
+| last_practiced_at | timestamptz | |
+
+### `story_states` · #13
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| user_id | int FK → users | unique, cascade |
+| chapter | int | |
+| current_location_id | int FK → locations, null | |
+| flags | JSON | ör. `{"helped_neighbor": true}` |
+| ending | varchar(40), null | ulaşılan son |
+| updated_at | timestamptz | |
+
+Karakter oluşturulduğunda bir kez yaratılır (#13).
+
+### `npc_relationships` · #13
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| user_id | int FK → users | cascade |
+| npc_id | int FK → npcs | `(user_id, npc_id)` unique |
+| trust | int | 0–100, Story Engine sınırlar |
+
+### `story_decisions` · #17
+
+| Alan | Tip | Not |
+|---|---|---|
+| id | int PK | |
+| user_id | int FK → users | cascade |
+| quest_template_id | int FK → quest_templates | |
+| decision_key | varchar(60) | şablondaki karar noktası |
+| choice | varchar(60) | şablondaki seçeneklerden biri |
+| created_at | timestamptz | |
+
+`(user_id, quest_template_id, decision_key)` unique'tir. Aynı karar iki kez verilemez.
+
+## Modüller arası sınırlar
+
+| Modül | Okur | Yazar | AI'ya bağlı mı? |
+|---|---|---|---|
+| AI servisi (`services/ai`) | Prompt için verilen bağlam | Hiçbir tablo | Evet. Sadece doğrulanmış `DialogueAnalysis` döner |
+| Learning Engine (`engines/learning.py`) | `skill_observations`, `language_errors` | `language_errors`, `skill_observations`, `skill_scores` | Hayır |
+| Story Engine (`engines/story.py`) | `story_states`, `npc_relationships`, `story_decisions`, `quest_progress`, `quest_templates` | `story_states`, `npc_relationships`, `story_decisions` | Hayır. AI'nın önerdiği aksiyonu şablonun whitelist'ine göre kabul ya da reddeder |
+| Adaptive Quest Engine (`engines/quest.py`) | Learning ve Story Engine'in sonuçları, `quest_templates` | Hiçbir tablo | Hayır. Sadece öneri ve gerekçe döner |
+| Progression (`engines/progression.py`) | `quest_progress`, `player_profiles` | `player_profiles.xp`, `level`, `quest_progress.xp_awarded` | Hayır |
+
+Bir diyalog mesajında akış şöyledir: router mesajı alır → AI servisi analiz eder → Learning Engine
+hata ve fırsatları kaydeder → Story Engine önerilen aksiyonu doğrular → görev hedefleri güncellenir.
+Bu adımlar tek transaction içinde yapılır. AI hata verirse hiçbir tablo değişmez.
+
+## Kullanıcı verisini silme
+
+Tüm oyuncu tabloları `users`'a `ON DELETE CASCADE` ile bağlıdır. Bir hesabı silmek, ona ait tüm
+oyun ve öğrenme verisini siler. Hesabı koruyup yalnızca ilerlemeyi sıfırlama #29'dadır.

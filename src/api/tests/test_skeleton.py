@@ -15,7 +15,7 @@ def test_health_reports_api_status(client):
 @pytest.mark.parametrize(
     ("method", "path"),
     [
-        ("get", "/api/player/profile"),
+        ("get", "/api/player/progress"),
         ("get", "/api/quests"),
         ("post", "/api/dialogue/message"),
         ("get", "/api/story/state"),
