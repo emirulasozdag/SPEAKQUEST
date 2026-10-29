@@ -281,6 +281,11 @@ docker compose up --build
 commitlenmez. Kod ve sayfa değişiklikleri container yeniden başlatılmadan yansır. Durdurmak için
 `docker compose down` kullanılır.
 
+**AI (NPC diyaloğu) için:** `.env` içine `AI_PROVIDER=gemini` ve kendi `AI_API_KEY` değerinizi yazın
+(ücretsiz anahtar: <https://aistudio.google.com/apikey>). Anahtar boşsa oyun yine çalışır, NPC güvenli bir
+yedek cevap verir ve oyunda hiçbir şey değişmez. Model adı `AI_MODEL` ile değiştirilebilir; seçim gerekçesi
+[docs/decisions/0001-ai-provider.md](docs/decisions/0001-ai-provider.md) içindedir.
+
 PostgreSQL bilgisayarınızda **5433** portundan erişilebilir (yerel bir PostgreSQL ile çakışmaması
 için). Gerekirse `.env` içindeki `POSTGRES_PORT` ile değiştirilebilir.
 

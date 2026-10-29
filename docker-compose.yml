@@ -26,6 +26,8 @@ services:
       SECRET_KEY: ${SECRET_KEY:-dev-only-change-me}
       AI_PROVIDER: ${AI_PROVIDER:-}
       AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL: ${AI_MODEL:-}
+      AI_TIMEOUT_SECONDS: ${AI_TIMEOUT_SECONDS:-20}
     ports:
       - "8000:8000"
     depends_on:
