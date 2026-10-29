@@ -2,7 +2,7 @@
 
 import { ApiError, getCurrentUser, getProfile, handleApiError } from "../api.js";
 import { fillCharacterForm, saveCharacterForm } from "../components/character-form.js";
-import { showAlert } from "../components/form.js";
+import { clearErrorsOnEdit, showAlert } from "../components/form.js";
 import { CHARACTER_PAGE } from "../session.js";
 
 const form = document.querySelector("#character-form");
@@ -43,4 +43,5 @@ form.addEventListener("submit", async (event) => {
   submitButton.textContent = "Save changes";
 });
 
+clearErrorsOnEdit(form);
 loadProfile();

@@ -2,6 +2,7 @@
 
 import { ApiError, getProfile, handleApiError } from "../api.js";
 import { saveCharacterForm } from "../components/character-form.js";
+import { clearErrorsOnEdit } from "../components/form.js";
 import { DASHBOARD_PAGE } from "../session.js";
 
 const form = document.querySelector("#character-form");
@@ -34,4 +35,5 @@ form.addEventListener("submit", async (event) => {
   submitButton.textContent = "Move to the city";
 });
 
+clearErrorsOnEdit(form);
 skipIfCharacterExists();

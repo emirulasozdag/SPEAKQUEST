@@ -18,8 +18,14 @@ export function setFieldError(field, message) {
   feedback.classList.toggle("d-block", Boolean(message));
 }
 
-export function clearFieldErrors(fields) {
-  Object.values(fields).forEach((field) => setFieldError(field, null));
+// Hides a field's error as soon as the player changes that field, so an old message never
+// sits next to a value that has already been fixed.
+export function clearErrorsOnEdit(form) {
+  form.addEventListener("input", (event) => {
+    // closest() also finds a fieldset marked invalid, such as the avatar choice
+    const field = event.target.closest(".is-invalid");
+    if (field) setFieldError(field, null);
+  });
 }
 
 // Shows validation errors from the API (422) next to the matching fields.

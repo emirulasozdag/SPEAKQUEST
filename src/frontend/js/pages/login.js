@@ -2,7 +2,7 @@
 // the dashboard, or character creation for players who have no character yet.
 
 import { ApiError, handleApiError } from "../api.js";
-import { applyFieldErrors, setFieldError, showAlert } from "../components/form.js";
+import { applyFieldErrors, clearErrorsOnEdit, setFieldError, showAlert } from "../components/form.js";
 import { logIn, pageAfterLogin } from "../session.js";
 
 const form = document.querySelector("#login-form");
@@ -12,6 +12,8 @@ const fields = {
   email: form.querySelector("#login-email"),
   password: form.querySelector("#login-password"),
 };
+
+clearErrorsOnEdit(form);
 
 function validate() {
   const errors = {};

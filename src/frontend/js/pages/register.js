@@ -2,7 +2,7 @@
 // in and moves on to character creation.
 
 import { ApiError, LOGIN_PAGE, handleApiError, registerUser } from "../api.js";
-import { applyFieldErrors, setFieldError } from "../components/form.js";
+import { applyFieldErrors, clearErrorsOnEdit, setFieldError } from "../components/form.js";
 import { CHARACTER_PAGE, logIn } from "../session.js";
 
 const form = document.querySelector("#register-form");
@@ -13,6 +13,8 @@ const fields = {
   password: form.querySelector("#register-password"),
   confirm: form.querySelector("#register-password-confirm"),
 };
+
+clearErrorsOnEdit(form);
 
 function validate() {
   const errors = {};
