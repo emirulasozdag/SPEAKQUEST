@@ -126,6 +126,7 @@ yapılandırılmış JSON olarak alınır ve backend tarafından doğrulanır:
       "explanation": "Geçmişte tamamlanmış olaylarda fiilin geçmiş zaman biçimi kullanılır."
     }
   ],
+  "correctly_used": ["prepositions"],
   "feedback": "Good answer! Remember to use the past form of the verb.",
   "suggested_story_action": "interview_positive"
 }
