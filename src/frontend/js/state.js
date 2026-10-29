@@ -23,6 +23,12 @@ export function getSession() {
   return read();
 }
 
+// A session is valid while its access token has not expired.
+export function hasValidSession() {
+  const { token, tokenExpiresAt } = read();
+  return Boolean(token) && Date.now() < (tokenExpiresAt ?? 0);
+}
+
 export function setSession(partial) {
   write({ ...read(), ...partial });
 }

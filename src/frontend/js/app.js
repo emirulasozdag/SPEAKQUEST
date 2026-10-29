@@ -1,13 +1,34 @@
-// Entry point loaded by every page: renders shared components and wires placeholder actions.
+// Entry point loaded by every page: protects game pages, renders shared components and wires
+// placeholder actions.
 
-import { getHealth } from "./api.js";
+import { getHealth, redirectToLogin } from "./api.js";
 import { renderFooter } from "./components/footer.js";
 import { renderNavbar } from "./components/navbar.js";
 import { showToast } from "./components/toast.js";
+import { clearSession, hasValidSession } from "./state.js";
+
+// Pages marked <body data-auth="required"> are only for logged-in players.
+// Returns false when the page is being left for the login page.
+function guardProtectedPage() {
+  if (document.body.dataset.auth === "required" && !hasValidSession()) {
+    redirectToLogin();
+    return false;
+  }
+  return true;
+}
 
 function renderComponents() {
   document.querySelectorAll('[data-component="navbar"]').forEach(renderNavbar);
   document.querySelectorAll('[data-component="footer"]').forEach(renderFooter);
+}
+
+function wireLogout() {
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest('[data-action="logout"]')) return;
+    event.preventDefault();
+    clearSession();
+    window.location.assign("/");
+  });
 }
 
 // Buttons and forms marked with data-feature are planned but not built yet.
@@ -48,6 +69,9 @@ async function showApiStatus() {
   });
 }
 
-renderComponents();
-wirePlannedFeatures();
-showApiStatus();
+if (guardProtectedPage()) {
+  renderComponents();
+  wireLogout();
+  wirePlannedFeatures();
+  showApiStatus();
+}

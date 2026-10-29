@@ -1,8 +1,9 @@
-// Login page: checks the form, exchanges email and password for an access token
-// and opens the dashboard.
+// Login page: checks the form, exchanges email and password for an access token and opens
+// the dashboard, or character creation for players who have no character yet.
 
-import { ApiError, getCurrentUser, loginUser } from "../api.js";
-import { setSession } from "../state.js";
+import { ApiError, handleApiError } from "../api.js";
+import { applyFieldErrors, clearErrorsOnEdit, setFieldError, showAlert } from "../components/form.js";
+import { logIn, pageAfterLogin } from "../session.js";
 
 const form = document.querySelector("#login-form");
 const alertBox = document.querySelector("#login-alert");
@@ -12,18 +13,7 @@ const fields = {
   password: form.querySelector("#login-password"),
 };
 
-function showAlert(message, kind = "danger") {
-  alertBox.className = `alert alert-${kind}`;
-  alertBox.textContent = message;
-  alertBox.hidden = false;
-}
-
-function setFieldError(input, message) {
-  const feedback = form.querySelector(`#${input.id}-error`);
-  input.classList.toggle("is-invalid", Boolean(message));
-  input.setAttribute("aria-invalid", message ? "true" : "false");
-  feedback.textContent = message ?? "";
-}
+clearErrorsOnEdit(form);
 
 function validate() {
   const errors = {};
@@ -51,30 +41,15 @@ form.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
   submitButton.textContent = "Logging in…";
   try {
-    const { access_token: token, expires_in: expiresIn } = await loginUser(
-      fields.email.value.trim(),
-      fields.password.value,
-    );
-    const user = await getCurrentUser(token);
-    setSession({
-      token,
-      tokenExpiresAt: Date.now() + expiresIn * 1000,
-      email: user.email,
-      userId: user.id,
-    });
-    window.location.assign("/pages/dashboard.html");
+    await logIn(fields.email.value.trim(), fields.password.value);
+    window.location.assign(await pageAfterLogin());
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
-      showAlert("Incorrect email or password.");
+      showAlert(alertBox, "Incorrect email or password.");
       fields.password.value = "";
       fields.password.focus();
-    } else if (error instanceof ApiError && error.status === 422) {
-      error.fieldErrors.forEach(({ loc, msg }) => {
-        const input = fields[loc.at(-1)];
-        if (input) setFieldError(input, msg);
-      });
     } else {
-      showAlert("The server could not be reached. Check that it is running and try again.");
+      handleApiError(error, { onFieldErrors: (fieldErrors) => applyFieldErrors(fields, fieldErrors) });
     }
     submitButton.disabled = false;
     submitButton.textContent = "Log in";

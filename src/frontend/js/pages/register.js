@@ -1,8 +1,9 @@
-// Register page: validates the form, creates the account through the API and moves on
-// to character creation.
+// Register page: validates the form, creates the account through the API, logs the new player
+// in and moves on to character creation.
 
-import { ApiError, registerUser } from "../api.js";
-import { setSession } from "../state.js";
+import { ApiError, LOGIN_PAGE, handleApiError, registerUser } from "../api.js";
+import { applyFieldErrors, clearErrorsOnEdit, setFieldError } from "../components/form.js";
+import { CHARACTER_PAGE, logIn } from "../session.js";
 
 const form = document.querySelector("#register-form");
 const alertBox = document.querySelector("#register-alert");
@@ -13,18 +14,7 @@ const fields = {
   confirm: form.querySelector("#register-password-confirm"),
 };
 
-function showAlert(message, kind = "danger") {
-  alertBox.className = `alert alert-${kind}`;
-  alertBox.textContent = message;
-  alertBox.hidden = false;
-}
-
-function setFieldError(input, message) {
-  const feedback = form.querySelector(`#${input.id}-error`);
-  input.classList.toggle("is-invalid", Boolean(message));
-  input.setAttribute("aria-invalid", message ? "true" : "false");
-  feedback.textContent = message ?? "";
-}
+clearErrorsOnEdit(form);
 
 function validate() {
   const errors = {};
@@ -52,26 +42,29 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
+  const email = fields.email.value.trim();
+  const password = fields.password.value;
   submitButton.disabled = true;
   submitButton.textContent = "Creating account…";
   try {
-    const user = await registerUser(fields.email.value.trim(), fields.password.value);
-    setSession({ email: user.email, userId: user.id });
-    showAlert("Account created. Next, create your character.", "success");
-    window.setTimeout(() => window.location.assign("/pages/character.html"), 1200);
+    await registerUser(email, password);
   } catch (error) {
     if (error instanceof ApiError && error.status === 409) {
       setFieldError(fields.email, "An account with this email already exists.");
       fields.email.focus();
-    } else if (error instanceof ApiError && error.status === 422) {
-      error.fieldErrors.forEach(({ loc, msg }) => {
-        const input = fields[loc.at(-1)];
-        if (input) setFieldError(input, msg);
-      });
     } else {
-      showAlert("The server could not be reached. Check that it is running and try again.");
+      handleApiError(error, { onFieldErrors: (fieldErrors) => applyFieldErrors(fields, fieldErrors) });
     }
     submitButton.disabled = false;
     submitButton.textContent = "Create account";
+    return;
+  }
+
+  try {
+    await logIn(email, password);
+    window.location.assign(CHARACTER_PAGE);
+  } catch {
+    // The account exists even if the automatic login failed, so the player can log in by hand
+    window.location.assign(LOGIN_PAGE);
   }
 });

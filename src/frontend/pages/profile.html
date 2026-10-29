@@ -12,8 +12,9 @@
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
   <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/pages/profile.js"></script>
 </head>
-<body>
+<body data-auth="required">
   <header data-component="navbar" data-variant="game"></header>
 
   <main class="container py-5">
@@ -21,20 +22,52 @@
 
     <div class="row g-4">
       <section class="col-lg-7" aria-labelledby="character-title">
-        <form class="sq-panel" data-feature="Saving your profile">
+        <div id="character-alert" role="alert" hidden></div>
+
+        <form id="character-form" class="sq-panel" novalidate>
           <h2 id="character-title" class="sq-panel-title">Character</h2>
-          <div class="mb-3">
-            <label for="profile-name" class="form-label">Character name</label>
-            <input type="text" class="form-control" id="profile-name" name="character_name" value="Alex">
-          </div>
-          <div class="mb-4">
-            <label for="profile-level" class="form-label">English level</label>
-            <select class="form-select" id="profile-level" name="english_level">
-              <option value="A2">A2</option>
-              <option value="B1" selected>B1</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-primary">Save changes</button>
+          <!-- Disabled until the saved character has loaded -->
+          <fieldset id="character-fields" disabled>
+            <div class="mb-3">
+              <label for="character-name" class="form-label">Character name</label>
+              <input type="text" class="form-control" id="character-name" name="character_name" maxlength="30" autocomplete="off" required aria-describedby="character-name-error">
+              <div id="character-name-error" class="invalid-feedback"></div>
+            </div>
+
+            <fieldset id="avatar" class="mb-3" aria-describedby="avatar-error">
+              <legend class="form-label fs-6">Avatar</legend>
+              <div class="d-flex flex-wrap gap-3">
+                <input type="radio" class="btn-check" name="avatar" id="avatar-1" value="1">
+                <label class="sq-avatar-option" for="avatar-1"><span class="sq-avatar sq-cafe">A</span><span class="visually-hidden">Avatar A</span></label>
+                <input type="radio" class="btn-check" name="avatar" id="avatar-2" value="2">
+                <label class="sq-avatar-option" for="avatar-2"><span class="sq-avatar sq-apartment">B</span><span class="visually-hidden">Avatar B</span></label>
+                <input type="radio" class="btn-check" name="avatar" id="avatar-3" value="3">
+                <label class="sq-avatar-option" for="avatar-3"><span class="sq-avatar sq-office">C</span><span class="visually-hidden">Avatar C</span></label>
+              </div>
+              <div id="avatar-error" class="invalid-feedback"></div>
+            </fieldset>
+
+            <div class="mb-3">
+              <label for="english-level" class="form-label">English level</label>
+              <select class="form-select" id="english-level" name="english_level" aria-describedby="english-level-error">
+                <option value="A2">A2 – I can handle simple everyday talk</option>
+                <option value="B1">B1 – I can get by in most situations</option>
+              </select>
+              <div id="english-level-error" class="invalid-feedback"></div>
+            </div>
+
+            <div class="mb-4">
+              <label for="learning-goal" class="form-label">What do you want to get better at?</label>
+              <select class="form-select" id="learning-goal" name="learning_goal" aria-describedby="learning-goal-error">
+                <option value="everyday">Everyday conversation</option>
+                <option value="work">Job interviews and work</option>
+                <option value="grammar">Grammar accuracy</option>
+              </select>
+              <div id="learning-goal-error" class="invalid-feedback"></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </fieldset>
         </form>
       </section>
 
@@ -42,10 +75,10 @@
         <div class="sq-panel">
           <h2 id="account-title" class="sq-panel-title">Account</h2>
           <p class="mb-1 small text-secondary">Email</p>
-          <p>alex@example.com</p>
+          <p id="account-email">Loading…</p>
           <div class="d-grid gap-2">
             <button type="button" class="btn btn-outline-secondary" data-feature="Changing your password">Change password</button>
-            <button type="button" class="btn btn-outline-secondary" data-feature="Logging out">Log out</button>
+            <button type="button" class="btn btn-outline-secondary" data-action="logout">Log out</button>
             <button type="button" class="btn btn-outline-danger" data-feature="Resetting game progress">Reset game progress</button>
           </div>
         </div>
