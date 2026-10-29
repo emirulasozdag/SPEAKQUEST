@@ -12,8 +12,9 @@
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
   <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/pages/character.js"></script>
 </head>
-<body>
+<body data-auth="required">
   <header data-component="navbar" data-variant="public"></header>
 
   <main class="container py-5">
@@ -22,13 +23,16 @@
         <h1 class="h2 mb-2">Who is moving to the city?</h1>
         <p class="text-secondary mb-4">You can change all of this later in your profile.</p>
 
-        <form class="sq-panel" data-feature="Character creation" novalidate>
+        <div id="character-alert" role="alert" hidden></div>
+
+        <form id="character-form" class="sq-panel" novalidate>
           <div class="mb-4">
             <label for="character-name" class="form-label">Character name</label>
-            <input type="text" class="form-control" id="character-name" name="character_name" maxlength="30" required>
+            <input type="text" class="form-control" id="character-name" name="character_name" maxlength="30" autocomplete="off" required aria-describedby="character-name-error">
+            <div id="character-name-error" class="invalid-feedback"></div>
           </div>
 
-          <fieldset class="mb-4">
+          <fieldset id="avatar" class="mb-4" aria-describedby="avatar-error">
             <legend class="form-label fs-6">Avatar</legend>
             <div class="d-flex flex-wrap gap-3">
               <input type="radio" class="btn-check" name="avatar" id="avatar-1" value="1" checked>
@@ -38,23 +42,26 @@
               <input type="radio" class="btn-check" name="avatar" id="avatar-3" value="3">
               <label class="sq-avatar-option" for="avatar-3"><span class="sq-avatar sq-office">C</span><span class="visually-hidden">Avatar C</span></label>
             </div>
+            <div id="avatar-error" class="invalid-feedback"></div>
           </fieldset>
 
           <div class="row g-3 mb-4">
             <div class="col-md-6">
               <label for="english-level" class="form-label">Your English level</label>
-              <select class="form-select" id="english-level" name="english_level">
+              <select class="form-select" id="english-level" name="english_level" aria-describedby="english-level-error">
                 <option value="A2">A2 – I can handle simple everyday talk</option>
                 <option value="B1" selected>B1 – I can get by in most situations</option>
               </select>
+              <div id="english-level-error" class="invalid-feedback"></div>
             </div>
             <div class="col-md-6">
               <label for="learning-goal" class="form-label">What do you want to get better at?</label>
-              <select class="form-select" id="learning-goal" name="learning_goal">
-                <option>Everyday conversation</option>
-                <option>Job interviews and work</option>
-                <option>Grammar accuracy</option>
+              <select class="form-select" id="learning-goal" name="learning_goal" aria-describedby="learning-goal-error">
+                <option value="everyday">Everyday conversation</option>
+                <option value="work">Job interviews and work</option>
+                <option value="grammar">Grammar accuracy</option>
               </select>
+              <div id="learning-goal-error" class="invalid-feedback"></div>
             </div>
           </div>
 

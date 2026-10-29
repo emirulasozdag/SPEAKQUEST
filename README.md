@@ -251,9 +251,10 @@ SPEAKQUEST/
 > **Proje durumu:** İskelet hazır; **kayıt olma** ve **giriş yapma** çalışıyor
 > (`POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`, kayıt ve giriş
 > sayfaları). Giriş başarılı olunca 24 saat geçerli bir erişim token'ı (JWT) verilir. Oyuncu
-> profili API'si de hazır (`GET` ve `PUT /api/player/profile`); karakter oluşturma sayfasının bu
-> API'ye bağlanması #6'dadır. Diğer sayfalar UI taslağıdır; henüz yazılmamış endpointler
-> `501 Not Implemented` döner.
+> profili API'si de hazır (`GET` ve `PUT /api/player/profile`). Kayıt olan kullanıcı otomatik
+> giriş yapar ve karakterini oluşturur; Profile sayfası karakteri gösterir ve günceller. Oyun
+> sayfaları giriş gerektirir, süresi dolan oturum login sayfasına döner. Diğer sayfalar UI
+> taslağıdır; henüz yazılmamış endpointler `501 Not Implemented` döner.
 > Özellikler yol haritasındaki sırayla eklenecektir.
 
 ### Docker ile (önerilen)
