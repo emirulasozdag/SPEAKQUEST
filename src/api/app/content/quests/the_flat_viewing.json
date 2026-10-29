@@ -1,0 +1,24 @@
+{
+  "slug": "the_flat_viewing",
+  "title": "The Flat Viewing",
+  "chapter": 2,
+  "location": "apartment",
+  "npc": "alex",
+  "target_skills": ["question_formation"],
+  "min_level": "A2",
+  "max_level": "B1",
+  "summary": "Alex remembers your help with the boxes and tells you that the bigger flat upstairs is free. Ask the right questions before you decide.",
+  "npc_opening": "Thanks again for helping me the other day! Guess what, the flat upstairs is empty now. I have the key. Do you want to see it? Ask me anything.",
+  "objectives": [
+    { "id": "ask_price", "description": "Ask how much the rent is." },
+    { "id": "ask_details", "description": "Ask about the rooms, the bills or the neighbours." },
+    { "id": "describe_needs", "description": "Explain what you need in a new home." }
+  ],
+  "prerequisites": {
+    "quests_completed": ["meet_your_neighbor"],
+    "flags": ["helped_alex"]
+  },
+  "rewards": { "xp": 80, "trust": { "alex": 10 } },
+  "allowed_story_actions": ["continue", "npc_pleased", "npc_confused", "viewing_positive"],
+  "decision_points": []
+}

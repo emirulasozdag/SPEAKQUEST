@@ -1,0 +1,24 @@
+{
+  "slug": "the_missing_backpack",
+  "title": "The Missing Backpack",
+  "chapter": 3,
+  "location": "cafe",
+  "npc": "mia",
+  "target_skills": ["past_simple", "question_formation"],
+  "min_level": "A2",
+  "max_level": "B1",
+  "summary": "Mia's blue backpack disappeared from the café yesterday afternoon. You watched it for her for a while. Tell her what you saw and ask the right questions to find out what happened.",
+  "npc_opening": "Oh, thank goodness you're here! My backpack is gone. My keys and my notebook were in it. You were here yesterday, right? What did you see?",
+  "objectives": [
+    { "id": "describe_yesterday", "description": "Tell Mia what you did and saw at the café yesterday." },
+    { "id": "ask_questions", "description": "Ask Mia when and where she last had the backpack." },
+    { "id": "suggest_next_step", "description": "Suggest what Mia could do to get the backpack back." }
+  ],
+  "prerequisites": {
+    "quests_completed": ["morning_at_the_cafe"],
+    "flags": ["watched_mia_bag"]
+  },
+  "rewards": { "xp": 120, "trust": { "mia": 15 } },
+  "allowed_story_actions": ["continue", "npc_pleased", "npc_confused", "clue_found"],
+  "decision_points": []
+}

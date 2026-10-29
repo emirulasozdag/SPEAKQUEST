@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "apartment",
+    "name": "Linden House",
+    "description": "An old brick apartment building on Linden Street. The stairs creak, the walls are thin and everyone knows everyone. Your new home.",
+    "sort_order": 1
+  },
+  {
+    "slug": "cafe",
+    "name": "Corner Café",
+    "description": "A small, warm café on the corner of Linden Street. It smells of coffee and cinnamon, and the regulars all know Mia by name.",
+    "sort_order": 2
+  },
+  {
+    "slug": "office",
+    "name": "Bright Path Travel",
+    "description": "A friendly travel agency in the city centre, with maps on the walls and a busy front desk. They are looking for a new customer assistant.",
+    "sort_order": 3
+  }
+]
