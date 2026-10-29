@@ -1,0 +1,38 @@
+{
+  "slug": "meet_your_neighbor",
+  "title": "Meet Your Neighbor",
+  "chapter": 1,
+  "location": "apartment",
+  "npc": "alex",
+  "target_skills": ["present_simple"],
+  "min_level": "A2",
+  "max_level": "B1",
+  "summary": "You arrive at Linden House with two suitcases. Your neighbour Alex is carrying boxes up the stairs. Introduce yourself and tell Alex a little about your life.",
+  "npc_opening": "Oh, hi! You must be the new neighbour. I'm Alex, I live in 3B. Welcome to Linden House! Where are you from?",
+  "objectives": [
+    { "id": "greet", "description": "Greet Alex." },
+    { "id": "introduce_yourself", "description": "Say your name and where you are from." },
+    { "id": "describe_routine", "description": "Tell Alex something you usually do every day or every week." }
+  ],
+  "prerequisites": {},
+  "rewards": { "xp": 50, "trust": { "alex": 5 } },
+  "allowed_story_actions": ["continue", "npc_pleased", "npc_confused"],
+  "decision_points": [
+    {
+      "id": "help_alex_move",
+      "prompt": "Alex is struggling with a heavy box of plant pots. Do you offer to help?",
+      "options": [
+        {
+          "id": "help",
+          "label": "Help Alex carry the boxes upstairs.",
+          "effects": { "flags": ["helped_alex"], "trust": { "alex": 15 } }
+        },
+        {
+          "id": "not_now",
+          "label": "Say you are too tired after the journey.",
+          "effects": {}
+        }
+      ]
+    }
+  ]
+}

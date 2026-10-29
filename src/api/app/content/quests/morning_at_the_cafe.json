@@ -1,0 +1,39 @@
+{
+  "slug": "morning_at_the_cafe",
+  "title": "Morning at the Café",
+  "chapter": 2,
+  "location": "cafe",
+  "npc": "mia",
+  "target_skills": ["vocabulary_usage", "prepositions"],
+  "min_level": "A2",
+  "max_level": "B1",
+  "summary": "Your first morning in the city. Mia runs the Corner Café next to your building. Order breakfast and chat about the neighbourhood.",
+  "npc_opening": "Good morning and welcome to the Corner Café! I haven't seen you before. What can I get you today?",
+  "objectives": [
+    { "id": "greet", "description": "Greet Mia." },
+    { "id": "order", "description": "Order a drink or something to eat." },
+    { "id": "answer_preference", "description": "Answer Mia's question about how you like your order." },
+    { "id": "describe_location", "description": "Say where you live or where something is, for example next to the park." }
+  ],
+  "prerequisites": { "quests_completed": ["meet_your_neighbor"] },
+  "rewards": { "xp": 60, "trust": { "mia": 5 } },
+  "allowed_story_actions": ["continue", "npc_pleased", "npc_confused", "order_taken"],
+  "decision_points": [
+    {
+      "id": "watch_mia_bag",
+      "prompt": "The kitchen timer rings. Mia asks you to keep an eye on her blue backpack behind the counter for a few minutes.",
+      "options": [
+        {
+          "id": "watch",
+          "label": "Say yes and watch the backpack until Mia comes back.",
+          "effects": { "flags": ["watched_mia_bag"], "trust": { "mia": 15 } }
+        },
+        {
+          "id": "in_a_hurry",
+          "label": "Say sorry, you are in a hurry.",
+          "effects": {}
+        }
+      ]
+    }
+  ]
+}

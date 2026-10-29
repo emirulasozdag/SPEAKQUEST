@@ -1,0 +1,21 @@
+{
+  "slug": "the_job_interview",
+  "title": "The Job Interview",
+  "chapter": 2,
+  "location": "office",
+  "npc": "olivia",
+  "target_skills": ["past_simple"],
+  "min_level": "A2",
+  "max_level": "B1",
+  "summary": "Bright Path Travel needs a new customer assistant. Olivia, the hiring manager, wants to hear about you and your experience.",
+  "npc_opening": "Hello, thank you for coming in. Please, have a seat. To start, can you tell me a little about yourself?",
+  "objectives": [
+    { "id": "introduce_yourself", "description": "Introduce yourself to Olivia." },
+    { "id": "describe_experience", "description": "Describe a job, a project or a responsibility you had in the past." },
+    { "id": "explain_motivation", "description": "Explain why you want to work at Bright Path Travel." }
+  ],
+  "prerequisites": { "quests_completed": ["meet_your_neighbor"] },
+  "rewards": { "xp": 100, "trust": { "olivia": 10 } },
+  "allowed_story_actions": ["continue", "npc_pleased", "npc_confused", "interview_positive", "interview_concern"],
+  "decision_points": []
+}

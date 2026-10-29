@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "home_at_last",
+    "title": "Home at Last",
+    "summary": "Alex and Mia throw you a small welcome party in the Linden House courtyard. You helped your neighbours when they needed it, and now the city feels like home.",
+    "conditions": {
+      "quests_completed": ["the_flat_viewing", "the_missing_backpack"],
+      "flags": ["helped_alex", "watched_mia_bag"],
+      "min_trust": { "alex": 30, "mia": 30 }
+    }
+  },
+  {
+    "slug": "new_in_town",
+    "title": "New in Town",
+    "summary": "You have found your way around the city, but it still feels a little like a stranger's place. Maybe next time you will say yes when a neighbour asks for help.",
+    "conditions": {}
+  }
+]

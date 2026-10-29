@@ -150,7 +150,7 @@ Güvenlik ve tutarlılık için şu kurallar uygulanır:
 - Karakter oluşturma
 - Ana dashboard (profil, seviye, XP, aktif görev, gelişim)
 - 2D şehir haritası ve 3 mekân: **Café, Apartment, Office**
-- 3 NPC ve 5 temel görev
+- 3 NPC ve 5 temel görev (hikâye, görevler ve sonlar: [docs/story-bible.md](docs/story-bible.md))
 - Yapay zekâ destekli yazılı diyalog ve İngilizce hata analizi
 - Learning Engine ve Story Engine
 - Kullanıcıya göre görev seçimi
@@ -229,13 +229,15 @@ SPEAKQUEST/
 │   │   │   ├── schemas/            # Pydantic şemaları
 │   │   │   ├── routers/            # REST endpointleri (/api/...)
 │   │   │   ├── services/ai/        # LLM istemcisi ve prompt'lar
-│   │   │   └── engines/            # learning, story, quest motorları
+│   │   │   ├── engines/            # learning, story, quest motorları ve hata kategorileri
+│   │   │   └── content/            # hikâye içeriği: mekânlar, NPC'ler, görevler, sonlar (JSON)
 │   │   ├── alembic/                # veritabanı migration'ları
 │   │   ├── tests/                  # pytest testleri
 │   │   ├── Dockerfile
 │   │   ├── requirements.txt        # çalışma bağımlılıkları
 │   │   └── requirements-dev.txt    # test bağımlılıkları
 │   └── frontend/                   # HTML, CSS, JS, Bootstrap
+├── docs/                           # veri modeli ve story bible (hikâye, görevler, içerik formatı)
 │       ├── index.html              # landing sayfası
 │       ├── pages/                  # diğer sayfalar
 │       ├── css/main.css            # tasarım değişkenleri ve ortak bileşenler

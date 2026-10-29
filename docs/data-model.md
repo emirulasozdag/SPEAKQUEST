@@ -93,6 +93,7 @@ Mekânın kilitli olup olmadığı saklanmaz. Story Engine bunu oyuncunun durumu
 | role | varchar(80) | |
 | personality | text | prompt'a girer |
 | speaking_style | text | prompt'a girer |
+| knows | JSON | NPC'nin bildiği hikâye bilgileri; prompt'a girer |
 
 ### `quest_templates` · #9 (içerik formatı #5)
 
@@ -101,18 +102,27 @@ Mekânın kilitli olup olmadığı saklanmaz. Story Engine bunu oyuncunun durumu
 | id | int PK | |
 | slug | varchar(60) | unique |
 | title | varchar(120) | |
+| chapter | int | hikâye bölümü |
 | location_id | int FK → locations | |
 | npc_id | int FK → npcs | |
 | target_skills | JSON | hata kategorisi listesi |
 | min_level, max_level | varchar(2) | seviye aralığı |
+| summary | text | sahnenin kısa anlatımı |
+| npc_opening | text | NPC'nin ilk cümlesi |
 | objectives | JSON | `[{id, description}]`, tamamlama bunlara bakar |
 | prerequisites | JSON | görev, bayrak ve güven eşiği koşulları |
 | rewards | JSON | XP ve güven değişimi |
 | allowed_story_actions | JSON | AI'nın önerebileceği aksiyonların whitelist'i |
 | decision_points | JSON | oyuncu kararları ve seçenekleri |
 
-Şablonların içeriği `src/api/app/content/` altındaki dosyalardır. Tablo, bu dosyaların sorgulanabilir
-kopyasıdır.
+Şablonların içeriği `src/api/app/content/` altındaki JSON dosyalarıdır (`locations.json`,
+`npcs.json`, `quests/<slug>.json`); format ve hikâye [story-bible.md](story-bible.md) içindedir.
+İçerik dosyalarında mekân ve NPC slug ile gösterilir; seed komutu (#9) bunları id'lere çevirir ve
+`app/content/schema.py` içindeki `load_content()` ile doğrulanmış içeriği okur. Tablo, bu
+dosyaların sorgulanabilir kopyasıdır.
+
+Hikâye sonları (`endings.json`) tabloya yazılmaz; Story Engine onları doğrudan içerik
+dosyasından okur. Oyuncunun ulaştığı son `story_states.ending` alanında slug olarak tutulur.
 
 ### `quest_progress` · #7
 
