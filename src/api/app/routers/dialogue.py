@@ -9,6 +9,7 @@ from app.schemas.dialogue import (
     DialogueHistoryOut,
     DialogueMessageOut,
     DialogueTurnOut,
+    ObjectiveStateOut,
     SendMessageRequest,
     StoryActionOut,
 )
@@ -57,6 +58,8 @@ def send_message(
         ],
         feedback=analysis.feedback,
         story_action=StoryActionOut(suggested=turn.story.action, accepted=turn.story.accepted),
+        objectives=[ObjectiveStateOut(id=o.id, description=o.description, met=o.met) for o in turn.objectives],
+        newly_met=list(turn.newly_met),
         player_message=DialogueMessageOut.model_validate(turn.player_message),
         npc_message=DialogueMessageOut.model_validate(turn.npc_message),
     )

@@ -6,6 +6,7 @@ dialogue session, so every message belongs to exactly one player through it. The
 line is stored as the first message when the quest is started (services/quests.start_quest).
 """
 
+import logging
 from dataclasses import dataclass
 from typing import Literal
 
@@ -14,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.engines.categories import SkillCategory
 from app.engines.learning import DetectedMistake, record_message_analysis
+from app.engines.objectives import apply_objectives
 from app.engines.story import StoryActionOutcome, StoryProgress
 from app.models.content import Npc, QuestTemplate
 from app.models.dialogue import PLAYER_MESSAGE_MAX_LENGTH, DialogueMessage, MessageRole
@@ -21,11 +23,20 @@ from app.models.player import EnglishLevel
 from app.models.quest_progress import QuestProgress
 from app.services.ai.analysis import analyze_message
 from app.services.ai.client import AiClient
-from app.services.ai.prompts import MAX_HISTORY_MESSAGES, DialogueContext, HistoryLine, NpcProfile, QuestBrief
+from app.services.ai.prompts import (
+    MAX_HISTORY_MESSAGES,
+    DialogueContext,
+    HistoryLine,
+    NpcProfile,
+    ObjectiveBrief,
+    QuestBrief,
+)
 from app.services.ai.schemas import DialogueAnalysis
 from app.services.players import get_profile
 from app.services.quests import get_active_quest
 from app.services.story import apply_suggested_action, get_story_state, load_story_progress
+
+logger = logging.getLogger("speakquest.dialogue")
 
 
 class DialogueNotFoundError(Exception):
@@ -58,6 +69,16 @@ class DialogueTurn:
     player_message: DialogueMessage | None = None
     npc_message: DialogueMessage | None = None
     story: StoryActionOutcome | None = None
+    # Every objective of the quest with its state after this message; empty when the AI was unavailable
+    objectives: tuple["ObjectiveState", ...] = ()
+    newly_met: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ObjectiveState:
+    id: str
+    description: str
+    met: bool
 
 
 def get_history(db: Session, user_id: int, quest_id: int) -> list[DialogueMessage]:
@@ -116,6 +137,18 @@ def send_message(db: Session, user_id: int, text: str, client: AiClient | None) 
     )
     # Only a suggestion: the Story Engine checks it against the quest's allowed actions
     story = apply_suggested_action(db, user_id, quest, analysis.suggested_story_action)
+    outcome = apply_objectives(
+        [objective["id"] for objective in quest.objectives],
+        progress.objectives_met,
+        analysis.objectives_met,
+        analysis.communication_success,
+    )
+    if outcome.unknown:
+        # Ids only (capped), never the reply: the AI named objectives this quest does not have
+        logger.warning("ai reported unknown objective ids quest=%s ids=%s", quest.slug, list(outcome.unknown[:5]))
+    if outcome.newly_met:
+        # A new list, so SQLAlchemy sees the JSON column change
+        progress.objectives_met = list(outcome.met)
     npc_message = DialogueMessage(quest_progress_id=progress.id, role=MessageRole.NPC, text=analysis.npc_reply)
     db.add(npc_message)
     db.commit()
@@ -127,6 +160,11 @@ def send_message(db: Session, user_id: int, text: str, client: AiClient | None) 
         player_message=player_message,
         npc_message=npc_message,
         story=story,
+        objectives=tuple(
+            ObjectiveState(objective["id"], objective["description"], objective["id"] in outcome.met)
+            for objective in quest.objectives
+        ),
+        newly_met=outcome.newly_met,
     )
 
 
@@ -141,7 +179,9 @@ def _dialogue_context(
         quest=QuestBrief(
             title=quest.title,
             summary=quest.summary,
-            objectives=tuple(objective["description"] for objective in quest.objectives),
+            objectives=tuple(
+                ObjectiveBrief(objective["id"], objective["description"]) for objective in quest.objectives
+            ),
             allowed_story_actions=tuple(quest.allowed_story_actions),
         ),
         level=level,

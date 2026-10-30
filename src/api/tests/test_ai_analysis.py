@@ -136,6 +136,7 @@ def test_injection_even_a_fully_fooled_model_cannot_add_xp_or_level_to_the_resul
         "correctly_used",
         "feedback",
         "suggested_story_action",
+        "objectives_met",
     }
     assert not hasattr(result, "xp") and not hasattr(result, "level")
     # The unknown action is only a suggestion: the Story Engine rejects it against the quest's whitelist

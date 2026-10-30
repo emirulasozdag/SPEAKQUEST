@@ -129,7 +129,8 @@ yapılandırılmış JSON olarak alınır ve backend tarafından doğrulanır:
   ],
   "correctly_used": ["prepositions"],
   "feedback": "Good answer! Remember to use the past form of the verb.",
-  "suggested_story_action": "interview_positive"
+  "suggested_story_action": "interview_positive",
+  "objectives_met": ["describe_experience"]
 }
 ```
 
@@ -138,6 +139,8 @@ Güvenlik ve tutarlılık için şu kurallar uygulanır:
 - XP, seviye, görev tamamlama ve hikâye durumu **yalnızca backend** tarafından hesaplanır.
   Yapay zekâ oyun durumunu doğrudan değiştiremez.
 - `suggested_story_action` yalnızca bir öneridir; nihai kararı Story Engine verir.
+- `objectives_met` yalnızca bir iddiadır; hangi hedefin karşılandığına backend karar verir.
+  Yalnızca anlaşılan mesajlar ve görevin kendi hedefleri sayılır.
 - Doğrulanmamış AI cevabı veritabanına veya oyun durumuna uygulanmaz.
 - API anahtarları frontend kodunda bulunmaz, backend ortam değişkenlerinde saklanır.
 - AI servisi hata verdiğinde uygulama çökmez, kullanıcıya anlaşılır bir mesaj gösterilir.
