@@ -4,7 +4,7 @@ Bu doküman SpeakQuest MVP'sinin veritabanı sözleşmesidir. Bir tabloyu ekleye
 bu dosyayı da günceller. Tablolar SQLAlchemy modelleri olarak `src/api/app/models/` altında yazılır
 ve her değişiklik tek bir Alembic migration zincirine eklenir.
 
-**Durum:** `users`, `player_profiles`, `locations`, `npcs` ve `quest_templates` uygulandı. Diğer tablolar önerilen tasarımdır; sahibi olan
+**Durum:** `users`, `player_profiles`, `locations`, `npcs`, `quest_templates` ve `quest_progress` uygulandı. Diğer tablolar önerilen tasarımdır; sahibi olan
 iş paketi uygularken alanları netleştirir ve bu dosyayı günceller.
 
 ## Genel kurallar
@@ -138,7 +138,7 @@ koşulları #13 ile bu fonksiyona eklenir; endpoint değişmez.
 Hikâye sonları (`endings.json`) tabloya yazılmaz; Story Engine onları doğrudan içerik
 dosyasından okur. Oyuncunun ulaştığı son `story_states.ending` alanında slug olarak tutulur.
 
-### `quest_progress` · #7
+### `quest_progress` · uygulandı (#7)
 
 Bir oyuncunun bir görevle ilişkisi. Ayrı bir `dialogue_sessions` tablosu yoktur: bir görev denemesi
 aynı zamanda o görevin diyalog oturumudur.
@@ -153,8 +153,21 @@ aynı zamanda o görevin diyalog oturumudur.
 | xp_awarded | int | tamamlanınca verilen XP, tekrar ödül vermeyi engeller |
 | started_at, completed_at | timestamptz | |
 
-`(user_id, quest_template_id)` unique'tir. Kullanıcı başına yalnızca bir `active` görev olabilir.
-`locked` ve `available` saklanmaz, Story Engine hesaplar.
+`(user_id, quest_template_id)` unique'tir. Kullanıcı başına yalnızca bir `active` görev olabilir:
+bunu API'nin kontrolüne ek olarak veritabanı da zorlar (`status = 'active'` üzerinde kısmi unique
+index), böylece aynı anda gelen iki istek de ikinci aktif görevi açamaz. `locked` ve `available`
+saklanmaz, Story Engine'in `is_unlocked()` fonksiyonu her istekte hesaplar.
+
+**API:** `GET /api/quests` oyuncunun görevlerini durumlarıyla (`locked`, `available`, `active`,
+`completed`), `GET /api/quests/active` aktif görevi hedefleriyle (`met` alanını yalnızca backend
+doğrular) döner; aktif görev yoksa `404`. `POST /api/quests/{id}/start` görevi başlatır (`201`):
+bilinmeyen görev `404`; kilitli, zaten aktif, zaten tamamlanmış ya da başka görev aktifken `409`.
+NPC'nin ilk cümlesi (`npc_opening`) bu cevaplarda yoktur; diyalog geçmişi boşken #11 onu şablondan
+okuyup ilk mesaj olarak saklar. `POST /api/quests/{id}/complete` S03-A'dadır (`501`).
+
+**XP ve seviye:** `engines/progression.py`. Seviye eşikleri `LEVEL_THRESHOLDS = (0, 50, 120, 220, 350,
+500)`; MVP'nin 5 görevi toplam 410 XP verir ve oyuncuyu 5. seviyeye çıkarır. Görev tamamlanırken
+`add_xp()` sonucu `player_profiles.xp/level` ve `quest_progress.xp_awarded` alanlarına yazılır (S03-A).
 
 ### `dialogue_messages` · #11
 
