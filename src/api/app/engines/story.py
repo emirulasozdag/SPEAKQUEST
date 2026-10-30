@@ -13,9 +13,8 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, replace
 
 from app.content.schema import Conditions
-
-TRUST_MIN = 0
-TRUST_MAX = 100
+# Re-exported so callers of the Story Engine find the trust bounds here
+from app.engines.trust import TRUST_MAX, TRUST_MIN, clamp_trust
 
 # Story actions that make the quest's NPC like the player a little more. Every other allowed action
 # (continue, npc_confused, interview_concern) only colours the conversation and changes nothing:
@@ -89,10 +88,6 @@ def apply_trust_changes(progress: StoryProgress, changes: Mapping[str, int]) -> 
     for npc, change in changes.items():
         trust[npc] = clamp_trust(trust.get(npc, 0) + change)
     return replace(progress, trust=trust)
-
-
-def clamp_trust(value: int) -> int:
-    return max(TRUST_MIN, min(TRUST_MAX, value))
 
 
 def current_chapter(open_quest_chapters: Iterable[int], completed_quest_chapters: Iterable[int]) -> int:

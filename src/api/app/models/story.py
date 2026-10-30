@@ -4,7 +4,7 @@ from sqlalchemy import JSON, CheckConstraint, DateTime, ForeignKey, Integer, Str
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
-from app.engines.story import TRUST_MAX, TRUST_MIN
+from app.engines.trust import TRUST_MAX, TRUST_MIN
 from app.models.content import Location, Npc
 
 
