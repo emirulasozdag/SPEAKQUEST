@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SpeakQuest">
+  <title>SpeakQuest</title>
+  <path d="M8 10h48a6 6 0 0 1 6 6v26a6 6 0 0 1-6 6H28L14 60V48H8a6 6 0 0 1-6-6V16a6 6 0 0 1 6-6z" fill="#c47812"/>
+  <path d="M32 16l4 9 10 1-7.5 6.5 2.3 9.5L32 37l-8.8 5 2.3-9.5L18 26l10-1z" fill="#ffffff"/>
+</svg>

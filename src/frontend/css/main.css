@@ -1,23 +1,63 @@
-/* SpeakQuest design tokens and shared components (on top of Bootstrap 5) */
+/* SpeakQuest design tokens and shared components (on top of Bootstrap 5).
+   The tokens are described in docs/design-system.md; components use them instead of raw values. */
 
 :root {
+  /* ---------- Colour ---------- */
   --sq-ink: #1e2a47;
   --sq-ink-soft: #4a5672;
+  --sq-muted: #5f6b85;
   --sq-paper: #f3f5f9;
   --sq-surface: #ffffff;
   --sq-line: #d9dfe9;
+  --sq-on-dark: #ffffff;
+  --sq-on-dark-soft: rgba(255, 255, 255, 0.82);
 
-  /* Each city line has its own colour, like a transit map */
+  /* Each place has its own colour and a light tint for backgrounds */
   --sq-cafe: #c47812;
+  --sq-cafe-tint: #f6e1c3;
+  --sq-cafe-ink: #7a4d0f;
   --sq-apartment: #2f8a5f;
+  --sq-apartment-tint: #d4ecdf;
   --sq-office: #3a62c9;
+  --sq-office-tint: #d9e3f8;
+  --sq-office-hover: #2f51a8;
+  --sq-office-pressed: #284690;
+  --sq-park: #b9dec8;
 
   --sq-error: #c2412d;
+  --sq-error-on-dark: #ffb4a6;
   --sq-fix: #1f7a4d;
+  --sq-fix-on-dark: #9be7bf;
+  --sq-ok: #4cc38a;
+  /* Only for shapes and borders, never for text (below 4.5:1) */
+  --sq-locked: #a3abbd;
 
+  /* ---------- Typography ---------- */
   --sq-font-display: "Bricolage Grotesque", system-ui, sans-serif;
   --sq-font-body: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --sq-text-sm: 0.9rem;
+  --sq-text-base: 1.0625rem;
+  --sq-text-lg: 1.2rem;
 
+  /* ---------- Spacing, shape, depth, motion ---------- */
+  --sq-space-1: 0.25rem;
+  --sq-space-2: 0.5rem;
+  --sq-space-3: 1rem;
+  --sq-space-4: 1.5rem;
+  --sq-space-5: 2rem;
+  --sq-space-6: 3rem;
+
+  --sq-radius-sm: 0.5rem;
+  --sq-radius-md: 0.75rem;
+  --sq-radius-lg: 1.1rem;
+  --sq-radius-pill: 999px;
+
+  --sq-shadow-sm: 0 1px 2px rgba(30, 42, 71, 0.08);
+  --sq-shadow-md: 0 8px 24px rgba(30, 42, 71, 0.14);
+
+  --sq-transition: 160ms ease-out;
+
+  /* ---------- Bootstrap mapped to the tokens ---------- */
   --bs-body-font-family: var(--sq-font-body);
   --bs-body-color: var(--sq-ink);
   --bs-body-bg: var(--sq-paper);
@@ -25,10 +65,37 @@
   --bs-primary-rgb: 58, 98, 201;
   --bs-link-color: var(--sq-office);
   --bs-border-color: var(--sq-line);
+  --bs-secondary-color: var(--sq-ink-soft);
 }
 
+/* Bootstrap buttons read their own variables, so they are mapped to the tokens here */
+.btn-primary {
+  --bs-btn-bg: var(--sq-office);
+  --bs-btn-border-color: var(--sq-office);
+  --bs-btn-hover-bg: var(--sq-office-hover);
+  --bs-btn-hover-border-color: var(--sq-office-hover);
+  --bs-btn-active-bg: var(--sq-office-pressed);
+  --bs-btn-active-border-color: var(--sq-office-pressed);
+  --bs-btn-disabled-bg: var(--sq-office);
+  --bs-btn-disabled-border-color: var(--sq-office);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--sq-office);
+  --bs-btn-border-color: var(--sq-office);
+  --bs-btn-hover-bg: var(--sq-office);
+  --bs-btn-hover-border-color: var(--sq-office);
+  --bs-btn-active-bg: var(--sq-office);
+  --bs-btn-active-border-color: var(--sq-office);
+}
+
+/* Place themes: set on any element to colour it like that place */
+.sq-cafe { --sq-line-color: var(--sq-cafe); --sq-tint: var(--sq-cafe-tint); }
+.sq-apartment { --sq-line-color: var(--sq-apartment); --sq-tint: var(--sq-apartment-tint); }
+.sq-office { --sq-line-color: var(--sq-office); --sq-tint: var(--sq-office-tint); }
+
 body {
-  font-size: 1.0625rem;
+  font-size: var(--sq-text-base);
   line-height: 1.6;
   min-height: 100vh;
   display: flex;
@@ -54,7 +121,7 @@ h2 { font-size: clamp(1.5rem, 2vw + 0.75rem, 2rem); }
 h3 { font-size: 1.25rem; }
 
 .sq-lead {
-  font-size: 1.2rem;
+  font-size: var(--sq-text-lg);
   color: var(--sq-ink-soft);
   max-width: 60ch;
 }
@@ -75,18 +142,26 @@ h3 { font-size: 1.25rem; }
 }
 
 .sq-header .navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sq-space-2);
   font-family: var(--sq-font-display);
   font-weight: 800;
-  color: #fff;
+  color: var(--sq-on-dark);
+}
+
+.sq-logo {
+  width: 2rem;
+  height: 2rem;
 }
 
 .sq-header .nav-link {
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--sq-on-dark-soft);
 }
 
 .sq-header .nav-link:hover,
 .sq-header .nav-link[aria-current="page"] {
-  color: #fff;
+  color: var(--sq-on-dark);
 }
 
 .sq-header .nav-link[aria-current="page"] {
@@ -95,7 +170,7 @@ h3 { font-size: 1.25rem; }
 
 .sq-status {
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--sq-on-dark-soft);
 }
 
 .sq-status::before {
@@ -105,10 +180,10 @@ h3 { font-size: 1.25rem; }
   height: 0.6rem;
   margin-right: 0.4rem;
   border-radius: 50%;
-  background: #8a93a8;
+  background: var(--sq-locked);
 }
 
-.sq-status[data-state="ok"]::before { background: #4cc38a; }
+.sq-status[data-state="ok"]::before { background: var(--sq-ok); }
 .sq-status[data-state="down"]::before { background: var(--sq-error); }
 
 /* ---------- Footer ---------- */
@@ -116,7 +191,7 @@ h3 { font-size: 1.25rem; }
 .sq-footer {
   border-top: 1px solid var(--sq-line);
   color: var(--sq-ink-soft);
-  font-size: 0.9rem;
+  font-size: var(--sq-text-sm);
 }
 
 /* ---------- Panels ---------- */
@@ -124,18 +199,19 @@ h3 { font-size: 1.25rem; }
 .sq-panel {
   background: var(--sq-surface);
   border: 1px solid var(--sq-line);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
+  border-radius: var(--sq-radius-md);
+  box-shadow: var(--sq-shadow-sm);
+  padding: var(--sq-space-4);
 }
 
 .sq-panel-title {
   font-family: var(--sq-font-display);
   font-size: 1.1rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: var(--sq-space-3);
 }
 
-/* Places and quests carry their city line as a station dot, like on the map */
+/* Places and quests carry their colour as a station dot, like on the map */
 .sq-line-tag {
   position: relative;
   padding-left: 3.25rem;
@@ -153,37 +229,78 @@ h3 { font-size: 1.25rem; }
   border: 4px solid var(--sq-line-color, var(--sq-ink));
 }
 
-.sq-cafe { --sq-line-color: var(--sq-cafe); }
-.sq-apartment { --sq-line-color: var(--sq-apartment); }
-.sq-office { --sq-line-color: var(--sq-office); }
+/* ---------- Portraits and avatars ---------- */
+
+.sq-avatar,
+.sq-portrait {
+  width: 4.5rem;
+  height: 4.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--sq-tint, var(--sq-line));
+}
+
+/* Letter fallback, used until a page shows the avatar image */
+span.sq-avatar {
+  display: grid;
+  place-items: center;
+  font-family: var(--sq-font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--sq-on-dark);
+  background: var(--sq-line-color, var(--sq-ink));
+}
+
+.sq-portrait-sm {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.btn-check:checked + .sq-avatar-option .sq-avatar {
+  outline: 4px solid var(--sq-ink);
+  outline-offset: 3px;
+}
+
+.btn-check:focus-visible + .sq-avatar-option .sq-avatar {
+  outline: 4px solid var(--sq-cafe);
+  outline-offset: 3px;
+}
 
 /* ---------- Speech bubbles (the core mechanic) ---------- */
 
 .sq-bubble {
   max-width: 34rem;
   padding: 0.9rem 1.15rem;
-  border-radius: 1.1rem;
+  border-radius: var(--sq-radius-lg);
   background: var(--sq-surface);
   border: 1px solid var(--sq-line);
+  box-shadow: var(--sq-shadow-sm);
 }
 
 .sq-bubble-npc {
-  border-bottom-left-radius: 0.25rem;
+  border-bottom-left-radius: var(--sq-space-1);
 }
 
 .sq-bubble-player {
   margin-left: auto;
   background: var(--sq-ink);
-  color: #fff;
+  color: var(--sq-on-dark);
   border-color: var(--sq-ink);
-  border-bottom-right-radius: 0.25rem;
+  border-bottom-right-radius: var(--sq-space-1);
+}
+
+/* An NPC line with the speaker's small portrait next to it */
+.sq-bubble-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sq-space-2);
 }
 
 .sq-speaker {
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--sq-ink-soft);
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--sq-space-1);
 }
 
 .sq-correction {
@@ -205,19 +322,114 @@ h3 { font-size: 1.25rem; }
   font-weight: 700;
 }
 
-.sq-bubble-player .sq-wrong { color: #ffb4a6; text-decoration-color: #ffb4a6; }
-.sq-bubble-player .sq-right { color: #9be7bf; }
+.sq-bubble-player .sq-wrong { color: var(--sq-error-on-dark); text-decoration-color: var(--sq-error-on-dark); }
+.sq-bubble-player .sq-right { color: var(--sq-fix-on-dark); }
+
+/* ---------- Dialogue scene ---------- */
+
+.sq-scene {
+  position: relative;
+  overflow: hidden;
+  min-height: 11rem;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--sq-space-3);
+  border-radius: var(--sq-radius-lg);
+  background: var(--sq-tint, var(--sq-line));
+}
+
+.sq-scene-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The name card sits on a solid surface so its text never depends on the illustration */
+.sq-scene-npc {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sq-space-3);
+  padding: var(--sq-space-2) var(--sq-space-4) var(--sq-space-2) var(--sq-space-2);
+  border-radius: var(--sq-radius-pill);
+  background: var(--sq-surface);
+  box-shadow: var(--sq-shadow-md);
+}
+
+.sq-scene-npc .sq-portrait {
+  border: 3px solid var(--sq-line-color, var(--sq-ink));
+}
+
+.sq-npc-name {
+  font-family: var(--sq-font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.sq-npc-role {
+  font-size: var(--sq-text-sm);
+  color: var(--sq-ink-soft);
+  margin: 0;
+}
+
+/* Collapsible language feedback */
+.sq-feedback summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sq-space-2);
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--sq-font-display);
+  font-weight: 700;
+}
+
+.sq-feedback summary::-webkit-details-marker {
+  display: none;
+}
+
+.sq-feedback summary::after {
+  content: "Show";
+  font-family: var(--sq-font-body);
+  font-weight: 400;
+  font-size: var(--sq-text-sm);
+  color: var(--sq-office);
+}
+
+.sq-feedback[open] summary::after {
+  content: "Hide";
+}
+
+.sq-feedback[open] summary {
+  margin-bottom: var(--sq-space-3);
+}
+
+.sq-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  margin-left: var(--sq-space-2);
+  padding-inline: var(--sq-space-2);
+  border-radius: var(--sq-radius-pill);
+  background: var(--sq-cafe-tint);
+  color: var(--sq-cafe-ink);
+  font-size: 0.85rem;
+}
 
 /* ---------- Landing hero ---------- */
 
 .sq-hero {
   background: var(--sq-ink);
-  color: #fff;
-  padding: 3rem 1rem;
+  color: var(--sq-on-dark);
+  padding: var(--sq-space-6) var(--sq-space-3);
 }
 
 .sq-hero .sq-lead {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--sq-on-dark-soft);
 }
 
 .sq-hero .sq-bubble-npc {
@@ -225,7 +437,12 @@ h3 { font-size: 1.25rem; }
 }
 
 .sq-hero .sq-correction {
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--sq-on-dark-soft);
+}
+
+.sq-hero-logo {
+  width: 4rem;
+  height: 4rem;
 }
 
 .sq-hero-title {
@@ -257,50 +474,120 @@ h3 { font-size: 1.25rem; }
   place-items: center;
   border-radius: 50%;
   background: var(--sq-ink);
-  color: #fff;
+  color: var(--sq-on-dark);
   font-family: var(--sq-font-display);
   font-weight: 700;
 }
 
-/* ---------- City map (transit diagram) ---------- */
-
-.sq-map {
-  width: 100%;
-  height: auto;
+/* A place card with its scene illustration on top */
+.sq-place-card {
+  overflow: hidden;
+  padding: 0;
 }
 
-.sq-map .sq-track {
+.sq-place-card > img {
+  display: block;
+  width: 100%;
+  height: 7rem;
+  object-fit: cover;
+}
+
+.sq-place-card .sq-place-body {
+  padding: var(--sq-space-4);
+}
+
+/* ---------- City map (illustrated) ---------- */
+
+.sq-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--sq-radius-md);
+}
+
+.sq-map .sq-ground { fill: var(--sq-apartment-tint); }
+.sq-map .sq-park { fill: var(--sq-park); }
+.sq-map .sq-water { fill: var(--sq-office-tint); }
+
+.sq-map .sq-road {
   fill: none;
-  stroke-width: 10;
+  stroke: var(--sq-surface);
+  stroke-width: 26;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.sq-map .sq-station circle {
-  fill: #fff;
-  stroke: var(--sq-ink);
-  stroke-width: 5;
+.sq-map .sq-road-line {
+  fill: none;
+  stroke: var(--sq-line);
+  stroke-width: 3;
+  stroke-dasharray: 14 12;
 }
 
-.sq-map .sq-station text {
+.sq-place {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sq-place .sq-building {
+  transition: transform var(--sq-transition);
+  transform-box: fill-box;
+  transform-origin: bottom center;
+}
+
+.sq-place:hover .sq-building,
+.sq-place:focus-visible .sq-building {
+  transform: translateY(-6px);
+}
+
+.sq-place .sq-place-label rect {
+  fill: var(--sq-surface);
+  stroke: var(--sq-line-color, var(--sq-ink));
+  stroke-width: 3;
+}
+
+.sq-place text {
   font-family: var(--sq-font-display);
   font-weight: 700;
-  font-size: 22px;
+  font-size: 20px;
   fill: var(--sq-ink);
 }
 
-.sq-map .sq-station.is-locked circle {
-  stroke: #a3abbd;
+.sq-place .sq-place-status {
+  font-family: var(--sq-font-body);
+  font-weight: 400;
+  font-size: 15px;
+  fill: var(--sq-ink-soft);
+}
+
+.sq-place:focus-visible {
+  outline: none;
+}
+
+.sq-place:focus-visible .sq-place-label rect {
+  stroke: var(--sq-cafe);
+  stroke-width: 6;
+}
+
+/* Locked: greyed building, dashed label; the status text also says "Locked" */
+.sq-place.is-locked {
+  cursor: not-allowed;
+}
+
+.sq-place.is-locked .sq-building {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.sq-place.is-locked .sq-place-label rect {
+  stroke: var(--sq-locked);
   stroke-dasharray: 6 5;
 }
 
-.sq-map .sq-station.is-locked text {
-  fill: #8a93a8;
-}
-
-.sq-map a:focus-visible circle {
-  stroke: var(--sq-cafe);
-  stroke-width: 8;
+/* Active quest here: a thicker frame and a filled label */
+.sq-place.is-active .sq-place-label rect {
+  fill: var(--sq-tint);
+  stroke-width: 5;
 }
 
 /* ---------- Progress ---------- */
@@ -325,31 +612,11 @@ h3 { font-size: 1.25rem; }
 /* ---------- Placeholder notice ---------- */
 
 .sq-draft-note {
-  background: #fff7e8;
+  background: var(--sq-cafe-tint);
   border: 1px dashed var(--sq-cafe);
-  color: #7a4d0f;
-  border-radius: 0.5rem;
-  font-size: 0.9rem;
-}
-
-/* ---------- Avatar choices ---------- */
-
-.sq-avatar {
-  width: 4.5rem;
-  height: 4.5rem;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-family: var(--sq-font-display);
-  font-weight: 800;
-  font-size: 1.5rem;
-  color: #fff;
-  background: var(--sq-line-color, var(--sq-ink));
-}
-
-.btn-check:checked + .sq-avatar-option .sq-avatar {
-  outline: 4px solid var(--sq-ink);
-  outline-offset: 3px;
+  color: var(--sq-cafe-ink);
+  border-radius: var(--sq-radius-sm);
+  font-size: var(--sq-text-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -357,5 +624,10 @@ h3 { font-size: 1.25rem; }
     scroll-behavior: auto !important;
     transition: none !important;
     animation: none !important;
+  }
+
+  .sq-place:hover .sq-building,
+  .sq-place:focus-visible .sq-building {
+    transform: none;
   }
 }

@@ -19,33 +19,57 @@
   <main class="container py-4">
     <p class="sq-draft-note px-3 py-2 mb-4">UI draft: this conversation is sample content. AI replies arrive in the AI integration phase.</p>
 
+    <section class="sq-scene sq-office mb-4" aria-label="Bright Path Travel">
+      <img class="sq-scene-bg" src="/assets/scenes/office.svg" alt="">
+      <div class="sq-scene-npc">
+        <img class="sq-portrait" src="/assets/portraits/olivia.svg" alt="">
+        <div>
+          <p class="sq-npc-name">Olivia</p>
+          <p class="sq-npc-role">Hiring manager · Bright Path Travel</p>
+        </div>
+      </div>
+    </section>
+
     <div class="row g-4">
-      <aside class="col-lg-3 order-lg-1" aria-labelledby="objective-title">
-        <div class="sq-panel sq-line-tag sq-office">
-          <p class="small text-secondary mb-1">Office · Ms. Carter</p>
+      <aside class="col-lg-4 order-lg-2 d-flex flex-column gap-4" aria-label="Quest details">
+        <section class="sq-panel sq-line-tag sq-office" aria-labelledby="objective-title">
           <h1 class="h4 mb-3">The Job Interview</h1>
           <h2 id="objective-title" class="sq-panel-title mb-2">Your goal</h2>
-          <p class="mb-3">Tell the interviewer about your previous job and why you want this one.</p>
+          <p class="mb-3">Tell Olivia about your previous job and why you want this one.</p>
           <div class="progress sq-xp mb-1" role="progressbar" aria-label="Quest progress" aria-valuenow="1" aria-valuemin="0" aria-valuemax="3">
             <div class="progress-bar" style="width: 33%"></div>
           </div>
           <p class="small text-secondary mb-0">Step 1 of 3</p>
-        </div>
-      </aside>
+        </section>
 
-      <section class="col-lg-6 order-lg-2" aria-labelledby="conversation-title">
+        <details class="sq-panel sq-feedback" open>
+          <summary><span>Language feedback<span class="sq-count" aria-label="1 correction">1</span></span></summary>
+          <p class="small text-secondary mb-1">Past Simple</p>
+          <p class="mb-2"><span class="sq-wrong">I work</span> → <span class="sq-right">I worked</span></p>
+          <p class="small mb-3">"Last year" is a finished time, so the verb takes its past form.</p>
+          <hr>
+          <p class="small text-secondary mb-0">Communication: understood ✓</p>
+        </details>
+      </aside>
+      <section class="col-lg-8 order-lg-1" aria-labelledby="conversation-title">
         <h2 id="conversation-title" class="visually-hidden">Conversation</h2>
         <div class="d-flex flex-column gap-3 mb-4" aria-live="polite">
-          <div class="sq-bubble sq-bubble-npc">
-            <p class="sq-speaker">Ms. Carter</p>
-            <p class="mb-0">Good morning! Thanks for coming in. Please, have a seat.</p>
+          <div class="sq-bubble-row">
+            <img class="sq-portrait sq-portrait-sm sq-office" src="/assets/portraits/olivia.svg" alt="">
+            <div class="sq-bubble sq-bubble-npc">
+              <p class="sq-speaker">Olivia</p>
+              <p class="mb-0">Good morning! Thanks for coming in. Please, have a seat.</p>
+            </div>
           </div>
           <div class="sq-bubble sq-bubble-player">
             <p class="mb-0">Good morning. Thank you for inviting me.</p>
           </div>
-          <div class="sq-bubble sq-bubble-npc">
-            <p class="sq-speaker">Ms. Carter</p>
-            <p class="mb-0">Can you tell me about your previous experience?</p>
+          <div class="sq-bubble-row">
+            <img class="sq-portrait sq-portrait-sm sq-office" src="/assets/portraits/olivia.svg" alt="">
+            <div class="sq-bubble sq-bubble-npc">
+              <p class="sq-speaker">Olivia</p>
+              <p class="mb-0">Can you tell me about your previous experience?</p>
+            </div>
           </div>
           <div class="sq-bubble sq-bubble-player">
             <p class="mb-0">Last year I <span class="sq-wrong">work</span> <span class="sq-right">worked</span> in a restaurant.</p>
@@ -63,16 +87,6 @@
         </form>
       </section>
 
-      <aside class="col-lg-3 order-lg-3" aria-labelledby="feedback-title">
-        <div class="sq-panel">
-          <h2 id="feedback-title" class="sq-panel-title">Feedback</h2>
-          <p class="small text-secondary mb-1">Past Simple</p>
-          <p class="mb-2"><span class="sq-wrong">I work</span> → <span class="sq-right">I worked</span></p>
-          <p class="small mb-3">"Last year" is a finished time, so the verb takes its past form.</p>
-          <hr>
-          <p class="small text-secondary mb-0">Communication: understood ✓</p>
-        </div>
-      </aside>
     </div>
   </main>
 

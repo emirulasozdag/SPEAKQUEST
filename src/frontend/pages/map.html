@@ -18,41 +18,60 @@
 
   <main class="container py-5">
     <h1 class="h2 mb-2">Where to next?</h1>
-    <p class="text-secondary mb-4">Each line is a part of the city. Places unlock as the story moves on.</p>
+    <p class="text-secondary mb-4">Choose a place to visit. Places unlock as the story moves on.</p>
 
     <div class="row g-4">
       <div class="col-lg-8">
         <div class="sq-panel">
-          <svg class="sq-map" viewBox="0 0 800 460" role="group" aria-label="City map with three lines">
-            <path class="sq-track" stroke="var(--sq-cafe)" d="M60 120 H360 L460 220" />
-            <path class="sq-track" stroke="var(--sq-apartment)" d="M460 220 L360 320 H120" />
-            <path class="sq-track" stroke="var(--sq-office)" d="M460 220 H740" />
+          <svg class="sq-map" viewBox="0 0 800 480" role="group" aria-labelledby="map-title">
+            <title id="map-title">City map: Linden Street and the city centre</title>
+            <rect class="sq-ground" width="800" height="480" />
+            <path class="sq-water" d="M0 425c120-20 220 20 340 0s240-25 460 5V480H0z" />
+            <circle class="sq-park" cx="200" cy="80" r="52" />
+            <circle class="sq-park" cx="262" cy="104" r="34" />
+            <path class="sq-road" d="M-20 300H820M330 -20V420" />
+            <path class="sq-road-line" d="M0 300H800M330 0V410" />
 
-            <a href="/pages/dialogue.html" aria-label="Café, 2 quests available">
-              <g class="sq-station">
-                <circle cx="220" cy="120" r="22" />
-                <text x="190" y="80">Café</text>
+            <a class="sq-place sq-apartment" href="/pages/dialogue.html" data-location="apartment" aria-label="Linden House, open">
+              <g class="sq-building">
+                <rect x="70" y="150" width="160" height="135" fill="#b5654a" />
+                <rect x="60" y="138" width="180" height="16" rx="4" fill="#7a3b1d" />
+                <g fill="#fff6e9"><rect x="88" y="170" width="34" height="28" rx="4" /><rect x="178" y="170" width="34" height="28" rx="4" /><rect x="88" y="214" width="34" height="28" rx="4" /><rect x="178" y="214" width="34" height="28" rx="4" /></g>
+                <rect x="132" y="235" width="36" height="50" rx="18" fill="#2f8a5f" />
+              </g>
+              <g class="sq-place-label">
+                <rect x="55" y="326" width="190" height="62" rx="14" />
+                <text x="150" y="352" text-anchor="middle">Linden House</text>
+                <text class="sq-place-status" x="150" y="375" text-anchor="middle" data-place-status>Open</text>
               </g>
             </a>
-            <a href="/pages/dialogue.html" aria-label="Apartment, 1 quest available">
-              <g class="sq-station">
-                <circle cx="240" cy="320" r="22" />
-                <text x="185" y="375">Apartment</text>
+
+            <a class="sq-place sq-cafe" href="/pages/dialogue.html" data-location="cafe" aria-label="Corner Café, open">
+              <g class="sq-building">
+                <rect x="385" y="190" width="130" height="95" fill="#fff6e9" />
+                <path d="M375 190h150l-10 26H385z" fill="#c47812" />
+                <path d="M400 190l-4 26M430 190v26M460 190v26M490 190l4 26" stroke="#fff6e9" stroke-width="8" />
+                <rect x="398" y="232" width="56" height="34" rx="4" fill="#d9e3f8" />
+                <rect x="468" y="230" width="32" height="55" rx="4" fill="#7a3b1d" />
+                <path d="M440 150h22v18a11 11 0 0 1-22 0z" fill="#7a3b1d" />
+              </g>
+              <g class="sq-place-label">
+                <rect x="365" y="326" width="170" height="62" rx="14" />
+                <text x="450" y="352" text-anchor="middle">Corner Café</text>
+                <text class="sq-place-status" x="450" y="375" text-anchor="middle" data-place-status>Open</text>
               </g>
             </a>
-            <a href="/pages/dialogue.html" aria-label="Office, 2 quests available">
-              <g class="sq-station">
-                <circle cx="620" cy="220" r="22" />
-                <text x="585" y="180">Office</text>
+
+            <a class="sq-place sq-office" href="/pages/dialogue.html" data-location="office" aria-label="Bright Path Travel, open">
+              <g class="sq-building">
+                <rect x="600" y="70" width="130" height="215" rx="6" fill="#3a62c9" />
+                <g fill="#a9bdf0"><rect x="616" y="88" width="42" height="24" rx="3" /><rect x="672" y="88" width="42" height="24" rx="3" /><rect x="616" y="126" width="42" height="24" rx="3" /><rect x="672" y="126" width="42" height="24" rx="3" /><rect x="616" y="164" width="42" height="24" rx="3" /><rect x="672" y="164" width="42" height="24" rx="3" /><rect x="616" y="202" width="42" height="24" rx="3" /><rect x="672" y="202" width="42" height="24" rx="3" /></g>
+                <rect x="648" y="244" width="34" height="41" rx="3" fill="#1e2a47" />
               </g>
-            </a>
-            <g class="sq-station" aria-hidden="true">
-              <circle cx="460" cy="220" r="14" />
-            </g>
-            <a href="#" data-feature="District unlocking" aria-label="Harbour, locked">
-              <g class="sq-station is-locked">
-                <circle cx="740" cy="220" r="18" />
-                <text x="690" y="270">Harbour</text>
+              <g class="sq-place-label">
+                <rect x="570" y="326" width="190" height="62" rx="14" />
+                <text x="665" y="352" text-anchor="middle">Bright Path Travel</text>
+                <text class="sq-place-status" x="665" y="375" text-anchor="middle" data-place-status>Open</text>
               </g>
             </a>
           </svg>
@@ -63,16 +82,16 @@
         <h2 id="places-title" class="sq-panel-title">Places</h2>
         <div class="d-grid gap-3">
           <a class="sq-panel sq-line-tag sq-cafe text-decoration-none text-body" href="/pages/dialogue.html">
-            <h3 class="mb-1">Café</h3>
-            <p class="mb-0 small text-secondary">Sam the barista · 2 quests</p>
+            <h3 class="mb-1">Corner Café</h3>
+            <p class="mb-0 small text-secondary">Mia, barista</p>
           </a>
           <a class="sq-panel sq-line-tag sq-apartment text-decoration-none text-body" href="/pages/dialogue.html">
-            <h3 class="mb-1">Apartment</h3>
-            <p class="mb-0 small text-secondary">Mrs. Novak, landlord · 1 quest</p>
+            <h3 class="mb-1">Linden House</h3>
+            <p class="mb-0 small text-secondary">Alex, your neighbour</p>
           </a>
           <a class="sq-panel sq-line-tag sq-office text-decoration-none text-body" href="/pages/dialogue.html">
-            <h3 class="mb-1">Office</h3>
-            <p class="mb-0 small text-secondary">Ms. Carter, interviewer · 2 quests</p>
+            <h3 class="mb-1">Bright Path Travel</h3>
+            <p class="mb-0 small text-secondary">Olivia, hiring manager</p>
           </a>
         </div>
       </aside>

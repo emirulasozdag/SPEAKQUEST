@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Player avatar 3">
+  <title>Player avatar 3</title>
+  <clipPath id="frame"><circle cx="60" cy="60" r="60"/></clipPath>
+  <g clip-path="url(#frame)">
+  <circle cx="60" cy="60" r="60" fill="#d9e3f8"/>
+  
+  <path d="M18 120c2-24 20-36 42-36s40 12 42 36z" fill="#2f8a5f"/>
+  <rect x="52" y="70" width="16" height="16" rx="6" fill="#e0a87f"/>
+  <ellipse cx="60" cy="54" rx="21" ry="24" fill="#e0a87f"/>
+  <path d="M36 52c-2-20 10-30 24-30 12 0 22 8 24 22-12 0-26-4-34-12-2 8-8 14-14 20z" fill="#4a4a52"/>
+  <circle cx="52" cy="56" r="2.6" fill="#1e2a47"/>
+  <circle cx="68" cy="56" r="2.6" fill="#1e2a47"/>
+  <path d="M53 66q7 6 14 0" fill="none" stroke="#1e2a47" stroke-width="2.4" stroke-linecap="round"/>
+  
+  </g>
+</svg>

@@ -55,7 +55,7 @@ export function renderNavbar(host) {
   host.innerHTML = `
     <nav class="navbar navbar-expand-lg py-3" aria-label="Main">
       <div class="container">
-        <a class="navbar-brand" href="/">SpeakQuest</a>
+        <a class="navbar-brand" href="/"><img class="sq-logo" src="/assets/logo.svg" alt="">SpeakQuest</a>
         ${variant === "game" ? gameNav() : publicNav()}
       </div>
     </nav>`;

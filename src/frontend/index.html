@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SpeakQuest is a story-based English learning game. Move to a new city and talk your way through it with AI characters.">
-  <title>SpeakQuest – Your words change the story</title>
+  <title>SpeakQuest – Your Words Change the Story</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&amp;display=swap">
@@ -21,7 +21,9 @@
       <div class="container py-lg-5">
         <div class="row align-items-center g-5">
           <div class="col-lg-6">
-            <h1 id="hero-title" class="sq-hero-title mb-4">Your words change the story</h1>
+            <img class="sq-hero-logo mb-3" src="/assets/logo.svg" alt="">
+            <p class="sq-display h4 mb-2">SpeakQuest</p>
+            <h1 id="hero-title" class="sq-hero-title mb-4">Your Words Change the Story</h1>
             <p class="sq-lead mb-4">
               You just moved to a new city. Order coffee, find a flat, pass a job interview.
               Every conversation is in English, and every answer shapes what happens next.
@@ -35,7 +37,7 @@
           <div class="col-lg-6">
             <figure class="mb-0" aria-label="Example conversation from the Job Interview quest">
               <div class="sq-bubble sq-bubble-npc mb-3">
-                <p class="sq-speaker mb-1">Ms. Carter · Interviewer</p>
+                <p class="sq-speaker mb-1">Olivia · Hiring manager</p>
                 <p class="mb-0">Can you tell me about your previous experience?</p>
               </div>
               <div class="sq-bubble sq-bubble-player mb-2">
@@ -72,21 +74,42 @@
       <h2 id="places-title" class="mb-4">Your first three places</h2>
       <div class="row g-4">
         <article class="col-md-4">
-          <div class="sq-panel sq-line-tag sq-cafe h-100">
-            <h3>Café</h3>
-            <p class="mb-0">Order, small talk, and making your first friend in town.</p>
+          <div class="sq-panel sq-place-card sq-apartment h-100">
+            <img src="/assets/scenes/apartment.svg" alt="">
+            <div class="sq-place-body">
+              <h3>Linden House</h3>
+              <p>Your new home. Meet the neighbours and find a bigger flat.</p>
+              <div class="d-flex align-items-center gap-2">
+                <img class="sq-portrait sq-portrait-sm" src="/assets/portraits/alex.svg" alt="">
+                <p class="mb-0 small"><strong>Alex</strong> · your neighbour</p>
+              </div>
+            </div>
           </div>
         </article>
         <article class="col-md-4">
-          <div class="sq-panel sq-line-tag sq-apartment h-100">
-            <h3>Apartment</h3>
-            <p class="mb-0">Meet the landlord, sort out the lease, help a neighbour.</p>
+          <div class="sq-panel sq-place-card sq-cafe h-100">
+            <img src="/assets/scenes/cafe.svg" alt="">
+            <div class="sq-place-body">
+              <h3>Corner Café</h3>
+              <p>Order, make small talk and help solve a small mystery.</p>
+              <div class="d-flex align-items-center gap-2">
+                <img class="sq-portrait sq-portrait-sm" src="/assets/portraits/mia.svg" alt="">
+                <p class="mb-0 small"><strong>Mia</strong> · barista</p>
+              </div>
+            </div>
           </div>
         </article>
         <article class="col-md-4">
-          <div class="sq-panel sq-line-tag sq-office h-100">
-            <h3>Office</h3>
-            <p class="mb-0">The job interview, then your first week at work.</p>
+          <div class="sq-panel sq-place-card sq-office h-100">
+            <img src="/assets/scenes/office.svg" alt="">
+            <div class="sq-place-body">
+              <h3>Bright Path Travel</h3>
+              <p>The job interview, then your first week at work.</p>
+              <div class="d-flex align-items-center gap-2">
+                <img class="sq-portrait sq-portrait-sm" src="/assets/portraits/olivia.svg" alt="">
+                <p class="mb-0 small"><strong>Olivia</strong> · hiring manager</p>
+              </div>
+            </div>
           </div>
         </article>
       </div>
