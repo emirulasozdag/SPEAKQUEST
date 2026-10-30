@@ -4,6 +4,7 @@ completing one.
 Two things are stored per player, nothing else: a quest_progress row exists once a quest was
 started (status active or completed). Whether an untouched quest is locked or available is
 computed on every request by the Story Engine's is_unlocked(), so it can never go stale.
+Starting and completing a quest also move the player's story state (location, trust, chapter).
 """
 
 from collections.abc import Iterable
@@ -18,11 +19,12 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.content.schema import Conditions
 from app.engines.progression import XpGain, add_xp
-from app.engines.story import StoryProgress, is_unlocked
+from app.engines.story import StoryProgress, current_chapter, is_unlocked
 from app.models.content import QuestTemplate
 from app.models.dialogue import DialogueMessage, MessageRole
 from app.models.quest_progress import QuestProgress, QuestProgressStatus
 from app.services.players import get_profile
+from app.services.story import add_trust, get_story_state, load_story_progress
 
 
 class QuestStatus(StrEnum):
@@ -67,20 +69,6 @@ class PlayerQuest:
     quest: QuestTemplate
     status: QuestStatus
     progress: QuestProgress | None
-
-
-def load_story_progress(db: Session, user_id: int) -> StoryProgress:
-    """The player's story state as the Story Engine's unlock rule needs it.
-
-    Completed quests come from quest_progress. Flags and NPC trust stay empty until the Story
-    Engine stores them (#13, #17); a quest that needs one is simply locked until then.
-    """
-    completed = db.scalars(
-        select(QuestTemplate.slug)
-        .join(QuestProgress, QuestProgress.quest_template_id == QuestTemplate.id)
-        .where(QuestProgress.user_id == user_id, QuestProgress.status == QuestProgressStatus.COMPLETED)
-    )
-    return StoryProgress(completed_quests=frozenset(completed))
 
 
 def quest_statuses(db: Session, user_id: int, quests: Iterable[QuestTemplate]) -> dict[str, QuestStatus]:
@@ -137,6 +125,8 @@ def start_quest(db: Session, user_id: int, quest_id: int) -> PlayerQuest:
         db.flush()
         # Every conversation opens with the NPC's line from the template, saved with the quest
         db.add(DialogueMessage(quest_progress_id=progress.id, role=MessageRole.NPC, text=quest.npc_opening))
+        if (story := get_story_state(db, user_id)) is not None:
+            story.current_location_id = quest.location_id
         db.commit()
     except IntegrityError:
         # Two requests raced past the checks above; the database constraints decide who won
@@ -199,9 +189,22 @@ def complete_quest(db: Session, user_id: int, quest_id: int) -> CompletedQuest:
     gain = add_xp(profile.xp, reward)
     profile.xp = gain.xp
     profile.level = gain.level
+    add_trust(db, user_id, quest.rewards.get("trust", {}))
+    _update_chapter(db, user_id)
     db.commit()
     db.refresh(progress)
     return CompletedQuest(PlayerQuest(quest, QuestStatus.COMPLETED, progress), gain)
+
+
+def _update_chapter(db: Session, user_id: int) -> None:
+    story = get_story_state(db, user_id)
+    if story is None:
+        return
+    quests = list_player_quests(db, user_id)
+    story.chapter = current_chapter(
+        open_quest_chapters=[q.quest.chapter for q in quests if q.status in (QuestStatus.AVAILABLE, QuestStatus.ACTIVE)],
+        completed_quest_chapters=[q.quest.chapter for q in quests if q.status == QuestStatus.COMPLETED],
+    )
 
 
 def _load_quest(db: Session, quest_id: int) -> QuestTemplate:

@@ -240,28 +240,41 @@ Learning Engine'in her beceri için hesapladığı özet. `skill_observations`'t
 | error_count | int | |
 | last_practiced_at | timestamptz | |
 
-### `story_states` · #13
+### `story_states` · uygulandı (#13)
 
 | Alan | Tip | Not |
 |---|---|---|
 | id | int PK | |
 | user_id | int FK → users | unique, cascade |
 | chapter | int | |
-| current_location_id | int FK → locations, null | |
-| flags | JSON | ör. `{"helped_neighbor": true}` |
+| current_location_id | int FK → locations, null | son başlatılan görevin mekânı |
+| flags | JSON | kararların açtığı bayrak slug'ları, ör. `["helped_alex"]` |
 | ending | varchar(40), null | ulaşılan son |
 | updated_at | timestamptz | |
 
-Karakter oluşturulduğunda bir kez yaratılır (#13).
+Karakter oluşturulduğunda aynı transaction'da bir kez yaratılır (bölüm 1, bayrak yok); karakteri
+düzenlemek sıfırlamaz. Migration, bu tablodan önce oluşturulmuş karakterler için de başlangıç
+durumunu ekler. Görev başlatılınca `current_location_id` görevin mekânına geçer. Görev
+tamamlanınca bölüm yeniden hesaplanır: hâlâ oynanabilecek (`available` ya da `active`) görevlerin
+en küçük bölümü; hiçbiri kalmadıysa son tamamlanan bölüm.
 
-### `npc_relationships` · #13
+### `npc_relationships` · uygulandı (#13)
 
 | Alan | Tip | Not |
 |---|---|---|
 | id | int PK | |
 | user_id | int FK → users | cascade |
 | npc_id | int FK → npcs | `(user_id, npc_id)` unique |
-| trust | int | 0–100, Story Engine sınırlar |
+| trust | int | 0–100, Story Engine sınırlar; veritabanında da CHECK var |
+
+Satırı olmayan NPC'nin güveni 0'dır. Güven yalnızca Story Engine üzerinden değişir
+(`services/story.py`): görev tamamlanınca şablondaki `rewards.trust` aynı transaction'da eklenir
+(tamamlama bir kez yapılabildiği için ödül de bir kez gelir), AI'nın önerdiği aksiyon
+`apply_story_action()` ile süzülür, kararlar (#17) da aynı yolu kullanır.
+
+**API:** `GET /api/story/state` oyuncunun bölümünü, mekânını (`{slug, name}` ya da `null`),
+bayraklarını, sonunu ve her NPC için `{slug, name, trust}` listesini döner. Karakter yoksa `404`.
+NPC'lerin prompt bilgileri (`personality`, `knows`) bu cevapta yoktur.
 
 ### `story_decisions` · #17
 

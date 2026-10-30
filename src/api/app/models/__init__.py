@@ -9,6 +9,18 @@ from app.models.content import Location, Npc, QuestTemplate
 from app.models.dialogue import DialogueMessage
 from app.models.player import PlayerProfile
 from app.models.quest_progress import QuestProgress
+from app.models.story import NpcRelationship, StoryState
 from app.models.user import User
 
-__all__ = ["Base", "DialogueMessage", "Location", "Npc", "PlayerProfile", "QuestProgress", "QuestTemplate", "User"]
+__all__ = [
+    "Base",
+    "DialogueMessage",
+    "Location",
+    "Npc",
+    "NpcRelationship",
+    "PlayerProfile",
+    "QuestProgress",
+    "QuestTemplate",
+    "StoryState",
+    "User",
+]
