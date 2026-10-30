@@ -93,6 +93,10 @@ export function getCurrentUser() {
   return authRequest("/auth/me");
 }
 
+export function deleteAccount(password) {
+  return authRequest("/auth/me", { method: "DELETE", body: { password } });
+}
+
 export function getProfile() {
   return authRequest("/player/profile");
 }

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -7,8 +7,19 @@ from app.core.dependencies import get_current_user
 from app.core.rate_limit import RateLimiter, client_ip, raise_if_limited
 from app.core.security import create_access_token
 from app.models.user import User
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UserResponse
-from app.services.users import EmailAlreadyRegisteredError, authenticate_user, create_user
+from app.schemas.auth import (
+    DeleteAccountRequest,
+    LoginRequest,
+    RegisterRequest,
+    TokenResponse,
+    UserResponse,
+)
+from app.services.users import (
+    EmailAlreadyRegisteredError,
+    authenticate_user,
+    create_user,
+    delete_account,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -67,3 +78,16 @@ def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)
 def me(current_user: User = Depends(get_current_user)) -> UserResponse:
     """Return the account that the access token belongs to."""
     return UserResponse.model_validate(current_user)
+
+
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+def delete_me(
+    payload: DeleteAccountRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> Response:
+    """Permanently delete the account and all of the player's data. Needs the current password."""
+    if not delete_account(db, current_user, payload.password):
+        # 403, not 401: the session is still valid, only the confirmation failed
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Incorrect password.")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

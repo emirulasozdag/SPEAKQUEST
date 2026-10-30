@@ -80,11 +80,41 @@
             <button type="button" class="btn btn-outline-secondary" data-feature="Changing your password">Change password</button>
             <button type="button" class="btn btn-outline-secondary" data-action="logout">Log out</button>
             <button type="button" class="btn btn-outline-danger" data-feature="Resetting game progress">Reset game progress</button>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete-account-dialog">Delete account</button>
           </div>
         </div>
       </section>
     </div>
   </main>
+
+  <div class="modal fade" id="delete-account-dialog" tabindex="-1" aria-labelledby="delete-account-title" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="delete-account-form" class="modal-content" novalidate>
+        <div class="modal-header">
+          <h2 id="delete-account-title" class="modal-title h5">Delete account</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="delete-account-alert" role="alert" hidden></div>
+          <p>This permanently deletes your account, your character and all of your game and learning data. It cannot be undone.</p>
+          <div class="mb-3">
+            <label for="delete-password" class="form-label">Current password</label>
+            <input type="password" class="form-control" id="delete-password" name="password" autocomplete="current-password" required aria-describedby="delete-password-error">
+            <div id="delete-password-error" class="invalid-feedback"></div>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="delete-confirm" required aria-describedby="delete-confirm-error">
+            <label class="form-check-label" for="delete-confirm">I understand that my account and all of my data will be deleted for good.</label>
+            <div id="delete-confirm-error" class="invalid-feedback"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Delete my account</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <footer data-component="footer"></footer>
 </body>
