@@ -8,13 +8,14 @@ from app.core.security import hash_password, verify_password
 from app.models.dialogue import DialogueMessage
 from app.models.player import PlayerProfile
 from app.models.quest_progress import QuestProgress
+from app.models.story import NpcRelationship, StoryState
 from app.models.user import User
 
 # Every model that stores data of one player, keyed by user_id. A PR that adds such a table
 # adds it here too; tests/test_account_deletion.py fails when one is missing.
 # The rows are deleted explicitly as well as through ON DELETE CASCADE, so deletion does not
 # depend on the database enforcing foreign keys (SQLite does not by default).
-PLAYER_DATA_MODELS = (PlayerProfile, QuestProgress)
+PLAYER_DATA_MODELS = (PlayerProfile, QuestProgress, StoryState, NpcRelationship)
 
 
 class EmailAlreadyRegisteredError(Exception):

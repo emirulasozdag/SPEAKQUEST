@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.models.player import PlayerProfile
 from app.schemas.player import ProfileUpdateRequest
+from app.services.story import get_story_state, new_story_state
 
 
 def get_profile(db: Session, user_id: int) -> PlayerProfile | None:
@@ -22,6 +23,9 @@ def save_profile(db: Session, user_id: int, data: ProfileUpdateRequest) -> tuple
     if created:
         profile = PlayerProfile(user_id=user_id)
         db.add(profile)
+        # The story starts once, with the character; editing the character later never resets it
+        if get_story_state(db, user_id) is None:
+            db.add(new_story_state(user_id))
 
     _apply_character_fields(profile, data)
     try:

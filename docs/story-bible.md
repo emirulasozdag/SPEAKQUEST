@@ -184,8 +184,16 @@ aksiyonlar:
 - `npc_confused`: NPC oyuncuyu anlamadı; oyuncudan tekrar denemesi beklenir.
 
 Göreve özel aksiyonlar (`order_taken`, `viewing_positive`, `interview_positive`,
-`interview_concern`, `clue_found`) o görevin anlatımı içindir. Etkilerini Story Engine (#13)
-belirler; içerik dosyası yalnızca hangi aksiyonların geçerli olduğunu söyler.
+`interview_concern`, `clue_found`) o görevin anlatımı içindir. İçerik dosyası yalnızca hangi
+aksiyonların geçerli olduğunu söyler; etkilerini Story Engine (`engines/story.py`,
+`apply_story_action`) belirler:
+
+- Görevin `allowed_story_actions` listesinde olmayan aksiyon reddedilir, hiçbir şey değişmez.
+- `npc_pleased`, `order_taken`, `viewing_positive`, `interview_positive`, `clue_found`: görevin
+  NPC'sinin güvenine en fazla +2 eklenir (100'ü geçmez). Hikâyeyi asıl ilerleten kararlar (+15)
+  ve görev ödülleridir; bu yalnızca küçük bir bonustur.
+- `continue`, `npc_confused`, `interview_concern`: kabul edilir ama durumu değiştirmez. Dil
+  öğrenen oyuncu anlaşılmadığı için hikâyede cezalandırılmaz.
 
 ### Örnek
 
