@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Alex, your neighbour in flat 3B">
+  <title>Alex, your neighbour in flat 3B</title>
+  <clipPath id="frame"><circle cx="60" cy="60" r="60"/></clipPath>
+  <g clip-path="url(#frame)">
+  <circle cx="60" cy="60" r="60" fill="#d4ecdf"/>
+  
+  <path d="M18 120c2-24 20-36 42-36s40 12 42 36z" fill="#2f8a5f"/>
+  <rect x="52" y="70" width="16" height="16" rx="6" fill="#c98f63"/>
+  <ellipse cx="60" cy="54" rx="21" ry="24" fill="#c98f63"/>
+  <path d="M38 50c-2-18 10-28 22-28s26 8 22 28c-4-8-12-12-22-12s-18 4-22 12z" fill="#2b2b33"/>
+  <circle cx="52" cy="56" r="2.6" fill="#1e2a47"/>
+  <circle cx="68" cy="56" r="2.6" fill="#1e2a47"/>
+  <path d="M53 66q7 6 14 0" fill="none" stroke="#1e2a47" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M47 86l13 10 13-10" fill="none" stroke="#d4ecdf" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+</svg>

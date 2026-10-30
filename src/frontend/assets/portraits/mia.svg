@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Mia, barista at the Corner Café">
+  <title>Mia, barista at the Corner Café</title>
+  <clipPath id="frame"><circle cx="60" cy="60" r="60"/></clipPath>
+  <g clip-path="url(#frame)">
+  <circle cx="60" cy="60" r="60" fill="#f6e1c3"/>
+  <path d="M36 50c0-22 12-32 24-32s24 10 24 32v26H36z" fill="#7a3b1d"/>
+  <path d="M18 120c2-24 20-36 42-36s40 12 42 36z" fill="#c47812"/>
+  <rect x="52" y="70" width="16" height="16" rx="6" fill="#e8b48a"/>
+  <ellipse cx="60" cy="54" rx="21" ry="24" fill="#e8b48a"/>
+  <path d="M38 48c4-16 14-22 24-22 10 0 18 8 20 20-10-2-22-8-26-14-4 8-10 14-18 16z" fill="#7a3b1d"/>
+  <circle cx="52" cy="56" r="2.6" fill="#1e2a47"/>
+  <circle cx="68" cy="56" r="2.6" fill="#1e2a47"/>
+  <path d="M53 66q7 6 14 0" fill="none" stroke="#1e2a47" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M44 92h32v28H44z" fill="#fff6e9"/><path d="M50 92v-6M70 92v-6" stroke="#fff6e9" stroke-width="3"/>
+  </g>
+</svg>
