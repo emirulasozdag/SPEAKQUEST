@@ -23,6 +23,8 @@ from app.content.schema import Slug
 from app.engines.categories import SkillCategory
 
 MAX_DETECTED_ERRORS = 5
+# A quest has a handful of objectives; a longer list from the model is a broken reply
+MAX_OBJECTIVES_MET = 10
 
 NpcReply = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=800)]
 Sentence = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)]
@@ -63,6 +65,11 @@ class DialogueAnalysis(_AiModel):
     correctly_used: list[SkillCategory] = []
     feedback: Feedback = ""
     suggested_story_action: Slug = DEFAULT_STORY_ACTION
+    # Ids of the quest objectives this message fulfils. Only a claim: the objectives engine keeps the
+    # ids that belong to the quest and ignores the rest, so plain strings are accepted here.
+    objectives_met: list[Annotated[str, StringConstraints(strip_whitespace=True, max_length=60)]] = Field(
+        default=[], max_length=MAX_OBJECTIVES_MET
+    )
 
 
 class AnalysisFailure(BaseModel):

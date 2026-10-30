@@ -149,7 +149,7 @@ aynı zamanda o görevin diyalog oturumudur.
 | user_id | int FK → users | cascade |
 | quest_template_id | int FK → quest_templates | |
 | status | varchar(12) | `active`, `completed` |
-| objectives_met | JSON | backend'in doğruladığı hedef id'leri |
+| objectives_met | JSON | backend'in doğruladığı hedef id'leri; her diyalog turunda `engines/objectives.py` ekler (#31) |
 | xp_awarded | int | tamamlanınca verilen XP, tekrar ödül vermeyi engeller |
 | started_at, completed_at | timestamptz | |
 
@@ -188,6 +188,15 @@ güncellemede satır bulamadığı için XP almaz. Şablondaki güven ödülü (
 | created_at | timestamptz | |
 
 Prompt'a yalnızca son N mesaj girer. Tüm geçmiş sadece oyuncunun kendisine gösterilir.
+
+**Hedef işaretleme (#31):** AI cevabındaki `objectives_met`, bu mesajın karşıladığını düşündüğü
+hedef id'lerinin listesidir (prompt görevin hedeflerini id ve açıklamayla verir). Bu yalnızca bir
+iddiadır; `engines/objectives.py` şu kurallarla karar verir: (1) yalnızca görev şablonundaki id'ler
+sayılır, bilinmeyen ve başka görevin id'leri yok sayılır ve loglanır; (2) yalnızca
+`communication_success` true olan mesaj hedef karşılayabilir, dil bilgisi hataları engellemez; (3)
+karşılanmış hedef geri alınmaz. AI hata verirse ya da cevap geçersizse hiçbir hedef işaretlenmez
+(zaten hiçbir şey yazılmaz). `POST /api/dialogue/message` cevabı `objectives` (her hedef için `id`,
+`description`, `met`) ve bu mesajla ilk kez karşılanan `newly_met` id'lerini döner.
 
 **API:** `GET /api/dialogue/history/{quest_id}` oyuncunun o görevdeki mesajlarını `id` sırasıyla
 (eskiden yeniye) döner. Görev yoksa ya da oyuncu onu hiç başlatmadıysa `404`; başka bir oyuncunun

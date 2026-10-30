@@ -231,7 +231,8 @@ async function sendCurrentMessage() {
     input.value = "";
     updateCounter();
     addTurn(turn);
-    await refreshObjectives();
+    // The reply already carries every goal with its state, so no second request is needed
+    showObjectives(turn.objectives);
   } catch (error) {
     if (error instanceof ApiError && error.status !== 0 && error.status !== 401) {
       showAlert(alertBox, error.message, "danger");

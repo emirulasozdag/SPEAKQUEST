@@ -44,6 +44,13 @@ class StoryActionOut(BaseModel):
     accepted: bool
 
 
+class ObjectiveStateOut(BaseModel):
+    id: str
+    description: str
+    # Set only by the backend; the AI's claim is checked first (engines/objectives.py)
+    met: bool
+
+
 class DialogueTurnOut(BaseModel):
     # "ai_unavailable": the NPC answered with a fallback line, nothing was saved, try again
     status: Literal["ok", "ai_unavailable"]
@@ -54,5 +61,9 @@ class DialogueTurnOut(BaseModel):
     corrections: list[CorrectionOut] = []
     feedback: str = ""
     story_action: StoryActionOut | None = None
+    # Every objective of the quest with its state after this message (met and still open), and the
+    # ids this message fulfilled for the first time. Empty when the AI was unavailable.
+    objectives: list[ObjectiveStateOut] = []
+    newly_met: list[str] = []
     player_message: DialogueMessageOut | None = None
     npc_message: DialogueMessageOut | None = None
