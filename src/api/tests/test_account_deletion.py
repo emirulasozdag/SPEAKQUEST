@@ -2,6 +2,7 @@ from sqlalchemy import func, select
 
 from app.content.seed import seed_content
 from app.models import Base
+from app.models.dialogue import DialogueMessage
 from app.models.user import User
 from app.services.users import PLAYER_DATA_MODELS
 
@@ -121,3 +122,17 @@ def test_every_table_with_player_data_is_deleted():
     listed = {model.__tablename__ for model in PLAYER_DATA_MODELS}
 
     assert tables_with_user_id == listed
+
+
+def test_deleting_an_account_removes_its_dialogue_messages(client, db_session):
+    """Messages hang off quest_progress, not users, so the table check above does not cover them."""
+    seed_content(db_session)
+    headers = create_player(client, "deniz@example.com")
+    start_first_quest(client, headers)
+    other = create_player(client, "ece@example.com")
+    start_first_quest(client, other)
+    assert db_session.scalar(select(func.count()).select_from(DialogueMessage)) == 2
+
+    assert delete_me(client, headers).status_code == 204
+
+    assert db_session.scalar(select(func.count()).select_from(DialogueMessage)) == 1

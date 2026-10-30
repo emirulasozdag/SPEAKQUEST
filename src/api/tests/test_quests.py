@@ -1,4 +1,4 @@
-"""Quest endpoints: list, active, start. Completing a quest is S03-A and still returns 501."""
+"""Quest endpoints: list, active, start. Completing a quest is tested in test_quest_complete.py."""
 
 from datetime import datetime, timezone
 
@@ -38,7 +38,7 @@ def start(client, headers, slug: str):
 
 
 def complete_in_db(db_session, email: str, slug: str) -> None:
-    """Stand-in for quest completion (S03-A): write the finished row the way the backend will."""
+    """Write a finished quest row directly, to set up story state without playing the quest."""
     user = db_session.scalar(select(User).where(User.email == email))
     quest = db_session.scalar(select(QuestTemplate).where(QuestTemplate.slug == slug))
     db_session.add(
@@ -181,10 +181,6 @@ def test_a_completed_quest_cannot_be_started_again(client, headers, db_session):
 
     assert response.status_code == 409
     assert response.json()["detail"] == "You have already completed this quest."
-
-
-def test_completing_a_quest_through_the_api_is_not_available_yet(client, headers):
-    assert client.post(f"{QUESTS_URL}/1/complete", headers=headers).status_code == 501
 
 
 # --- players do not see each other ----------------------------------------------------------

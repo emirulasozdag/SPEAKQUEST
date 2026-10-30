@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.engines.categories import SkillCategory
-from app.services.quests import PlayerQuest, QuestStatus
+from app.services.quests import CompletedQuest, PlayerQuest, QuestStatus
 
 
 class QuestSummaryOut(BaseModel):
@@ -62,4 +62,25 @@ class ActiveQuestOut(QuestSummaryOut):
                 ObjectiveOut(id=o["id"], description=o["description"], met=o["id"] in met)
                 for o in item.quest.objectives
             ],
+        )
+
+
+class QuestCompletedOut(BaseModel):
+    """The finished quest and what it paid. XP and level are the player's new totals."""
+
+    quest: QuestSummaryOut
+    xp_gained: int
+    xp: int
+    level: int
+    leveled_up: bool
+
+    @classmethod
+    def from_completed(cls, completed: CompletedQuest) -> "QuestCompletedOut":
+        gain = completed.gain
+        return cls(
+            quest=QuestSummaryOut.from_player_quest(completed.item),
+            xp_gained=gain.gained,
+            xp=gain.xp,
+            level=gain.level,
+            leveled_up=gain.leveled_up,
         )
