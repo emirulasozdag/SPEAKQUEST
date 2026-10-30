@@ -111,3 +111,22 @@ def test_each_user_only_sees_and_changes_their_own_profile(client):
     assert response.status_code == 201
     assert client.get(PROFILE_URL, headers=headers_a).json()["character_name"] == "Deniz"
     assert client.get(PROFILE_URL, headers=headers_b).json()["character_name"] == "Bora"
+
+
+@pytest.mark.parametrize(
+    ("xp", "into", "needed"),
+    [(0, 0, 50), (130, 10, 100), (500, 0, None), (620, 120, None)],
+    ids=["new-player", "mid-level", "max-level", "beyond-max"],
+)
+def test_profile_reports_progress_in_level(client, headers, db_session, xp, into, needed):
+    from app.models.player import PlayerProfile
+
+    client.put(PROFILE_URL, json=VALID_PROFILE, headers=headers)
+    profile = db_session.query(PlayerProfile).one()
+    profile.xp = xp
+    db_session.commit()
+
+    body = client.get(PROFILE_URL, headers=headers).json()
+
+    assert body["xp_into_level"] == into
+    assert body["xp_needed_for_next"] == needed

@@ -105,6 +105,28 @@ export function saveProfile(profile) {
   return authRequest("/player/profile", { method: "PUT", body: profile });
 }
 
+export function getLocations() {
+  return authRequest("/locations");
+}
+
+export function getQuests() {
+  return authRequest("/quests");
+}
+
+// Resolves to null when the player has no active quest (the API answers 404)
+export async function getActiveQuest() {
+  try {
+    return await authRequest("/quests/active");
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
+}
+
+export function startQuest(questId) {
+  return authRequest(`/quests/${questId}/start`, { method: "POST" });
+}
+
 export function getHealth() {
   return apiRequest("/health");
 }

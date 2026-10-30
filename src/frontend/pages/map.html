@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
   <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/pages/map.js"></script>
 </head>
 <body data-auth="required">
   <header data-component="navbar" data-variant="game"></header>
@@ -32,7 +33,7 @@
             <path class="sq-road" d="M-20 300H820M330 -20V420" />
             <path class="sq-road-line" d="M0 300H800M330 0V410" />
 
-            <a class="sq-place sq-apartment" href="/pages/dialogue.html" data-location="apartment" aria-label="Linden House, open">
+            <a class="sq-place sq-apartment" href="#place-detail" data-location="apartment" aria-label="Linden House">
               <g class="sq-building">
                 <rect x="70" y="150" width="160" height="135" fill="#b5654a" />
                 <rect x="60" y="138" width="180" height="16" rx="4" fill="#7a3b1d" />
@@ -42,11 +43,11 @@
               <g class="sq-place-label">
                 <rect x="55" y="326" width="190" height="62" rx="14" />
                 <text x="150" y="352" text-anchor="middle">Linden House</text>
-                <text class="sq-place-status" x="150" y="375" text-anchor="middle" data-place-status>Open</text>
+                <text class="sq-place-status" x="150" y="375" text-anchor="middle" data-place-status>Loading…</text>
               </g>
             </a>
 
-            <a class="sq-place sq-cafe" href="/pages/dialogue.html" data-location="cafe" aria-label="Corner Café, open">
+            <a class="sq-place sq-cafe" href="#place-detail" data-location="cafe" aria-label="Corner Café">
               <g class="sq-building">
                 <rect x="385" y="190" width="130" height="95" fill="#fff6e9" />
                 <path d="M375 190h150l-10 26H385z" fill="#c47812" />
@@ -58,11 +59,11 @@
               <g class="sq-place-label">
                 <rect x="365" y="326" width="170" height="62" rx="14" />
                 <text x="450" y="352" text-anchor="middle">Corner Café</text>
-                <text class="sq-place-status" x="450" y="375" text-anchor="middle" data-place-status>Open</text>
+                <text class="sq-place-status" x="450" y="375" text-anchor="middle" data-place-status>Loading…</text>
               </g>
             </a>
 
-            <a class="sq-place sq-office" href="/pages/dialogue.html" data-location="office" aria-label="Bright Path Travel, open">
+            <a class="sq-place sq-office" href="#place-detail" data-location="office" aria-label="Bright Path Travel">
               <g class="sq-building">
                 <rect x="600" y="70" width="130" height="215" rx="6" fill="#3a62c9" />
                 <g fill="#a9bdf0"><rect x="616" y="88" width="42" height="24" rx="3" /><rect x="672" y="88" width="42" height="24" rx="3" /><rect x="616" y="126" width="42" height="24" rx="3" /><rect x="672" y="126" width="42" height="24" rx="3" /><rect x="616" y="164" width="42" height="24" rx="3" /><rect x="672" y="164" width="42" height="24" rx="3" /><rect x="616" y="202" width="42" height="24" rx="3" /><rect x="672" y="202" width="42" height="24" rx="3" /></g>
@@ -71,7 +72,7 @@
               <g class="sq-place-label">
                 <rect x="570" y="326" width="190" height="62" rx="14" />
                 <text x="665" y="352" text-anchor="middle">Bright Path Travel</text>
-                <text class="sq-place-status" x="665" y="375" text-anchor="middle" data-place-status>Open</text>
+                <text class="sq-place-status" x="665" y="375" text-anchor="middle" data-place-status>Loading…</text>
               </g>
             </a>
           </svg>
@@ -79,21 +80,14 @@
       </div>
 
       <aside class="col-lg-4" aria-labelledby="places-title">
+        <div id="map-alert" role="alert" hidden></div>
+        <section id="place-detail" class="sq-panel sq-line-tag mb-4" aria-live="polite" tabindex="-1" hidden></section>
+
         <h2 id="places-title" class="sq-panel-title">Places</h2>
-        <div class="d-grid gap-3">
-          <a class="sq-panel sq-line-tag sq-cafe text-decoration-none text-body" href="/pages/dialogue.html">
-            <h3 class="mb-1">Corner Café</h3>
-            <p class="mb-0 small text-secondary">Mia, barista</p>
-          </a>
-          <a class="sq-panel sq-line-tag sq-apartment text-decoration-none text-body" href="/pages/dialogue.html">
-            <h3 class="mb-1">Linden House</h3>
-            <p class="mb-0 small text-secondary">Alex, your neighbour</p>
-          </a>
-          <a class="sq-panel sq-line-tag sq-office text-decoration-none text-body" href="/pages/dialogue.html">
-            <h3 class="mb-1">Bright Path Travel</h3>
-            <p class="mb-0 small text-secondary">Olivia, hiring manager</p>
-          </a>
-        </div>
+        <p id="places-loading" class="text-secondary" role="status">
+          <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Loading the city…
+        </p>
+        <div id="places-list" class="d-grid gap-3"></div>
       </aside>
     </div>
   </main>

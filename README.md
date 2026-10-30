@@ -357,7 +357,8 @@ artık çalışmaz (`401`).
 (1–3), `english_level` (`A2`, `B1`) ve `learning_goal` (`everyday`, `work`, `grammar`) alır. İlk
 çağrı karakteri oluşturur (`201`), sonraki çağrılar günceller (`200`). `xp` ve `level` istemciden
 gönderilirse istek `422` ile reddedilir; bu değerleri yalnızca backend kuralları değiştirir.
-Karakter henüz oluşturulmadıysa `GET /api/player/profile` `404` döner.
+Karakter henüz oluşturulmadıysa `GET /api/player/profile` `404` döner. Cevap XP çubuğu için `xp_into_level` (bu seviyede kazanılan XP) ve
+`xp_needed_for_next` (sonraki seviye için gereken XP; en yüksek seviyede `null`) alanlarını da içerir.
 
 Tüm endpointler kimlik doğrulama, yetkilendirme ve girdi doğrulaması içerir. Her kullanıcı yalnızca
 kendi verisine erişebilir. Görev tamamlama gibi kritik işlemler istemciden gelen değerlere güvenilerek
