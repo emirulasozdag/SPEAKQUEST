@@ -162,14 +162,21 @@ saklanmaz, Story Engine'in `is_unlocked()` fonksiyonu her istekte hesaplar.
 `completed`), `GET /api/quests/active` aktif görevi hedefleriyle (`met` alanını yalnızca backend
 doğrular) döner; aktif görev yoksa `404`. `POST /api/quests/{id}/start` görevi başlatır (`201`):
 bilinmeyen görev `404`; kilitli, zaten aktif, zaten tamamlanmış ya da başka görev aktifken `409`.
-NPC'nin ilk cümlesi (`npc_opening`) bu cevaplarda yoktur; diyalog geçmişi boşken #11 onu şablondan
-okuyup ilk mesaj olarak saklar. `POST /api/quests/{id}/complete` S03-A'dadır (`501`).
+NPC'nin ilk cümlesi (`npc_opening`) bu cevaplarda yoktur; görev başlatılırken aynı transaction'da
+şablondan okunup diyaloğun ilk mesajı olarak saklanır ve geçmişte görünür.
+
+`POST /api/quests/{id}/complete` aktif görevi tamamlar ve XP'yi bir kez öder. Tek ölçüt görev
+şablonundaki iletişim hedefleridir: her hedef id'si `objectives_met` içinde olmalıdır. Dil bilgisi
+hataları tamamlamayı engellemez. Bilinmeyen görev `404`; başlatılmamış, zaten tamamlanmış, hedefleri
+eksik ya da karakteri olmayan oyuncu için `409`. Cevap görevi, kazanılan XP'yi, yeni XP/seviyeyi ve
+seviye atlanıp atlanmadığını döner. Aynı görev için gelen ikinci istek, `status = 'active'` koşullu
+güncellemede satır bulamadığı için XP almaz. Şablondaki güven ödülü (`rewards.trust`) #13 ile uygulanır.
 
 **XP ve seviye:** `engines/progression.py`. Seviye eşikleri `LEVEL_THRESHOLDS = (0, 50, 120, 220, 350,
 500)`; MVP'nin 5 görevi toplam 410 XP verir ve oyuncuyu 5. seviyeye çıkarır. Görev tamamlanırken
-`add_xp()` sonucu `player_profiles.xp/level` ve `quest_progress.xp_awarded` alanlarına yazılır (S03-A).
+`add_xp()` sonucu `player_profiles.xp/level` ve `quest_progress.xp_awarded` alanlarına yazılır.
 
-### `dialogue_messages` · #11
+### `dialogue_messages` · uygulandı (#11)
 
 | Alan | Tip | Not |
 |---|---|---|
@@ -181,6 +188,11 @@ okuyup ilk mesaj olarak saklar. `POST /api/quests/{id}/complete` S03-A'dadır (`
 | created_at | timestamptz | |
 
 Prompt'a yalnızca son N mesaj girer. Tüm geçmiş sadece oyuncunun kendisine gösterilir.
+
+**API:** `GET /api/dialogue/history/{quest_id}` oyuncunun o görevdeki mesajlarını `id` sırasıyla
+(eskiden yeniye) döner. Görev yoksa ya da oyuncu onu hiç başlatmadıysa `404`; başka bir oyuncunun
+konuşması da aynı şekilde `404` döner. Tablo `users`'a değil `quest_progress`'e bağlı olduğundan
+hesap silinirken mesajlar `quest_progress` satırlarından önce açıkça silinir.
 
 ### `language_errors` · #12 (Learning Engine üzerinden yazılır)
 

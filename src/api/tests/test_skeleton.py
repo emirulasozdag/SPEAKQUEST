@@ -16,7 +16,6 @@ def test_health_reports_api_status(client):
     ("method", "path"),
     [
         ("get", "/api/player/progress"),
-        ("post", "/api/quests/1/complete"),
         ("post", "/api/dialogue/message"),
         ("get", "/api/story/state"),
     ],

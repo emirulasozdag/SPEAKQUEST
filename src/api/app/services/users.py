@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password, verify_password
+from app.models.dialogue import DialogueMessage
 from app.models.player import PlayerProfile
 from app.models.quest_progress import QuestProgress
 from app.models.user import User
@@ -59,6 +60,12 @@ def delete_account(db: Session, user: User, password: str) -> bool:
     """
     if not verify_password(password, user.password_hash):
         return False
+    # Messages hang off quest_progress, not users, so they go first, before their parent rows
+    db.execute(
+        delete(DialogueMessage).where(
+            DialogueMessage.quest_progress_id.in_(select(QuestProgress.id).where(QuestProgress.user_id == user.id))
+        )
+    )
     for model in PLAYER_DATA_MODELS:
         db.execute(delete(model).where(model.user_id == user.id))
     db.delete(user)
