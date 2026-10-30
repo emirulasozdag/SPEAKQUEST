@@ -194,7 +194,7 @@ Prompt'a yalnızca son N mesaj girer. Tüm geçmiş sadece oyuncunun kendisine g
 konuşması da aynı şekilde `404` döner. Tablo `users`'a değil `quest_progress`'e bağlı olduğundan
 hesap silinirken mesajlar `quest_progress` satırlarından önce açıkça silinir.
 
-### `language_errors` · #12 (Learning Engine üzerinden yazılır)
+### `language_errors` · uygulandı (#12, Learning Engine üzerinden yazılır)
 
 | Alan | Tip | Not |
 |---|---|---|
@@ -207,7 +207,7 @@ hesap silinirken mesajlar `quest_progress` satırlarından önce açıkça silin
 | explanation | text | |
 | created_at | timestamptz | |
 
-### `skill_observations` · #12 / #16
+### `skill_observations` · uygulandı (#12; puanlar #16)
 
 Spec'in istediği "öğrenme fırsatı" kaydı. Bir mesaj bir beceriyi kullanma fırsatı verdiyse, kategori
 başına bir satır yazılır. Fırsat yoksa satır yoktur. Böylece geçmiş zaman içermeyen bir cümle
@@ -224,6 +224,21 @@ Past Simple puanını artırmaz.
 
 `skill_scores` bu kayıtlardan hesaplanır. "Son 10 fırsatta 3 hata" gibi tekrar eden hata kuralı da
 bu tabloya bakar.
+
+Satırları yalnızca `engines/learning.record_message_analysis()` yazar. Bir mesajdaki her kategori
+tek fırsattır: aynı kategoride hem hata hem doğru kullanım varsa sonuç `incorrect` olur.
+
+**API:** `POST /api/dialogue/message` (`{"message": "..."}`) aktif görevdeki NPC'ye mesaj gönderir.
+Akış `services/dialogue.send_message()` içindedir: mesaj kırpılır; boşsa ya da 500 karakteri
+aşıyorsa `422`, karakter ya da aktif görev yoksa `409`. Dil modeline yalnızca NPC, görev, seviye,
+kısa bir hikâye özeti ve son mesajlar gider. Cevap doğrulandıktan sonra tek transaction'da oyuncu
+mesajı (`communication_success` ile) ve NPC cevabı saklanır, hatalar ve fırsatlar Learning Engine
+üzerinden yazılır, önerilen hikâye aksiyonu Story Engine'e (`apply_suggested_action`) iletilir. Cevap
+`npc_reply`, `communication_success`, `corrections` (`original → corrected` + Türkçe açıklama),
+`feedback`, `story_action` (`suggested`, `accepted`) ve saklanan iki mesajı içerir. Dil modeli
+yapılandırılmamışsa, hata verirse ya da geçersiz cevap dönerse yine `200` döner ama
+`status: "ai_unavailable"` ve yedek NPC cümlesiyle; hiçbir şey saklanmaz, oyuncu mesajı tekrar
+gönderebilir. Görev hedeflerinin işaretlenmesi #31'dedir.
 
 ### `skill_scores` · #16
 

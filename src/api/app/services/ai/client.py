@@ -14,7 +14,7 @@ import urllib.request
 from collections.abc import Callable
 from typing import Protocol
 
-from app.core.config import Settings
+from app.core.config import Settings, get_settings
 
 logger = logging.getLogger("speakquest.ai")
 
@@ -162,6 +162,18 @@ def _extract_text(payload: bytes) -> str:
     if not text.strip():
         raise AiError("bad_response", "empty text")
     return text
+
+
+def get_ai_client() -> AiClient | None:
+    """FastAPI dependency: the configured client, or None when no provider is set up.
+
+    None is not an error: the dialogue flow then answers with the safe fallback line. Tests
+    override this dependency, so they never call a real provider.
+    """
+    try:
+        return build_client(get_settings())
+    except AiError:
+        return None
 
 
 def build_client(settings: Settings) -> AiClient:
