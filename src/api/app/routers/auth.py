@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
+from app.core.rate_limit import RateLimiter, client_ip, raise_if_limited
 from app.core.security import create_access_token
 from app.models.user import User
 from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse, UserResponse
@@ -11,10 +12,22 @@ from app.services.users import EmailAlreadyRegisteredError, authenticate_user, c
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+# Failed logins are counted per email + IP, so one attacker cannot lock other people out
+login_limiter = RateLimiter()
+register_limiter = RateLimiter()
+
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> UserResponse:
+def register(
+    payload: RegisterRequest, request: Request, db: Session = Depends(get_db)
+) -> UserResponse:
     """Create an account. The password is stored only as a bcrypt hash."""
+    settings = get_settings()
+    ip_key = client_ip(request)
+    raise_if_limited(
+        register_limiter, ip_key, settings.register_rate_limit, settings.register_rate_window_seconds
+    )
+    register_limiter.hit(ip_key, settings.register_rate_window_seconds)
     try:
         user = create_user(db, email=payload.email, password=payload.password)
     except EmailAlreadyRegisteredError:
@@ -26,18 +39,27 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> UserRes
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)) -> TokenResponse:
+def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)) -> TokenResponse:
     """Exchange email and password for an access token."""
+    settings = get_settings()
+    attempt_key = f"{payload.email}|{client_ip(request)}"
+    # Checked before the password, so a blocked caller learns nothing about the account
+    raise_if_limited(
+        login_limiter, attempt_key, settings.login_rate_limit, settings.login_rate_window_seconds
+    )
+
     user = authenticate_user(db, email=payload.email, password=payload.password)
     if user is None:
+        login_limiter.hit(attempt_key, settings.login_rate_window_seconds)
         # Same answer for an unknown email and a wrong password, so accounts cannot be probed
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password.",
         )
+    login_limiter.reset(attempt_key)
     return TokenResponse(
         access_token=create_access_token(user.id),
-        expires_in=get_settings().access_token_expire_minutes * 60,
+        expires_in=settings.access_token_expire_minutes * 60,
     )
 
 
