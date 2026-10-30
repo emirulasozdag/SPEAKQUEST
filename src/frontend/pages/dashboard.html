@@ -12,58 +12,47 @@
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
   <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/pages/dashboard.js"></script>
 </head>
 <body data-auth="required">
   <header data-component="navbar" data-variant="game"></header>
 
   <main class="container py-5">
-    <p class="sq-draft-note px-3 py-2 mb-4">UI draft: the numbers below are sample data until the player API is connected.</p>
+    <div id="dashboard-alert" role="alert" hidden></div>
 
-    <div class="d-flex flex-wrap align-items-center gap-4 mb-5">
-      <span class="sq-avatar sq-cafe" aria-hidden="true">A</span>
-      <div class="flex-grow-1">
-        <h1 class="h2 mb-1">Good to see you, Alex</h1>
-        <p class="mb-2 text-secondary">Level 3 · B1 · Chapter 1: A new address</p>
-        <div class="progress sq-xp" role="progressbar" aria-label="XP to next level" aria-valuenow="240" aria-valuemin="0" aria-valuemax="400">
-          <div class="progress-bar" style="width: 60%"></div>
+    <p id="dashboard-loading" class="text-secondary" role="status">
+      <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Loading your adventure…
+    </p>
+
+    <div id="dashboard-content" hidden>
+      <section class="d-flex flex-wrap align-items-center gap-4 mb-5" aria-labelledby="player-name">
+        <img id="player-avatar" class="sq-avatar" src="/assets/avatars/avatar-1.svg" alt="">
+        <div class="flex-grow-1">
+          <h1 id="player-name" class="h2 mb-1"></h1>
+          <p id="player-level" class="mb-2 text-secondary"></p>
+          <div id="xp-bar" class="progress sq-xp" role="progressbar" aria-label="XP to next level" aria-valuemin="0">
+            <div class="progress-bar"></div>
+          </div>
+          <p id="xp-text" class="small text-secondary mt-1 mb-0"></p>
         </div>
-        <p class="small text-secondary mt-1 mb-0">240 / 400 XP to level 4</p>
+        <a id="continue-button" class="btn btn-lg btn-primary" href="/pages/map.html">Continue adventure</a>
+      </section>
+
+      <div class="row g-4">
+        <section class="col-lg-7" aria-labelledby="active-quest-title">
+          <div id="active-quest" class="sq-panel sq-line-tag h-100">
+            <h2 id="active-quest-title" class="sq-panel-title">Active quest</h2>
+            <div id="active-quest-body"></div>
+          </div>
+        </section>
+
+        <section class="col-lg-5" aria-labelledby="completed-title">
+          <div class="sq-panel h-100">
+            <h2 id="completed-title" class="sq-panel-title">Completed quests</h2>
+            <ul id="completed-list" class="list-unstyled mb-0"></ul>
+          </div>
+        </section>
       </div>
-      <a class="btn btn-lg btn-primary" href="/pages/dialogue.html">Continue adventure</a>
-    </div>
-
-    <div class="row g-4">
-      <section class="col-lg-7" aria-labelledby="active-quest-title">
-        <div class="sq-panel sq-line-tag sq-office h-100">
-          <h2 id="active-quest-title" class="sq-panel-title">Active quest</h2>
-          <h3>The Job Interview</h3>
-          <p>Ms. Carter at the Office wants to hear about your previous work. Answer her questions and get the job.</p>
-          <p class="small text-secondary">Practises: Past Simple · Reward: 120 XP</p>
-          <a class="btn btn-outline-primary" href="/pages/dialogue.html">Open conversation</a>
-        </div>
-      </section>
-
-      <section class="col-lg-5" aria-labelledby="focus-title">
-        <div class="sq-panel h-100">
-          <h2 id="focus-title" class="sq-panel-title">What to work on</h2>
-          <ul class="list-unstyled mb-3">
-            <li class="sq-skill-row d-flex justify-content-between py-2"><span>Past Simple</span><span class="text-secondary">7 mistakes</span></li>
-            <li class="sq-skill-row d-flex justify-content-between py-2"><span>Prepositions</span><span class="text-secondary">4 mistakes</span></li>
-            <li class="sq-skill-row d-flex justify-content-between py-2"><span>Question Formation</span><span class="text-secondary">2 mistakes</span></li>
-          </ul>
-          <a href="/pages/progress.html">See full progress</a>
-        </div>
-      </section>
-
-      <section class="col-12" aria-labelledby="recent-title">
-        <div class="sq-panel">
-          <h2 id="recent-title" class="sq-panel-title">Recently completed</h2>
-          <ul class="list-unstyled mb-0">
-            <li class="sq-skill-row d-flex justify-content-between py-2"><span>First Coffee · Café</span><span class="text-secondary">+80 XP</span></li>
-            <li class="sq-skill-row d-flex justify-content-between py-2"><span>Meeting the Landlord · Apartment</span><span class="text-secondary">+100 XP</span></li>
-          </ul>
-        </div>
-      </section>
     </div>
   </main>
 

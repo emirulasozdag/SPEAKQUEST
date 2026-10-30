@@ -590,6 +590,32 @@ span.sq-avatar {
   stroke-width: 5;
 }
 
+/* Place cards in the list next to the map are buttons */
+.sq-place-button {
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  transition: box-shadow var(--sq-transition);
+}
+
+.sq-place-button:hover {
+  box-shadow: var(--sq-shadow-md);
+}
+
+/* Quest status: a word, with a matching tint */
+.sq-quest-status {
+  flex-shrink: 0;
+  padding: 0 var(--sq-space-2);
+  border-radius: var(--sq-radius-pill);
+  font-size: 0.85rem;
+  background: var(--sq-paper);
+  color: var(--sq-ink-soft);
+}
+
+.sq-quest-status[data-status="available"] { background: var(--sq-office-tint); color: var(--sq-ink); }
+.sq-quest-status[data-status="active"] { background: var(--sq-cafe-tint); color: var(--sq-cafe-ink); }
+.sq-quest-status[data-status="completed"] { background: var(--sq-apartment-tint); color: var(--sq-ink); }
+
 /* ---------- Progress ---------- */
 
 .sq-xp {
