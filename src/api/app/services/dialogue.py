@@ -7,6 +7,7 @@ line is stored as the first message when the quest is started (services/quests.s
 """
 
 import logging
+from collections import Counter
 from dataclasses import dataclass
 from typing import Literal
 
@@ -19,6 +20,7 @@ from app.engines.objectives import apply_objectives
 from app.engines.story import StoryActionOutcome, StoryProgress
 from app.models.content import Npc, QuestTemplate
 from app.models.dialogue import PLAYER_MESSAGE_MAX_LENGTH, DialogueMessage, MessageRole
+from app.models.learning import LanguageError
 from app.models.player import EnglishLevel
 from app.models.quest_progress import QuestProgress
 from app.services.ai.analysis import analyze_message
@@ -89,6 +91,63 @@ def get_history(db: Session, user_id: int, quest_id: int) -> list[DialogueMessag
     if progress_id is None:
         raise DialogueNotFoundError
     return _messages_of(db, progress_id)
+
+
+def get_corrections(db: Session, user_id: int, message_ids: list[int]) -> dict[int, list[LanguageError]]:
+    """The mistakes found in the given messages of this player, by message id, oldest first."""
+    if not message_ids:
+        return {}
+    errors = db.scalars(
+        select(LanguageError)
+        .where(LanguageError.user_id == user_id, LanguageError.message_id.in_(message_ids))
+        .order_by(LanguageError.id)
+    )
+    by_message: dict[int, list[LanguageError]] = {}
+    for error in errors:
+        by_message.setdefault(error.message_id, []).append(error)
+    return by_message
+
+
+MAX_SUMMARY_EXAMPLES = 3
+
+
+@dataclass(frozen=True)
+class ConversationSummary:
+    """What the conversation of one quest showed, from stored data only."""
+
+    messages_sent: int
+    # Messages the NPC understood; communication is judged apart from grammar
+    understood: int
+    mistakes: int
+    # The most frequent mistake category; None when there were no mistakes
+    top_category: str | None
+    # Up to MAX_SUMMARY_EXAMPLES corrections, one per category first (most frequent category first)
+    examples: tuple[LanguageError, ...]
+
+
+def get_summary(db: Session, user_id: int, quest_id: int) -> ConversationSummary:
+    """Summarise the player's own conversation for a quest they started."""
+    messages = [message for message in get_history(db, user_id, quest_id) if message.role == MessageRole.PLAYER]
+    errors = [error for found in get_corrections(db, user_id, [m.id for m in messages]).values() for error in found]
+    return summarize(messages, errors)
+
+
+def summarize(messages: list[DialogueMessage], errors: list[LanguageError]) -> ConversationSummary:
+    """Pure aggregation over already loaded player messages and their mistakes."""
+    counts = Counter(error.category for error in errors)
+    # Most frequent category first; the category name only makes ties deterministic
+    ranked = sorted(counts, key=lambda category: (-counts[category], category))
+    # Newest mistake first within a category, so the example is what the player did last
+    newest = sorted(errors, key=lambda error: -error.id)
+    one_each = [next(error for error in newest if error.category == category) for category in ranked]
+    rest = [error for error in newest if error not in one_each]
+    return ConversationSummary(
+        messages_sent=len(messages),
+        understood=sum(1 for message in messages if message.communication_success),
+        mistakes=len(errors),
+        top_category=ranked[0] if ranked else None,
+        examples=tuple((one_each + rest)[:MAX_SUMMARY_EXAMPLES]),
+    )
 
 
 def send_message(db: Session, user_id: int, text: str, client: AiClient | None) -> DialogueTurn:
@@ -187,6 +246,7 @@ def _dialogue_context(
         level=level,
         story_summary=_story_summary(db, user_id, npc),
         history=tuple(HistoryLine(speaker=m.role, text=m.text) for m in recent),
+        objectives_met=tuple(progress.objectives_met),
     )
 
 

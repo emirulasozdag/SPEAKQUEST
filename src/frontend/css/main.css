@@ -692,3 +692,25 @@ span.sq-avatar {
   border-radius: var(--sq-radius-lg);
   border: 2px solid var(--sq-fix);
 }
+
+/* ---------- Dialogue: collapsible corrections ---------- */
+
+.sq-correction-badge {
+  margin-top: var(--sq-space-2);
+  padding: 0.2rem var(--sq-space-3);
+  border: 1px solid var(--sq-cafe);
+  border-radius: var(--sq-radius-pill);
+  background: var(--sq-cafe-tint);
+  color: var(--sq-cafe-ink);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.sq-correction-badge::after {
+  content: " ▾";
+}
+
+.sq-correction-badge[aria-expanded="true"]::after {
+  content: " ▴";
+}

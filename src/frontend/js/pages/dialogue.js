@@ -6,6 +6,7 @@ import {
   completeQuest,
   getActiveQuest,
   getDialogueHistory,
+  getDialogueSummary,
   getLocations,
   getQuests,
   handleApiError,
@@ -87,50 +88,71 @@ function communicationNote(success) {
   return note;
 }
 
-function feedbackBlock(turn) {
-  const box = document.createElement("div");
-  box.className = "sq-turn-feedback";
-  box.append(communicationNote(turn.communication_success));
+function correctionItem(fix) {
+  const item = document.createElement("li");
+  item.className = "sq-fix-item";
+  const category = document.createElement("span");
+  category.className = "small text-secondary d-block";
+  category.textContent = categoryLabel(fix.category);
+  const change = document.createElement("span");
+  change.className = "d-block";
+  const wrong = document.createElement("span");
+  wrong.className = "sq-wrong";
+  wrong.textContent = fix.original;
+  const right = document.createElement("span");
+  right.className = "sq-right";
+  right.textContent = fix.corrected;
+  change.append(wrong, " → ", right);
+  const why = document.createElement("span");
+  why.className = "small d-block";
+  why.textContent = fix.explanation;
+  item.append(category, change, why);
+  return item;
+}
 
-  if (!turn.corrections.length) {
-    const none = document.createElement("p");
-    none.className = "small text-secondary mb-0";
-    none.textContent = "No grammar mistakes found.";
-    box.append(none);
-    return box;
-  }
-
+function correctionList(corrections, label) {
   const list = document.createElement("ul");
   list.className = "list-unstyled mb-0";
-  list.setAttribute("aria-label", "Corrections");
-  for (const fix of turn.corrections) {
-    const item = document.createElement("li");
-    item.className = "sq-fix-item";
-    const category = document.createElement("span");
-    category.className = "small text-secondary d-block";
-    category.textContent = categoryLabel(fix.category);
-    const change = document.createElement("span");
-    change.className = "d-block";
-    const wrong = document.createElement("span");
-    wrong.className = "sq-wrong";
-    wrong.textContent = fix.original;
-    const right = document.createElement("span");
-    right.className = "sq-right";
-    right.textContent = fix.corrected;
-    change.append(wrong, " → ", right);
-    const why = document.createElement("span");
-    why.className = "small d-block";
-    why.textContent = fix.explanation;
-    item.append(category, change, why);
-    list.append(item);
-  }
-  box.append(list);
+  list.setAttribute("aria-label", label);
+  list.append(...corrections.map(correctionItem));
+  return list;
+}
+
+let feedbackCount = 0;
+
+// A badge next to the communication note opens the corrections. They are closed by default so
+// the story is not interrupted; the button is keyboard operable and announces its state.
+function feedbackBlock(success, corrections) {
+  const box = document.createElement("div");
+  box.className = "sq-turn-feedback";
+  box.append(communicationNote(success));
+  if (!corrections.length) return box;
+
+  const panelId = `corrections-${(feedbackCount += 1)}`;
+  const count = corrections.length;
+  const label = count === 1 ? "1 correction" : `${count} corrections`;
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "sq-correction-badge";
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.setAttribute("aria-controls", panelId);
+  toggle.textContent = label;
+  const panel = document.createElement("div");
+  panel.id = panelId;
+  panel.hidden = true;
+  panel.append(correctionList(corrections, label));
+  toggle.addEventListener("click", () => {
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    toggle.setAttribute("aria-expanded", String(open));
+    panel.hidden = !open;
+  });
+  box.append(toggle, panel);
   return box;
 }
 
 function addTurn(turn) {
   conversation.append(playerBubble(turn.player_message.text));
-  conversation.append(feedbackBlock(turn));
+  conversation.append(feedbackBlock(turn.communication_success, turn.corrections));
   conversation.append(npcBubble(turn.npc_reply));
   scrollToLatest();
 }
@@ -143,10 +165,7 @@ function showHistory(messages) {
     }
     conversation.append(playerBubble(message.text));
     if (message.communication_success !== null) {
-      const box = document.createElement("div");
-      box.className = "sq-turn-feedback";
-      box.append(communicationNote(message.communication_success));
-      conversation.append(box);
+      conversation.append(feedbackBlock(message.communication_success, message.corrections));
     }
   }
   scrollToLatest();
@@ -250,6 +269,47 @@ function updateCounter() {
   counter.textContent = `${input.value.length} / ${input.maxLength}`;
 }
 
+// The end-of-quest summary comes from stored data (GET /dialogue/summary), so it is the same after
+// a reload. If it cannot be loaded the quest is still complete and the rest of the page works.
+async function showSummary() {
+  const panel = document.querySelector("#summary-panel");
+  const body = document.querySelector("#summary-body");
+  try {
+    const summary = await getDialogueSummary(state.quest.id);
+    body.replaceChildren();
+
+    const understood = document.createElement("p");
+    understood.className = "mb-2";
+    understood.textContent = summary.messages_sent
+      ? `${state.npc?.name ?? "The character"} understood ${summary.understood} of your ${summary.messages_sent} messages.`
+      : "You finished this quest without sending any messages.";
+    const xp = document.createElement("p");
+    xp.className = "mb-3 fw-bold";
+    xp.textContent = `XP earned: +${state.quest.reward_xp}`;
+    body.append(understood, xp);
+
+    if (!summary.mistakes) {
+      const clean = document.createElement("p");
+      clean.className = "sq-right mb-0";
+      clean.textContent = "No grammar mistakes. Great work!";
+      body.append(clean);
+    } else {
+      const top = document.createElement("p");
+      top.className = "mb-2";
+      top.textContent = `Most common mistake: ${categoryLabel(summary.top_category)} (${summary.mistakes} in total).`;
+      const heading = document.createElement("h3");
+      heading.className = "h6";
+      heading.textContent = summary.examples.length === 1 ? "Example correction" : "Example corrections";
+      body.append(top, heading, correctionList(summary.examples, "Example corrections"));
+    }
+    panel.hidden = false;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) return handleApiError(error);
+    body.textContent = "Your summary could not be loaded.";
+    panel.hidden = false;
+  }
+}
+
 async function finishQuest() {
   completeButton.disabled = true;
   completeButton.textContent = "Completing…";
@@ -271,6 +331,7 @@ async function finishQuest() {
     link.textContent = "Back to dashboard";
     resultBox.append(title, total, link);
     resultBox.hidden = false;
+    await showSummary();
   } catch (error) {
     completeButton.disabled = false;
     completeButton.textContent = "Complete quest";
@@ -327,6 +388,7 @@ async function loadDialogue() {
       document.querySelector("#objective-bar").hidden = true;
       document.querySelector("#objective-text").textContent = "You completed this quest.";
       lockConversation("This quest is complete.");
+      await showSummary();
     }
     content.hidden = false;
   } catch (error) {
