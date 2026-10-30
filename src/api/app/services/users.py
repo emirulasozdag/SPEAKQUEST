@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.security import hash_password, verify_password
 from app.models.dialogue import DialogueMessage
+from app.models.learning import LanguageError, SkillObservation
 from app.models.player import PlayerProfile
 from app.models.quest_progress import QuestProgress
 from app.models.story import NpcRelationship, StoryState
@@ -15,7 +16,8 @@ from app.models.user import User
 # adds it here too; tests/test_account_deletion.py fails when one is missing.
 # The rows are deleted explicitly as well as through ON DELETE CASCADE, so deletion does not
 # depend on the database enforcing foreign keys (SQLite does not by default).
-PLAYER_DATA_MODELS = (PlayerProfile, QuestProgress, StoryState, NpcRelationship)
+# Learning rows point at dialogue messages, so they come before them
+PLAYER_DATA_MODELS = (LanguageError, SkillObservation, PlayerProfile, QuestProgress, StoryState, NpcRelationship)
 
 
 class EmailAlreadyRegisteredError(Exception):
@@ -61,13 +63,17 @@ def delete_account(db: Session, user: User, password: str) -> bool:
     """
     if not verify_password(password, user.password_hash):
         return False
-    # Messages hang off quest_progress, not users, so they go first, before their parent rows
-    db.execute(
-        delete(DialogueMessage).where(
-            DialogueMessage.quest_progress_id.in_(select(QuestProgress.id).where(QuestProgress.user_id == user.id))
-        )
-    )
     for model in PLAYER_DATA_MODELS:
+        if model is QuestProgress:
+            # Messages hang off quest_progress, not users: they go after the learning rows that
+            # point at them and before their own parent rows
+            db.execute(
+                delete(DialogueMessage).where(
+                    DialogueMessage.quest_progress_id.in_(
+                        select(QuestProgress.id).where(QuestProgress.user_id == user.id)
+                    )
+                )
+            )
         db.execute(delete(model).where(model.user_id == user.id))
     db.delete(user)
     db.commit()

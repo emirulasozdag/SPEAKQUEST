@@ -16,7 +16,6 @@ def test_health_reports_api_status(client):
     ("method", "path"),
     [
         ("get", "/api/player/progress"),
-        ("post", "/api/dialogue/message"),
     ],
 )
 def test_planned_endpoints_return_not_implemented(client, method, path):

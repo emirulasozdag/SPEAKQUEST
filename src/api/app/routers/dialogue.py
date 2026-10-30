@@ -3,17 +3,63 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
-from app.core.placeholders import not_implemented
 from app.models.user import User
-from app.schemas.dialogue import DialogueHistoryOut, DialogueMessageOut
+from app.schemas.dialogue import (
+    CorrectionOut,
+    DialogueHistoryOut,
+    DialogueMessageOut,
+    DialogueTurnOut,
+    SendMessageRequest,
+    StoryActionOut,
+)
 from app.services import dialogue as dialogue_service
+from app.services.ai.client import AiClient, get_ai_client
 
 router = APIRouter(prefix="/dialogue", tags=["dialogue"])
 
+_REFUSAL_STATUS = {
+    "empty": status.HTTP_422_UNPROCESSABLE_ENTITY,
+    "too_long": status.HTTP_422_UNPROCESSABLE_ENTITY,
+    "no_active_quest": status.HTTP_409_CONFLICT,
+    "no_character": status.HTTP_409_CONFLICT,
+}
 
-@router.post("/message")
-def send_message():
-    raise not_implemented("NPC dialogue")
+
+@router.post("/message", response_model=DialogueTurnOut)
+def send_message(
+    payload: SendMessageRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    client: AiClient | None = Depends(get_ai_client),
+) -> DialogueTurnOut:
+    """Send a message to the NPC of the active quest and get the reply and language feedback.
+
+    422 for an empty or too long message; 409 without a character or an active quest. When the AI
+    is unavailable the answer is still 200, with status "ai_unavailable", a fallback reply and
+    nothing saved, so the player can send the message again.
+    """
+    try:
+        turn = dialogue_service.send_message(db, current_user.id, payload.message, client)
+    except dialogue_service.MessageRefusedError as refused:
+        raise HTTPException(status_code=_REFUSAL_STATUS[refused.reason], detail=refused.message) from None
+
+    if turn.status != "ok":
+        return DialogueTurnOut(status=turn.status, quest_id=turn.quest_id, npc_reply=turn.npc_reply)
+    analysis = turn.analysis
+    return DialogueTurnOut(
+        status="ok",
+        quest_id=turn.quest_id,
+        npc_reply=turn.npc_reply,
+        communication_success=analysis.communication_success,
+        corrections=[
+            CorrectionOut(category=e.category, original=e.original, corrected=e.corrected, explanation=e.explanation)
+            for e in analysis.detected_errors
+        ],
+        feedback=analysis.feedback,
+        story_action=StoryActionOut(suggested=turn.story.action, accepted=turn.story.accepted),
+        player_message=DialogueMessageOut.model_validate(turn.player_message),
+        npc_message=DialogueMessageOut.model_validate(turn.npc_message),
+    )
 
 
 @router.get("/history/{quest_id}", response_model=DialogueHistoryOut)

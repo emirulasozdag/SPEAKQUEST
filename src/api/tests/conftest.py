@@ -8,6 +8,7 @@ from app.core.database import get_db
 from app.main import app
 from app.routers.auth import login_limiter, register_limiter
 from app.models import Base
+from app.services.ai.client import get_ai_client
 
 
 @pytest.fixture(autouse=True)
@@ -40,5 +41,7 @@ def db_session():
 @pytest.fixture
 def client(db_session) -> TestClient:
     app.dependency_overrides[get_db] = lambda: db_session
+    # No test ever calls a real AI provider through the API; dialogue tests set their own fake
+    app.dependency_overrides[get_ai_client] = lambda: None
     yield TestClient(app)
     app.dependency_overrides.clear()
