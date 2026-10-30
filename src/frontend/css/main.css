@@ -657,3 +657,38 @@ span.sq-avatar {
     transform: none;
   }
 }
+
+/* ---------- Dialogue: per-message feedback, goals, result ---------- */
+
+.sq-turn-feedback {
+  max-width: 34rem;
+  margin-left: auto;
+  padding: var(--sq-space-3) var(--sq-space-4);
+  border-left: 4px solid var(--sq-line);
+  background: var(--sq-surface);
+  border-radius: var(--sq-radius-lg);
+  font-size: 0.95rem;
+}
+
+.sq-comm.is-understood { color: var(--sq-fix); font-weight: 700; }
+.sq-comm.is-missed { color: var(--sq-error); font-weight: 700; }
+
+.sq-fix-item {
+  margin-top: var(--sq-space-3);
+  padding-top: var(--sq-space-2);
+  border-top: 1px solid var(--sq-line);
+}
+
+.sq-goal {
+  display: flex;
+  gap: var(--sq-space-2);
+  padding: var(--sq-space-1) 0;
+}
+
+.sq-goal.is-met { color: var(--sq-fix); font-weight: 700; }
+
+.sq-result {
+  padding: var(--sq-space-3);
+  border-radius: var(--sq-radius-lg);
+  border: 2px solid var(--sq-fix);
+}
