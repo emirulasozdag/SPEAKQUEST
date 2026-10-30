@@ -1,9 +1,11 @@
-// Profile page: shows the saved character and account email, and saves character changes.
+// Profile page: shows the saved character and account email, saves character changes and
+// deletes the account.
 
-import { ApiError, getCurrentUser, getProfile, handleApiError } from "../api.js";
+import { ApiError, deleteAccount, getCurrentUser, getProfile, handleApiError } from "../api.js";
 import { fillCharacterForm, saveCharacterForm } from "../components/character-form.js";
-import { clearErrorsOnEdit, showAlert } from "../components/form.js";
+import { clearErrorsOnEdit, setFieldError, showAlert } from "../components/form.js";
 import { CHARACTER_PAGE } from "../session.js";
+import { clearSession } from "../state.js";
 
 const form = document.querySelector("#character-form");
 const fieldset = document.querySelector("#character-fields");
@@ -43,5 +45,39 @@ form.addEventListener("submit", async (event) => {
   submitButton.textContent = "Save changes";
 });
 
+const deleteForm = document.querySelector("#delete-account-form");
+const deleteAlert = document.querySelector("#delete-account-alert");
+const deletePassword = document.querySelector("#delete-password");
+const deleteConfirm = document.querySelector("#delete-confirm");
+const deleteButton = deleteForm.querySelector('button[type="submit"]');
+
+deleteForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  deleteAlert.hidden = true;
+  setFieldError(deletePassword, deletePassword.value ? null : "Enter your current password.");
+  setFieldError(deleteConfirm, deleteConfirm.checked ? null : "Tick the box to confirm.");
+  if (!deletePassword.value || !deleteConfirm.checked) return;
+
+  deleteButton.disabled = true;
+  deleteButton.textContent = "Deleting…";
+  try {
+    await deleteAccount(deletePassword.value);
+    clearSession();
+    window.location.assign("/");
+    return;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 403) {
+      setFieldError(deletePassword, error.message);
+    } else if (error instanceof ApiError && error.status !== 401) {
+      showAlert(deleteAlert, "Your account could not be deleted. Please try again.");
+    } else {
+      handleApiError(error);
+    }
+  }
+  deleteButton.disabled = false;
+  deleteButton.textContent = "Delete my account";
+});
+
 clearErrorsOnEdit(form);
+clearErrorsOnEdit(deleteForm);
 loadProfile();

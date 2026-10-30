@@ -27,6 +27,7 @@ kullanmayı gerektiren yeni bir görev açılır.
 - [Klasör Yapısı](#klasör-yapısı)
 - [Kurulum ve Çalıştırma](#kurulum-ve-çalıştırma)
 - [Kullanım](#kullanım)
+- [Verilerimi nasıl silerim?](#verilerimi-nasıl-silerim)
 - [API Özeti](#api-özeti)
 - [Test](#test)
 - [Geliştirme Süreci](#geliştirme-süreci)
@@ -329,11 +330,22 @@ içinde anlatılır. Yeni bir tablo ekleyen PR bu dokümanı da günceller.
 7. **Learning Progress** ekranında hata kategorilerinizi, sık yaptığınız hataları ve zaman içindeki
    gelişiminizi takip edin.
 
+## Verilerimi nasıl silerim?
+
+**Profile** sayfasında _Delete account_ butonuna basın, mevcut şifrenizi girin ve onay kutusunu
+işaretleyin. Hesabınız, karakteriniz ve size ait tüm oyun ve öğrenme verisi (görev ilerlemesi,
+diyaloglar, dil hataları, beceri puanları, hikâye durumu ve kararlar) kalıcı olarak silinir; oturumunuz
+kapanır ve landing page'e yönlendirilirsiniz. Bu işlem geri alınamaz.
+
+Aynı işlem API ile de yapılabilir: `DELETE /api/auth/me` gövdesinde `{"password": "..."}` ister.
+Şifre doğruysa `204` döner, yanlışsa `403` döner ve hiçbir şey silinmez. Silinen hesabın token'ı
+artık çalışmaz (`401`).
+
 ## API Özeti
 
 | Alan | Endpoint |
 |---|---|
-| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` |
+| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `DELETE /auth/me` |
 | Player | `GET /player/profile`, `PUT /player/profile`, `GET /player/progress` |
 | Locations | `GET /locations`, `GET /locations/{id}` |
 | Quests | `GET /quests`, `GET /quests/active`, `POST /quests/{id}/start`, `POST /quests/{id}/complete` |

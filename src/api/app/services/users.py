@@ -1,11 +1,18 @@
 """User account operations, kept out of the routers so they can be reused and tested."""
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password, verify_password
+from app.models.player import PlayerProfile
 from app.models.user import User
+
+# Every model that stores data of one player, keyed by user_id. A PR that adds such a table
+# adds it here too; tests/test_account_deletion.py fails when one is missing.
+# The rows are deleted explicitly as well as through ON DELETE CASCADE, so deletion does not
+# depend on the database enforcing foreign keys (SQLite does not by default).
+PLAYER_DATA_MODELS = (PlayerProfile,)
 
 
 class EmailAlreadyRegisteredError(Exception):
@@ -42,3 +49,17 @@ def authenticate_user(db: Session, email: str, password: str) -> User | None:
     if not verify_password(password, user.password_hash):
         return None
     return user
+
+
+def delete_account(db: Session, user: User, password: str) -> bool:
+    """Delete the account and all of its player data in one transaction.
+
+    Returns False and deletes nothing when the password is wrong.
+    """
+    if not verify_password(password, user.password_hash):
+        return False
+    for model in PLAYER_DATA_MODELS:
+        db.execute(delete(model).where(model.user_id == user.id))
+    db.delete(user)
+    db.commit()
+    return True
