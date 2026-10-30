@@ -8,6 +8,7 @@ from app.schemas.dialogue import (
     CorrectionOut,
     DialogueHistoryOut,
     DialogueMessageOut,
+    DialogueSummaryOut,
     DialogueTurnOut,
     ObjectiveStateOut,
     SendMessageRequest,
@@ -80,6 +81,32 @@ def dialogue_history(
         messages = dialogue_service.get_history(db, current_user.id, quest_id)
     except dialogue_service.DialogueNotFoundError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="You have not started this quest.") from None
-    return DialogueHistoryOut(
-        quest_id=quest_id, messages=[DialogueMessageOut.model_validate(message) for message in messages]
+    found = dialogue_service.get_corrections(db, current_user.id, [m.id for m in messages])
+    out = []
+    for message in messages:
+        item = DialogueMessageOut.model_validate(message)
+        item.corrections = [CorrectionOut.model_validate(e, from_attributes=True) for e in found.get(message.id, [])]
+        out.append(item)
+    return DialogueHistoryOut(quest_id=quest_id, messages=out)
+
+
+@router.get("/summary/{quest_id}", response_model=DialogueSummaryOut)
+def dialogue_summary(
+    quest_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> DialogueSummaryOut:
+    """What the player's conversation for a quest showed: how often they were understood, the most
+    frequent mistake category and up to three example corrections. Same 404 rule as the history."""
+    try:
+        summary = dialogue_service.get_summary(db, current_user.id, quest_id)
+    except dialogue_service.DialogueNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="You have not started this quest.") from None
+    return DialogueSummaryOut(
+        quest_id=quest_id,
+        messages_sent=summary.messages_sent,
+        understood=summary.understood,
+        mistakes=summary.mistakes,
+        top_category=summary.top_category,
+        examples=[CorrectionOut.model_validate(e, from_attributes=True) for e in summary.examples],
     )

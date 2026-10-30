@@ -198,6 +198,14 @@ karşılanmış hedef geri alınmaz. AI hata verirse ya da cevap geçersizse hi�
 (zaten hiçbir şey yazılmaz). `POST /api/dialogue/message` cevabı `objectives` (her hedef için `id`,
 `description`, `met`) ve bu mesajla ilk kez karşılanan `newly_met` id'lerini döner.
 
+**Düzeltmeler ve özet (#32):** `GET /api/dialogue/history/{quest_id}` her oyuncu mesajı için o mesajın
+`language_errors` kayıtlarını `corrections` olarak da döner (NPC mesajlarında boş); böylece rozetler
+sayfa yenilenince geri gelir. `GET /api/dialogue/summary/{quest_id}` görev konuşmasının özetini döner:
+`messages_sent`, NPC'nin anladığı mesaj sayısı (`understood`), `mistakes`, en sık hata kategorisi
+(`top_category`, hata yoksa `null`) ve en fazla 3 örnek düzeltme (`examples`: önce her kategoriden en
+yenisi, en sık kategori önce). Özet yalnızca saklanan mesajlardan ve `language_errors`'tan hesaplanır;
+başlatılmamış görev ve başka oyuncunun görevi için `404`.
+
 **API:** `GET /api/dialogue/history/{quest_id}` oyuncunun o görevdeki mesajlarını `id` sırasıyla
 (eskiden yeniye) döner. Görev yoksa ya da oyuncu onu hiç başlatmadıysa `404`; başka bir oyuncunun
 konuşması da aynı şekilde `404` döner. Tablo `users`'a değil `quest_progress`'e bağlı olduğundan

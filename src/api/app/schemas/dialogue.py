@@ -7,6 +7,14 @@ from app.engines.categories import SkillCategory
 from app.models.dialogue import MessageRole
 
 
+class CorrectionOut(BaseModel):
+    category: SkillCategory
+    original: str
+    corrected: str
+    # One short sentence in Turkish
+    explanation: str
+
+
 class DialogueMessageOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -16,6 +24,22 @@ class DialogueMessageOut(BaseModel):
     # Only on player messages; null for the NPC
     communication_success: bool | None
     created_at: datetime
+    # Only filled when the history is read: the mistakes found in this player message. A turn
+    # answer carries its corrections at the top level instead.
+    corrections: list["CorrectionOut"] = []
+
+
+class DialogueSummaryOut(BaseModel):
+    """What a quest's conversation showed. Built only from stored messages and mistakes."""
+
+    quest_id: int
+    messages_sent: int
+    understood: int
+    mistakes: int
+    # Most frequent mistake category, null when the player made none
+    top_category: SkillCategory | None
+    # One to three corrections (empty when there were no mistakes)
+    examples: list["CorrectionOut"]
 
 
 class DialogueHistoryOut(BaseModel):
@@ -27,14 +51,6 @@ class SendMessageRequest(BaseModel):
     # Length and emptiness are checked by the service after trimming, so the player gets one
     # clear sentence instead of a validation list
     message: str
-
-
-class CorrectionOut(BaseModel):
-    category: SkillCategory
-    original: str
-    corrected: str
-    # One short sentence in Turkish
-    explanation: str
 
 
 class StoryActionOut(BaseModel):

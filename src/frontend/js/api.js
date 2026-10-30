@@ -135,6 +135,10 @@ export function getDialogueHistory(questId) {
   return authRequest(`/dialogue/history/${questId}`);
 }
 
+export function getDialogueSummary(questId) {
+  return authRequest(`/dialogue/summary/${questId}`);
+}
+
 export function sendDialogueMessage(message) {
   return authRequest("/dialogue/message", { method: "POST", body: { message } });
 }
