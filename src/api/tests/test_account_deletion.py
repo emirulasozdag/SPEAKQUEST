@@ -1,5 +1,6 @@
 from sqlalchemy import func, select
 
+from app.content.seed import seed_content
 from app.models import Base
 from app.models.user import User
 from app.services.users import PLAYER_DATA_MODELS
@@ -25,6 +26,11 @@ def create_player(client, email: str) -> dict[str, str]:
     return headers
 
 
+def start_first_quest(client, headers) -> None:
+    quest = next(q for q in client.get("/api/quests", headers=headers).json() if q["status"] == "available")
+    assert client.post(f"/api/quests/{quest['id']}/start", headers=headers).status_code == 201
+
+
 def delete_me(client, headers, password=PASSWORD):
     return client.request("DELETE", ME_URL, json={"password": password}, headers=headers)
 
@@ -37,7 +43,9 @@ def player_row_count(db_session, user_id: int) -> int:
 
 
 def test_delete_account_removes_user_and_all_player_data(client, db_session):
+    seed_content(db_session)
     headers = create_player(client, "deniz@example.com")
+    start_first_quest(client, headers)
     user_id = client.get(ME_URL, headers=headers).json()["id"]
     assert player_row_count(db_session, user_id) > 0
 
@@ -80,8 +88,11 @@ def test_token_of_deleted_account_stops_working(client):
 
 
 def test_deleting_one_account_keeps_other_players_data(client, db_session):
+    seed_content(db_session)
     headers_a = create_player(client, "a@example.com")
     headers_b = create_player(client, "b@example.com")
+    start_first_quest(client, headers_a)
+    start_first_quest(client, headers_b)
     user_b = client.get(ME_URL, headers=headers_b).json()["id"]
     rows_before = player_row_count(db_session, user_b)
 
