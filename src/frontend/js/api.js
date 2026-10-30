@@ -127,6 +127,18 @@ export function startQuest(questId) {
   return authRequest(`/quests/${questId}/start`, { method: "POST" });
 }
 
+export function completeQuest(questId) {
+  return authRequest(`/quests/${questId}/complete`, { method: "POST" });
+}
+
+export function getDialogueHistory(questId) {
+  return authRequest(`/dialogue/history/${questId}`);
+}
+
+export function sendDialogueMessage(message) {
+  return authRequest("/dialogue/message", { method: "POST", body: { message } });
+}
+
 export function getHealth() {
   return apiRequest("/health");
 }
