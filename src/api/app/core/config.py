@@ -28,6 +28,13 @@ class Settings(BaseSettings):
     # One call may take longer than this only if the provider hangs; one retry follows a timeout
     ai_timeout_seconds: float = 20.0
 
+    # Failed logins allowed per email + IP inside the window; the next attempt gets 429
+    login_rate_limit: int = 5
+    login_rate_window_seconds: int = 60
+    # Registration attempts allowed per IP inside the window
+    register_rate_limit: int = 5
+    register_rate_window_seconds: int = 60
+
     frontend_dir: Path = DEFAULT_FRONTEND_DIR
 
 
