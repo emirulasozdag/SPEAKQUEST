@@ -35,7 +35,6 @@ users 1──1 player_profiles
   │        └──* dialogue_messages
   │                 ├──* language_errors
   │                 └──* skill_observations
-  └──* skill_scores
 
 locations 1──* npcs 1──* quest_templates
 ```
@@ -239,8 +238,8 @@ Past Simple puanını artırmaz.
 | result | varchar(9) | `correct`, `incorrect` |
 | created_at | timestamptz | |
 
-`skill_scores` bu kayıtlardan hesaplanır. "Son 10 fırsatta 3 hata" gibi tekrar eden hata kuralı da
-bu tabloya bakar.
+Beceri puanları ve tekrar eden hata kuralı (#16) bu kayıtlardan her istekte hesaplanır, ayrı bir
+tabloda saklanmaz (aşağıdaki "Beceri puanları" bölümü).
 
 Satırları yalnızca `engines/learning.record_message_analysis()` yazar. Bir mesajdaki her kategori
 tek fırsattır: aynı kategoride hem hata hem doğru kullanım varsa sonuç `incorrect` olur.
@@ -257,20 +256,25 @@ yapılandırılmamışsa, hata verirse ya da geçersiz cevap dönerse yine `200`
 `status: "ai_unavailable"` ve yedek NPC cümlesiyle; hiçbir şey saklanmaz, oyuncu mesajı tekrar
 gönderebilir. Görev hedeflerinin işaretlenmesi #31'dedir.
 
-### `skill_scores` · #16
+### Beceri puanları · uygulandı (#16, tablo yok)
 
-Learning Engine'in her beceri için hesapladığı özet. `skill_observations`'tan yeniden üretilebilir.
+Planda bir `skill_scores` tablosu vardı. Uygulamada **tablo yoktur**: puanlar, tekrar eden hatalar
+ve öğrenme hedefi her istekte `skill_observations` ve oyuncunun son mesajlarından
+`engines/learning.py` ile hesaplanır. Nedenleri: puan zaten bu kayıtlardan yeniden üretilebilir bir
+özetti; saklanan bir kopya her mesajda güncellenmek zorunda kalır ve kayıtlarla çelişebilirdi; formül
+değişince eski satırları yeniden hesaplamak gerekirdi. Oyuncu başına kayıt sayısı küçük olduğu için
+hesap ucuzdur. Gerekirse ileride önbellek olarak eklenebilir; API değişmez.
 
-| Alan | Tip | Not |
-|---|---|---|
-| id | int PK | |
-| user_id | int FK → users | cascade |
-| category | varchar(30) | `(user_id, category)` unique |
-| score | int | 0–100, formül `docs/learning-engine.md` içinde |
-| opportunities | int | |
-| correct_count | int | |
-| error_count | int | |
-| last_practiced_at | timestamptz | |
+Formül, eşikler ve öğrenme hedefi seçimi [learning-engine.md](learning-engine.md) içindedir.
+
+**API:** `GET /api/learning/skills` her kategori için `score` (0–100), `status` (`not_practised`,
+`weak`, `developing`, `strong`), `opportunities`, `correct_count`, `error_count`, son 10 mesajdaki hata
+sayısı (`recent_mistakes`), `repeated` ve `last_practiced_at` döner; ayrıca tekrar eden hata kategorileri
+(`repeated_mistakes`). `GET /api/learning/recommendations` sıradaki öğrenme hedefini (`target`:
+`category`, `reason`, oyuncuya gösterilecek `message`, `score`) ve beş kategorinin tam sırasını
+(`ranking`) döner; seviye gerektiği için karakter yoksa `404`. `GET /api/learning/errors` oyuncunun
+hatalarını en yeniden eskiye, görev adıyla döner (`category` süzgeci, `limit` 1–100 varsayılan 20,
+`offset`; cevapta `total`). Hepsi yalnızca token'daki oyuncunun verisini okur.
 
 ### `story_states` · uygulandı (#13)
 
@@ -326,7 +330,7 @@ NPC'lerin prompt bilgileri (`personality`, `knows`) bu cevapta yoktur.
 | Modül | Okur | Yazar | AI'ya bağlı mı? |
 |---|---|---|---|
 | AI servisi (`services/ai`) | Prompt için verilen bağlam | Hiçbir tablo | Evet. Sadece doğrulanmış `DialogueAnalysis` döner |
-| Learning Engine (`engines/learning.py`) | `skill_observations`, `language_errors` | `language_errors`, `skill_observations`, `skill_scores` | Hayır |
+| Learning Engine (`engines/learning.py`) | `skill_observations`, `language_errors`, oyuncunun `dialogue_messages` | `language_errors`, `skill_observations` | Hayır |
 | Story Engine (`engines/story.py`) | `story_states`, `npc_relationships`, `story_decisions`, `quest_progress`, `quest_templates` | `story_states`, `npc_relationships`, `story_decisions` | Hayır. AI'nın önerdiği aksiyonu şablonun whitelist'ine göre kabul ya da reddeder |
 | Adaptive Quest Engine (`engines/quest.py`) | Learning ve Story Engine'in sonuçları, `quest_templates` | Hiçbir tablo | Hayır. Sadece öneri ve gerekçe döner |
 | Progression (`engines/progression.py`) | `quest_progress`, `player_profiles` | `player_profiles.xp`, `level`, `quest_progress.xp_awarded` | Hayır |
