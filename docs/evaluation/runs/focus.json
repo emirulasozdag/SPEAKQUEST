@@ -1,0 +1,550 @@
+{
+  "label": "focus-v2",
+  "model": "gemini-3.1-flash-lite",
+  "started": "2026-11-01T21:33:06+00:00",
+  "repeat": 2,
+  "metrics": {
+    "present_simple": {
+      "focus_on": {
+        "count": 4,
+        "of": 6,
+        "rate": 0.667
+      },
+      "focus_off": {
+        "count": 0,
+        "of": 6,
+        "rate": 0.0
+      }
+    },
+    "past_simple": {
+      "focus_on": {
+        "count": 4,
+        "of": 6,
+        "rate": 0.667
+      },
+      "focus_off": {
+        "count": 0,
+        "of": 6,
+        "rate": 0.0
+      }
+    },
+    "question_formation": {
+      "focus_on": {
+        "count": 2,
+        "of": 6,
+        "rate": 0.333
+      },
+      "focus_off": {
+        "count": 0,
+        "of": 6,
+        "rate": 0.0
+      }
+    },
+    "prepositions": {
+      "focus_on": {
+        "count": 4,
+        "of": 6,
+        "rate": 0.667
+      },
+      "focus_off": {
+        "count": 0,
+        "of": 6,
+        "rate": 0.0
+      }
+    },
+    "vocabulary_usage": {
+      "focus_on": {
+        "count": 4,
+        "of": 6,
+        "rate": 0.667
+      },
+      "focus_off": {
+        "count": 0,
+        "of": 6,
+        "rate": 0.0
+      }
+    }
+  },
+  "records": [
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "present_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I am Alex. What do you usually do during the day?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "present_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat upstairs?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "past_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Where did you live before you moved here?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "past_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat upstairs?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "question_formation",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I am Alex. Do you have any questions about the building?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "question_formation",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat upstairs?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "prepositions",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat on the third floor?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "prepositions",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat upstairs?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "vocabulary_usage",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. I live in 3B. How would you describe your old flat?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "vocabulary_usage",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat upstairs?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "present_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Thank you! I love this spot. Do you usually drink coffee in the morning?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "present_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Good morning! I am happy you like it here. Would you like to order a coffee today?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "past_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Thank you! I love this spot. What did you do yesterday for your first day here?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "past_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Thank you! I am happy you like it. What can I get for you today?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "question_formation",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Thank you! I am happy you like it here. Would you like to order a drink or something to eat?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "question_formation",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Good morning! I am happy you like it here. Would you like to order a coffee or maybe a croissant?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "prepositions",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Thank you! I am happy you like it. Where exactly is your new home in this neighbourhood?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "prepositions",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Thank you! It is lovely to have you here. What can I get for you today?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "vocabulary_usage",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Good morning! I am happy you like it here. How would you describe your new apartment in the building?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "vocabulary_usage",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "Good morning! I am happy you like it. Would you like to order a coffee or maybe a croissant?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "present_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is nice to meet you. Can you tell me a little about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "present_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is nice to meet you. Can you tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "past_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is nice to meet you. Can you tell me about a job you had before?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "past_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is nice to meet you. Can you tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "question_formation",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is a pleasure to meet you. Could you please tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "question_formation",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is nice to meet you. Can you tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "prepositions",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is a pleasure to meet you. Can you tell me your name and a little about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "prepositions",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is nice to meet you. Can you tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "vocabulary_usage",
+      "focus": true,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is a pleasure to meet you. Could you please introduce yourself and tell me a little about your background?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "vocabulary_usage",
+      "focus": false,
+      "status": "ok",
+      "round": 1,
+      "npc_reply": "It is nice to meet you. Can you tell me a little bit about yourself?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "present_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. What do you usually do in the morning?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "present_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat upstairs?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "past_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Where did you live before you moved here?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "past_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat upstairs?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "question_formation",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, nice to meet you too! I am Alex. Do you have any questions about the building?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "question_formation",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat upstairs?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "prepositions",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat on the third floor?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "prepositions",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, hi! I am Alex. Do you need help with your bags?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "vocabulary_usage",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. I live in 3B. How would you describe your old flat?"
+    },
+    {
+      "scene": "meet_your_neighbor",
+      "skill": "vocabulary_usage",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Oh, nice to meet you too! I'm Alex. Are you moving into the flat upstairs?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "present_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Thank you! I love this spot. What do you usually like to eat for breakfast?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "present_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Thank you! I am happy you like it here. What would you like to drink today?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "past_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Thank you! I love it here. What did you do yesterday before you arrived in our neighbourhood?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "past_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Thank you! I am happy you like it here. What can I get for you today?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "question_formation",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Thank you! I love this spot. Would you like to order a coffee or maybe a croissant?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "question_formation",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Good morning! I am happy you like it here. What can I get you for breakfast today?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "prepositions",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Thank you! I am happy you like it. Where exactly is your new home in this neighbourhood?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "prepositions",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Good morning! I am happy you like it here. What can I get for you today?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "vocabulary_usage",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Thank you! I am glad you like it here. How would you describe your new apartment in the city?"
+    },
+    {
+      "scene": "morning_at_the_cafe",
+      "skill": "vocabulary_usage",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "Thank you! I am happy you like it. Would you like to order a coffee or maybe a croissant?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "present_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is nice to meet you. Can you tell me a little about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "present_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is nice to meet you. Can you please tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "past_simple",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is nice to meet you. Can you tell me about a job you had in the past?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "past_simple",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is nice to meet you. Can you tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "question_formation",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is nice to meet you. Could you please introduce yourself to me?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "question_formation",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is nice to meet you. Can you tell me a little about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "prepositions",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is a pleasure to meet you. Could you tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "prepositions",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is a pleasure to meet you. Can you please tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "vocabulary_usage",
+      "focus": true,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is a pleasure to meet you. Can you please tell me a little bit about yourself?"
+    },
+    {
+      "scene": "the_job_interview",
+      "skill": "vocabulary_usage",
+      "focus": false,
+      "status": "ok",
+      "round": 2,
+      "npc_reply": "It is nice to meet you. Can you tell me a little about yourself?"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "description": "Held-out check for the prompt change of #20. Written after the new rules, never used to design them, and never shown to the model as an example. It tests the same four kinds of failure the main set revealed (a missing or wrong preposition after a verb or adjective, a wrong word choice, a correct sentence about other people or the story, an unrelated sentence) with new sentences, so before/after on this set shows whether the change generalises.",
+  "labelling": {
+    "drafted_by": "ilhannisanur",
+    "reviewed_by": [],
+    "status": "draft: every label needs a second team member's review before the results are final"
+  },
+  "sentences": [
+    {"id": "h-pr1", "kind": "error", "scene": "morning_at_the_cafe", "level": "B1", "npc_line": "Will you walk to work today?", "player": "I don't know, it depends of the weather.", "errors": ["prepositions"], "understood": true, "note": "'depends on the weather'."},
+    {"id": "h-pr2", "kind": "error", "scene": "meet_your_neighbor", "level": "B1", "npc_line": "Who lives with you?", "player": "My sister. She is married with a doctor.", "errors": ["prepositions"], "understood": true, "note": "'married to a doctor'."},
+    {"id": "h-pr3", "kind": "error", "scene": "the_job_interview", "level": "B1", "npc_line": "What are you proud of?", "player": "I am proud for my team at the hotel.", "errors": ["prepositions"], "understood": true, "note": "'proud of my team'."},
+    {"id": "h-vu1", "kind": "error", "scene": "meet_your_neighbor", "level": "A2", "npc_line": "Any plans for the weekend?", "player": "I want to make a party for my birthday.", "errors": ["vocabulary_usage"], "understood": true, "note": "'have a party' (or 'throw a party')."},
+    {"id": "h-vu2", "kind": "error", "scene": "the_job_interview", "level": "B1", "npc_line": "What did you learn in your last job?", "player": "I learned to decide fast and to do fewer mistakes.", "errors": ["vocabulary_usage"], "understood": true, "note": "'make fewer mistakes'."},
+    {"id": "h-vu3", "kind": "error", "scene": "the_missing_backpack", "level": "B1", "npc_line": "What is Mia like?", "player": "She is very sympathetic, everybody in the cafe likes her.", "errors": ["vocabulary_usage"], "understood": true, "note": "False friend: 'sympathetic' means understanding someone's problems; 'friendly' or 'nice' is meant (Turkish 'sempatik')."},
+    {"id": "h-ok1", "kind": "correct", "scene": "the_missing_backpack", "level": "B1", "npc_line": "Who had the bag last?", "player": "Olivia had it, and then she gave it to Alex.", "errors": [], "understood": true, "note": "Correct; names other people from the story."},
+    {"id": "h-ok2", "kind": "correct", "scene": "meet_your_neighbor", "level": "A2", "npc_line": "Who helped you with the boxes?", "player": "Nobody. I carried them all by myself.", "errors": [], "understood": true, "note": "Correct."},
+    {"id": "h-ok3", "kind": "correct", "scene": "morning_at_the_cafe", "level": "A2", "npc_line": "Where do you work?", "player": "I work at Bright Path Travel, next to the bank.", "errors": [], "understood": true, "note": "Correct."},
+    {"id": "h-un1", "kind": "unclear", "scene": "the_flat_viewing", "level": "A2", "npc_line": "Do you have any pets?", "player": "My favourite colour is green.", "errors": [], "understood": false, "note": "Correct English, unrelated to the question."},
+    {"id": "h-un2", "kind": "unclear", "scene": "the_job_interview", "level": "B1", "npc_line": "When can you start?", "player": "Elephants are very big animals.", "errors": [], "understood": false, "note": "Correct English, unrelated to the question."},
+    {"id": "h-un3", "kind": "unclear", "scene": "morning_at_the_cafe", "level": "A2", "npc_line": "Would you like milk in your coffee?", "player": "Football is popular in Brazil.", "errors": [], "understood": false, "note": "Correct English, unrelated to the question."}
+  ]
+}

@@ -147,6 +147,15 @@ Güvenlik ve tutarlılık için şu kurallar uygulanır:
 - API anahtarları frontend kodunda bulunmaz, backend ortam değişkenlerinde saklanır.
 - AI servisi hata verdiğinde uygulama çökmez, kullanıcıya anlaşılır bir mesaj gösterilir.
 
+NPC'ler oyuncunun en çok ihtiyaç duyduğu yapıyı doğal biçimde kullandıracak sorular sorar: Learning
+Engine oyuncunun kendi hatalarından bir hedef beceri seçer (yeni oyuncuda sahnenin becerisi), prompt
+NPC'ye bu yapıyı gerektiren sorular sordurur ([docs/learning-engine.md](docs/learning-engine.md)).
+
+Hata analizinin doğruluğu etiketli 48 cümle ve 12 cümlelik bir kontrol setiyle ölçülmüştür: anlaşılır
+ama küçük hatalı cümlelerin hiçbiri yanlışlıkla "anlaşılmadı" sayılmaz ve hatalı cümlelerin %99'unda
+doğru kategori bulunur. Yöntem, önce/sonra karşılaştırması ve sınırlar:
+[docs/evaluation/results.md](docs/evaluation/results.md).
+
 ## Kapsam (MVP)
 
 İlk sürüm küçük ama uçtan uca çalışan bir oyun olarak hedeflenmiştir.

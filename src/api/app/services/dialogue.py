@@ -15,7 +15,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.engines.categories import SkillCategory
-from app.engines.learning import DetectedMistake, record_message_analysis
+from app.engines.learning import DetectedMistake, PracticeFocus, choose_practice_focus, record_message_analysis
 from app.engines.objectives import apply_objectives
 from app.engines.story import StoryActionOutcome, StoryProgress
 from app.models.content import Npc, QuestTemplate
@@ -34,6 +34,7 @@ from app.services.ai.prompts import (
     QuestBrief,
 )
 from app.services.ai.schemas import DialogueAnalysis
+from app.services.learning import get_skill_scores
 from app.services.players import get_profile
 from app.services.quests import get_active_quest
 from app.services.story import apply_suggested_action, get_story_state, load_story_progress
@@ -247,7 +248,14 @@ def _dialogue_context(
         story_summary=_story_summary(db, user_id, npc),
         history=tuple(HistoryLine(speaker=m.role, text=m.text) for m in recent),
         objectives_met=tuple(progress.objectives_met),
+        practice_focus=practice_focus(db, user_id, quest, level).category,
     )
+
+
+def practice_focus(db: Session, user_id: int, quest: QuestTemplate, level: EnglishLevel) -> PracticeFocus:
+    """The structure this player should practise in this quest's conversation (#20)."""
+    scene_skills = [SkillCategory(skill) for skill in quest.target_skills]
+    return choose_practice_focus(get_skill_scores(db, user_id), level, scene_skills)
 
 
 def _story_summary(db: Session, user_id: int, npc: Npc) -> str:

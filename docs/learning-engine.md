@@ -103,6 +103,29 @@ Hedefin gerekçesi (`reason`) şunlardan biridir ve oyuncuya kısa bir cümleyle
 | `weakest_skill` | Pratik yapılmış ve puanı 75'in altında |
 | `review` | Pratik yapılmış ve güçlü (75+); tüm beceriler güçlüyken tekrar |
 
+## Diyaloğun odağı (kişiselleştirme)
+
+Learning Engine, her diyalog turunda NPC'nin oyuncuya hangi yapıyı kullandırması gerektiğini de
+seçer (#20). `choose_practice_focus(puanlar, seviye, sahne_becerileri)`:
+
+1. Öğrenme hedefi oyuncunun **kendi hatalarına dayanıyorsa** (`repeated_mistake` ya da
+   `weakest_skill`) odak bu beceridir.
+2. Böyle bir kanıt yoksa (yeni oyuncu ya da bütün beceriler güçlü) odak, görevin yazıldığı ilk
+   beceridir (`target_skills[0]`, gerekçe `scene`). Örneğin İş Görüşmesi'nde Past Simple: sahne en
+   doğal fırsatları o yapı için verir.
+
+Odak prompt'a "PRACTICE FOCUS" bölümü olarak girer
+([prompts.py](../src/api/app/services/ai/prompts.py)). NPC'den yalnızca **ne soracağını**
+değiştirmesi istenir: oyuncunun cevabında bu yapıyı kullanması gereken, sahneye ve karaktere uygun
+sorular. Örnekler: Past Simple için *What did you do yesterday?*, edatlar için *Where exactly did you
+leave it?*, soru kurma için oyuncuyu soru sormaya davet etmek. NPC dil bilgisinin adını söylemez ve
+cevabında oyuncuyu düzeltmez. Analiz kuralları odaktan bağımsızdır, yani odak becerisinde daha çok
+hata aranmaz; böylece kişiselleştirme ölçülen hata oranlarını şişirmez.
+
+Hata sayısı her mesajdan sonra yeniden hesaplandığı için odak konuşma içinde de değişir: oyuncu üst
+üste üç edat hatası yaparsa sonraki NPC cevabı edatlara yönelir. Etkisinin ölçümü
+[evaluation/results.md](evaluation/results.md) içindedir.
+
 ## Saklama
 
 Puanlar **ayrı bir tabloda saklanmaz**, her istekte kayıtlardan hesaplanır
@@ -124,4 +147,4 @@ Ayrıntılar [data-model.md](data-model.md) içindedir.
 
 - Öğrenme amacı (`learning_goal`: everyday, work, grammar) beceri sıralamasını etkilemez. Veri azken
   görev seçimine Adaptive Quest Engine yön verir ([quest-engine.md](quest-engine.md)).
-  Diyalogların zayıf beceriye göre kişiselleştirilmesi #20'dedir.
+  Diyalog odağı da öğrenme amacına değil, oyuncunun hatalarına ve sahneye bakar.
