@@ -17,7 +17,9 @@ from app.engines.learning import (
     LearningTarget,
     Observation,
     SkillScore,
+    TimelinePoint,
     rank_learning_targets,
+    score_timeline,
     skill_scores,
 )
 from app.models.content import QuestTemplate
@@ -63,6 +65,11 @@ def recent_message_ids(db: Session, user_id: int, limit: int = RECENT_WINDOW) ->
 
 def get_skill_scores(db: Session, user_id: int) -> dict[SkillCategory, SkillScore]:
     return skill_scores(load_observations(db, user_id), recent_message_ids(db, user_id))
+
+
+def get_timeline(db: Session, user_id: int) -> list[TimelinePoint]:
+    """Each skill's score at the end of every day the player practised (score_timeline)."""
+    return score_timeline(load_observations(db, user_id))
 
 
 def get_learning_targets(db: Session, user_id: int, level: EnglishLevel) -> list[LearningTarget]:

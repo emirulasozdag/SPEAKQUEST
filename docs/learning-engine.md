@@ -114,6 +114,9 @@ kendiliğinden yeni formüle uyar.
 - `GET /api/learning/skills`: her kategorinin puanı, durumu, sayaçları ve tekrar eden hatalar.
 - `GET /api/learning/recommendations`: öğrenme hedefi, gerekçesi ve tam sıralama.
 - `GET /api/learning/errors`: oyuncunun hataları, en yeniden eskiye, görev adıyla.
+- `GET /api/learning/timeline`: her becerinin, oyuncunun pratik yaptığı her günün sonundaki puanı
+  (en eskiden yeniye, en fazla son 30 gün). `score_timeline()` aynı formülü kullanır, son nokta
+  her zaman güncel puana eşittir. Learning Progress ekranındaki grafik bunu çizer.
 
 Ayrıntılar [data-model.md](data-model.md) içindedir.
 
