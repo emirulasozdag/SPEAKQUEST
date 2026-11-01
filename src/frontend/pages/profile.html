@@ -77,15 +77,73 @@
           <p class="mb-1 small text-secondary">Email</p>
           <p id="account-email">Loading…</p>
           <div class="d-grid gap-2">
-            <button type="button" class="btn btn-outline-secondary" data-feature="Changing your password">Change password</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#password-dialog">Change password</button>
             <button type="button" class="btn btn-outline-secondary" data-action="logout">Log out</button>
-            <button type="button" class="btn btn-outline-danger" data-feature="Resetting game progress">Reset game progress</button>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reset-dialog">Reset game progress</button>
             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete-account-dialog">Delete account</button>
           </div>
         </div>
       </section>
     </div>
   </main>
+
+  <div class="modal fade" id="password-dialog" tabindex="-1" aria-labelledby="password-title" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="password-form" class="modal-content" novalidate>
+        <div class="modal-header">
+          <h2 id="password-title" class="modal-title h5">Change password</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="password-alert" role="alert" hidden></div>
+          <div class="mb-3">
+            <label for="current-password" class="form-label">Current password</label>
+            <input type="password" class="form-control" id="current-password" autocomplete="current-password" required aria-describedby="current-password-error">
+            <div id="current-password-error" class="invalid-feedback"></div>
+          </div>
+          <div class="mb-3">
+            <label for="new-password" class="form-label">New password</label>
+            <input type="password" class="form-control" id="new-password" autocomplete="new-password" minlength="8" maxlength="72" required aria-describedby="new-password-help new-password-error">
+            <div id="new-password-help" class="form-text">At least 8 characters.</div>
+            <div id="new-password-error" class="invalid-feedback"></div>
+          </div>
+          <div>
+            <label for="repeat-password" class="form-label">Repeat the new password</label>
+            <input type="password" class="form-control" id="repeat-password" autocomplete="new-password" required aria-describedby="repeat-password-error">
+            <div id="repeat-password-error" class="invalid-feedback"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Change password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal fade" id="reset-dialog" tabindex="-1" aria-labelledby="reset-title" aria-hidden="true">
+    <div class="modal-dialog">
+      <form id="reset-form" class="modal-content" novalidate>
+        <div class="modal-header">
+          <h2 id="reset-title" class="modal-title h5">Reset game progress</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="reset-alert" role="alert" hidden></div>
+          <p>This deletes your quests, conversations, mistakes, skill scores, story decisions and NPC trust, and sets your XP and level back to the start. Your account and your character stay. It cannot be undone.</p>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="reset-confirm" required aria-describedby="reset-confirm-error">
+            <label class="form-check-label" for="reset-confirm">I want to start the game again from the beginning.</label>
+            <div id="reset-confirm-error" class="invalid-feedback"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger">Reset my progress</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <div class="modal fade" id="delete-account-dialog" tabindex="-1" aria-labelledby="delete-account-title" aria-hidden="true">
     <div class="modal-dialog">

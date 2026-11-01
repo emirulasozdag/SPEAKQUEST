@@ -93,6 +93,17 @@ export function getCurrentUser() {
   return authRequest("/auth/me");
 }
 
+export function changePassword(currentPassword, newPassword) {
+  return authRequest("/auth/change-password", {
+    method: "POST",
+    body: { current_password: currentPassword, new_password: newPassword },
+  });
+}
+
+export function resetProgress() {
+  return authRequest("/player/reset", { method: "POST" });
+}
+
 export function deleteAccount(password) {
   return authRequest("/auth/me", { method: "DELETE", body: { password } });
 }

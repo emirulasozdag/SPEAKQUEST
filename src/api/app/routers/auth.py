@@ -8,6 +8,7 @@ from app.core.rate_limit import RateLimiter, client_ip, raise_if_limited
 from app.core.security import create_access_token
 from app.models.user import User
 from app.schemas.auth import (
+    ChangePasswordRequest,
     DeleteAccountRequest,
     LoginRequest,
     RegisterRequest,
@@ -17,6 +18,7 @@ from app.schemas.auth import (
 from app.services.users import (
     EmailAlreadyRegisteredError,
     authenticate_user,
+    change_password,
     create_user,
     delete_account,
 )
@@ -90,4 +92,17 @@ def delete_me(
     if not delete_account(db, current_user, payload.password):
         # 403, not 401: the session is still valid, only the confirmation failed
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Incorrect password.")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+def change_my_password(
+    payload: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> Response:
+    """Replace the password after checking the current one. The new one follows the sign-up rules."""
+    if not change_password(db, current_user, payload.current_password, payload.new_password):
+        # 403, not 401: the session is still valid, only the check failed
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Your current password is incorrect.")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

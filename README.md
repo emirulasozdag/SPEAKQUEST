@@ -341,6 +341,10 @@ işaretleyin. Hesabınız, karakteriniz ve size ait tüm oyun ve öğrenme veris
 diyaloglar, dil hataları, beceri puanları, hikâye durumu ve kararlar) kalıcı olarak silinir; oturumunuz
 kapanır ve landing page'e yönlendirilirsiniz. Bu işlem geri alınamaz.
 
+Hesabı silmeden yalnızca oyunu baştan başlatmak için Profile sayfasındaki _Reset game progress_
+(`POST /api/player/reset`) kullanılır: görevler, diyaloglar, hatalar, beceri puanları, hikâye durumu ve
+kararlar silinir, XP ve seviye sıfırlanır; hesap ve karakter kalır.
+
 Aynı işlem API ile de yapılabilir: `DELETE /api/auth/me` gövdesinde `{"password": "..."}` ister.
 Şifre doğruysa `204` döner, yanlışsa `403` döner ve hiçbir şey silinmez. Silinen hesabın token'ı
 artık çalışmaz (`401`).
@@ -349,8 +353,8 @@ artık çalışmaz (`401`).
 
 | Alan | Endpoint |
 |---|---|
-| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `DELETE /auth/me` |
-| Player | `GET /player/profile`, `PUT /player/profile`, `GET /player/progress` |
+| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `DELETE /auth/me`, `POST /auth/change-password` |
+| Player | `GET /player/profile`, `PUT /player/profile`, `GET /player/progress`, `POST /player/reset` |
 | Locations | `GET /locations`, `GET /locations/{id}` |
 | Quests | `GET /quests`, `GET /quests/active`, `POST /quests/{id}/start`, `POST /quests/{id}/complete` |
 | Dialogue | `POST /dialogue/message`, `GET /dialogue/history/{quest_id}` |

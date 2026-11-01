@@ -5,27 +5,14 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password, verify_password
-from app.models.dialogue import DialogueMessage
-from app.models.learning import LanguageError, SkillObservation
 from app.models.player import PlayerProfile
-from app.models.quest_progress import QuestProgress
-from app.models.story import NpcRelationship, StoryDecision, StoryState
 from app.models.user import User
+from app.services.players import PROGRESS_MODELS, delete_progress
 
-# Every model that stores data of one player, keyed by user_id. A PR that adds such a table
-# adds it here too; tests/test_account_deletion.py fails when one is missing.
-# The rows are deleted explicitly as well as through ON DELETE CASCADE, so deletion does not
-# depend on the database enforcing foreign keys (SQLite does not by default).
-# Learning rows point at dialogue messages, so they come before them
-PLAYER_DATA_MODELS = (
-    LanguageError,
-    SkillObservation,
-    PlayerProfile,
-    QuestProgress,
-    StoryState,
-    NpcRelationship,
-    StoryDecision,
-)
+# Every model that stores data of one player, keyed by user_id: the game and learning progress
+# (services/players.py) plus the character itself. tests/test_account_deletion.py fails when a
+# table that points at users is missing here.
+PLAYER_DATA_MODELS = (*PROGRESS_MODELS, PlayerProfile)
 
 
 class EmailAlreadyRegisteredError(Exception):
@@ -71,18 +58,17 @@ def delete_account(db: Session, user: User, password: str) -> bool:
     """
     if not verify_password(password, user.password_hash):
         return False
-    for model in PLAYER_DATA_MODELS:
-        if model is QuestProgress:
-            # Messages hang off quest_progress, not users: they go after the learning rows that
-            # point at them and before their own parent rows
-            db.execute(
-                delete(DialogueMessage).where(
-                    DialogueMessage.quest_progress_id.in_(
-                        select(QuestProgress.id).where(QuestProgress.user_id == user.id)
-                    )
-                )
-            )
-        db.execute(delete(model).where(model.user_id == user.id))
+    delete_progress(db, user.id)
+    db.execute(delete(PlayerProfile).where(PlayerProfile.user_id == user.id))
     db.delete(user)
+    db.commit()
+    return True
+
+
+def change_password(db: Session, user: User, current_password: str, new_password: str) -> bool:
+    """Store a new bcrypt hash. Returns False and changes nothing when the current password is wrong."""
+    if not verify_password(current_password, user.password_hash):
+        return False
+    user.password_hash = hash_password(new_password)
     db.commit()
     return True
