@@ -76,6 +76,14 @@ class PlayerQuest:
     progress: QuestProgress | None
 
 
+def visible_summary(quest: QuestTemplate, status: QuestStatus) -> str:
+    """The summary the player may see. A locked quest shows its neutral locked_summary: summary may
+    describe a decision the player has not made, and it is not sent at all until the quest opens."""
+    if status == QuestStatus.LOCKED and quest.locked_summary:
+        return quest.locked_summary
+    return quest.summary
+
+
 def quest_statuses(db: Session, user_id: int, quests: Iterable[QuestTemplate]) -> dict[str, QuestStatus]:
     """The status of each quest for this player, keyed by quest slug."""
     quests = list(quests)

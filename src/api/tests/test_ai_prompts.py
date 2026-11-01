@@ -4,6 +4,7 @@ import dataclasses
 
 import pytest
 
+from app.content.schema import load_content
 from app.core.config import Settings
 from app.engines.categories import SkillCategory
 from app.models.player import EnglishLevel
@@ -141,3 +142,20 @@ def test_the_repair_prompt_repeats_only_our_validation_message():
     assert repair.user.startswith(prompt.user)
     assert "communication_success: Input should be a valid boolean" in repair.user
     assert "ONE valid JSON object" in repair.user
+
+
+def mia_prompt(quest_slug: str) -> str:
+    content = load_content()
+    quest = next(q for q in content.quests if q.slug == quest_slug)
+    npc = next(n for n in content.npcs if n.slug == quest.npc)
+    context = DialogueContext(
+        npc=NpcProfile.from_content(npc, quest), quest=QuestBrief.from_template(quest), level=EnglishLevel.B1
+    )
+    return build_prompt(context, "Hi").system
+
+
+def test_mia_knows_about_her_backpack_only_in_the_quest_where_it_is_lost():
+    # #64: before, Mia talked about the lost backpack in Morning at the Café, before it was lost
+    assert "backpack" not in mia_prompt("morning_at_the_cafe")
+    assert "disappeared yesterday afternoon" in mia_prompt("the_missing_backpack")
+    assert "delivery driver" in mia_prompt("the_missing_backpack")

@@ -8,6 +8,11 @@
   "min_level": "A2",
   "max_level": "B1",
   "summary": "Mia's blue backpack disappeared from the café yesterday afternoon. You watched it for her for a while. Tell her what you saw and ask the right questions to find out what happened.",
+  "locked_summary": "Something has gone missing at the Corner Café, and Mia needs help.",
+  "npc_knows": [
+    "Her blue backpack with her notebook and keys disappeared yesterday afternoon from behind the counter.",
+    "A delivery driver with a very similar blue bag came in yesterday around three o'clock. She only remembers this if the player asks good questions about yesterday."
+  ],
   "npc_opening": "Oh, thank goodness you're here! My backpack is gone. My keys and my notebook were in it. You were here yesterday, right? What did you see?",
   "objectives": [
     { "id": "describe_yesterday", "description": "Tell Mia what you did and saw at the café yesterday." },

@@ -103,6 +103,12 @@ class QuestTemplate(_ContentModel):
     rewards: Rewards
     allowed_story_actions: list[Slug] = Field(min_length=1)
     decision_points: list[DecisionPoint] = []
+    # Shown instead of summary while the quest is locked. summary may describe decisions that open
+    # the quest; this text must not, because the player may not have made them (or never will).
+    locked_summary: Text | None = None
+    # What the quest's NPC knows only during this quest, on top of the NPC's own knows: story events
+    # that have not happened before it, so the NPC cannot talk about them in earlier quests.
+    npc_knows: list[Text] = []
 
     @model_validator(mode="after")
     def check_quest(self) -> "QuestTemplate":
@@ -111,6 +117,8 @@ class QuestTemplate(_ContentModel):
             raise ValueError(f"quest {self.slug!r}: min_level is above max_level")
         _require_unique([objective.id for objective in self.objectives], f"objective in quest {self.slug!r}")
         _require_unique([point.id for point in self.decision_points], f"decision in quest {self.slug!r}")
+        if self.locked_summary is None and not self.prerequisites.is_empty():
+            raise ValueError(f"quest {self.slug!r}: a quest with prerequisites needs a locked_summary")
         return self
 
 

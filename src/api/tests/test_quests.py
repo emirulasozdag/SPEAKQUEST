@@ -6,6 +6,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
+from app.content.schema import load_content
 from app.content.seed import seed_content
 from app.models.quest_progress import QuestProgress
 from app.models.content import QuestTemplate
@@ -143,6 +144,21 @@ def test_a_quest_that_needs_a_decision_stays_locked_even_after_its_quest_prerequ
     complete_in_db(db_session, "deniz@example.com", STARTER)
     # the_flat_viewing also needs the helped_alex flag, which a player decision (#17) will set
     assert start(client, headers, "the_flat_viewing").status_code == 409
+
+
+def test_a_locked_quest_shows_its_neutral_summary_until_it_opens(client, headers, db_session):
+    # #65: the real summary of The Missing Backpack says "You watched it for her", which a player
+    # who said no never did; it is not sent until the quest opens
+    backpack = next(q for q in load_content().quests if q.slug == "the_missing_backpack")
+
+    response = client.get(QUESTS_URL, headers=headers)
+
+    assert quests_by_slug(client, headers)["the_missing_backpack"]["summary"] == backpack.locked_summary
+    assert backpack.summary not in response.text
+    complete_in_db(db_session, "deniz@example.com", STARTER)
+    assert quests_by_slug(client, headers)["morning_at_the_cafe"]["summary"] == next(
+        q.summary for q in load_content().quests if q.slug == "morning_at_the_cafe"
+    )
 
 
 def test_unknown_quest_is_404_and_a_non_number_is_422(client, headers):
