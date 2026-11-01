@@ -94,7 +94,8 @@ güçlü ve zayıf becerileri belirler ve zaman içindeki gelişimi ölçer. İl
 | Vocabulary Usage | Can you make me a favor? | Can you do me a favor? |
 
 Yapay zekâ hataları **tespit eder**; hata sıklığı, önceliklendirme, gelişim takibi ve sonraki öğrenme
-hedefinin seçimi Python ile yazılan Learning Engine tarafından yapılır.
+hedefinin seçimi Python ile yazılan Learning Engine tarafından yapılır. Puan formülü, tekrar eden hata kuralı ve
+hedef seçimi [docs/learning-engine.md](docs/learning-engine.md) içinde açıklanır.
 
 ### Story Engine (Dinamik Hikâye)
 
