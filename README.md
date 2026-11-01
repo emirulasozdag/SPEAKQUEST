@@ -365,7 +365,11 @@ artık çalışmaz (`401`).
 (1–3), `english_level` (`A2`, `B1`) ve `learning_goal` (`everyday`, `work`, `grammar`) alır. İlk
 çağrı karakteri oluşturur (`201`), sonraki çağrılar günceller (`200`). `xp` ve `level` istemciden
 gönderilirse istek `422` ile reddedilir; bu değerleri yalnızca backend kuralları değiştirir.
-Karakter henüz oluşturulmadıysa `GET /api/player/profile` `404` döner. Cevap XP çubuğu için `xp_into_level` (bu seviyede kazanılan XP) ve
+Karakter henüz oluşturulmadıysa `GET /api/player/profile` `404` döner.
+
+**İlerleme özeti:** `GET /api/player/progress` seviye, XP, seviye içi ilerleme, tamamlanan ve toplam
+görev sayısı, en zayıf beceri (`weakest_skill`: Learning Engine puanı en düşük, pratik yapılmış beceri;
+henüz pratik yoksa `null`) ve son aktivite zamanını (`last_activity_at`) tek cevapta döner. Cevap XP çubuğu için `xp_into_level` (bu seviyede kazanılan XP) ve
 `xp_needed_for_next` (sonraki seviye için gereken XP; en yüksek seviyede `null`) alanlarını da içerir.
 
 Tüm endpointler kimlik doğrulama, yetkilendirme ve girdi doğrulaması içerir. Her kullanıcı yalnızca
@@ -383,6 +387,19 @@ docker compose exec api python -m pytest
 ```
 
 ya da Docker olmadan `src/api` klasöründe `pytest`.
+
+Testler varsayılan olarak bellekte SQLite ile çalışır. Aynı testleri PostgreSQL'de çalıştırmak için
+yalnızca testlere ayrılmış boş bir veritabanı verin (her testte tablolar silinip yeniden kurulur):
+
+```bash
+TEST_DATABASE_URL=postgresql+psycopg://speakquest:speakquest@localhost:5433/speakquest_test pytest
+```
+
+CI'da iki iş vardır: `api-tests` testleri SQLite'ta çalıştırır. `postgres` işi ise gerçek bir
+PostgreSQL'de tek bir migration head olduğunu kontrol eder, boş veritabanında `alembic upgrade head`,
+`alembic check` ve `alembic downgrade base` çalıştırır ve testleri PostgreSQL'de koşar.
+`tests/test_access_control.py` her korumalı endpoint'in token istediğini ve bir oyuncunun başka bir
+oyuncunun verisini okuyup değiştiremediğini doğrular.
 
 Testlerde öncelik verilen alanlar:
 

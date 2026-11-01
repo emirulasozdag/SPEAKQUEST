@@ -3,11 +3,10 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
-from app.core.placeholders import not_implemented
 from app.models.user import User
-from app.schemas.player import ProfileResponse, ProfileUpdateRequest
+from app.schemas.player import ProfileResponse, ProfileUpdateRequest, ProgressResponse, WeakestSkillOut
 from app.services.players import get_profile as find_profile
-from app.services.players import reset_progress, save_profile
+from app.services.players import get_progress, reset_progress, save_profile
 
 router = APIRouter(prefix="/player", tags=["player"])
 
@@ -60,6 +59,27 @@ def reset_game(
     return ProfileResponse.model_validate(profile)
 
 
-@router.get("/progress")
-def get_progress():
-    raise not_implemented("Player progress")
+@router.get("/progress", response_model=ProgressResponse)
+def player_progress(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> ProgressResponse:
+    """The logged-in player's level, XP, completed quests, weakest skill and last activity."""
+    progress = get_progress(db, current_user.id)
+    if progress is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Create your character first.")
+    level = ProfileResponse.model_validate(progress.profile)
+    return ProgressResponse(
+        level=level.level,
+        xp=level.xp,
+        xp_into_level=level.xp_into_level,
+        xp_needed_for_next=level.xp_needed_for_next,
+        completed_quests=progress.completed_quests,
+        total_quests=progress.total_quests,
+        last_activity_at=progress.last_activity_at,
+        weakest_skill=(
+            WeakestSkillOut(category=weak.category, score=weak.score, status=weak.status)
+            if (weak := progress.weakest_skill)
+            else None
+        ),
+    )
