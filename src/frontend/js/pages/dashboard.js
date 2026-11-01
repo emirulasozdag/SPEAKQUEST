@@ -11,10 +11,16 @@ import {
   handleApiError,
 } from "../api.js";
 import { showAlert } from "../components/form.js";
-import { avatarUrl, dialogueUrl, portraitUrl } from "../components/quests.js";
+import {
+  ENDING_PAGE,
+  JOURNAL_PAGE,
+  MAP_PAGE,
+  RECOMMENDATION_HEADING,
+  avatarUrl,
+  dialogueUrl,
+  portraitUrl,
+} from "../components/quests.js";
 import { CHARACTER_PAGE } from "../session.js";
-
-const MAP_PAGE = "/pages/map.html";
 
 const loading = document.querySelector("#dashboard-loading");
 const content = document.querySelector("#dashboard-content");
@@ -50,14 +56,25 @@ function showNextStep(body, recommended, places, ending) {
     body.innerHTML = `
       <p class="small text-secondary mb-1">Suggested next quest</p>
       <h3></h3>
-      <p class="quest-reason"></p>
-      <a class="btn btn-outline-primary" href="${MAP_PAGE}">Find it on the city map</a>`;
+      <div class="sq-recommended mb-3">
+        <p class="small fw-bold mb-1"></p>
+        <p class="quest-reason mb-0"></p>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-primary" href="${MAP_PAGE}">Find it on the city map</a>
+        <a class="btn btn-link" href="${JOURNAL_PAGE}">All quests</a>
+      </div>`;
     body.querySelector("h3").textContent = [recommended.title, place?.name].filter(Boolean).join(" · ");
+    body.querySelector(".sq-recommended .fw-bold").textContent = RECOMMENDATION_HEADING;
     body.querySelector(".quest-reason").textContent = recommended.recommendation_reason;
   } else if (ending) {
-    body.innerHTML = '<p class="small text-secondary mb-1">Your story has ended</p><h3></h3><p class="mb-0"></p>';
+    body.innerHTML = `
+      <p class="small text-secondary mb-1">Your story has ended</p>
+      <h3></h3>
+      <p class="ending-summary"></p>
+      <a class="btn btn-primary" href="${ENDING_PAGE}">See how your story ended</a>`;
     body.querySelector("h3").textContent = ending.title;
-    body.querySelector("p.mb-0").textContent = ending.summary;
+    body.querySelector(".ending-summary").textContent = ending.summary;
   } else {
     body.innerHTML = `
       <p>You have no active quest right now. Pick a place on the city map to start one.</p>
@@ -72,7 +89,7 @@ function showActiveQuest(quest, places, recommended, ending) {
 
   if (!quest) {
     showNextStep(body, recommended, places, ending);
-    continueButton.href = MAP_PAGE;
+    continueButton.href = ending && !recommended ? ENDING_PAGE : MAP_PAGE;
     return;
   }
 

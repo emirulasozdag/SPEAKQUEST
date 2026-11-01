@@ -65,7 +65,11 @@ tamamlanmasıyla hikâye kapanır. Story Engine'in `choose_ending()` fonksiyonu
 
 - `POST /api/quests/{id}/complete` cevabındaki `ending` alanı sonu ve özetini taşır; hikâye
   sürerken `null`'dur.
-- `GET /api/story/ending` ulaşılan sonu döner; hikâye sürerken `404` döner.
+- `GET /api/story/ending` ulaşılan sonu döner; hikâye sürerken `404` döner. Cevap son ekranı
+  için şunları da taşır: toplam `xp`, `level`, `quests_completed`, verilen kararlar (`decisions`:
+  görev, soru ve seçilen seçeneğin metni, verildiği sırayla) ve en çok gelişen beceri
+  (`most_improved_skill`: başlangıç puanı `PRIOR_SCORE` = 50'nin en çok üstüne çıkan pratik
+  yapılmış beceri; hiçbiri çıkmadıysa `null`, Learning Engine'in `most_improved_skill()`).
 - Hikâye kapandıktan sonra yeni karar verilemez (`409`). `POST /api/player/reset` hikâyeyi yeniden
   açar.
 
@@ -73,3 +77,13 @@ tamamlanmasıyla hikâye kapanır. Story Engine'in `choose_ending()` fonksiyonu
 
 `GET /api/quests` her görevi `recommended` ve `recommendation_reason` alanlarıyla döner. Bir görev
 aktifken ya da hikâye bittiğinde hiçbir görev önerilmez.
+
+Kilitli görevlerde `locked_reason` oyuncuya neyin eksik olduğunu söyler. Metin Story Engine'in
+`unmet_conditions()` sonucundan üretilir, böylece `is_unlocked()` ile hep aynı kararı verir:
+
+- Tamamlanmamış görevler: _"Complete Meet Your Neighbor first."_
+- Eksik bir bayrak (flag): yalnızca hangi görevdeki seçimin açtığı söylenir, hangi seçenek olduğu
+  söylenmez: _"Opens through a choice you make in Meet Your Neighbor."_
+- O seçim zaten diğer yönde yapıldıysa görev kalıcı olarak kapalıdır: _"Your choice in Meet Your
+  Neighbor took the story another way, so this quest stays closed."_
+- Eksik güven: _"Alex needs to trust you more (10 of 30)."_ (şu anki içerikte kullanılmıyor)

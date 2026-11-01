@@ -4,19 +4,24 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
+from app.engines.learning import PRIOR_SCORE, most_improved_skill
 from app.models.content import Npc
 from app.models.user import User
-from app.schemas.quests import EndingOut
 from app.schemas.story import (
     DecisionOptionOut,
     DecisionOut,
     DecisionRequest,
     DecisionResultOut,
+    EndingSummaryOut,
+    ImprovedSkillOut,
+    KeyDecisionOut,
     NpcRelationshipOut,
     StoryLocationOut,
     StoryStateOut,
     UnlockedQuestOut,
 )
+from app.services import learning as learning_service
+from app.services import players as player_service
 from app.services import quests as quest_service
 from app.services import story as story_service
 
@@ -48,16 +53,35 @@ def story_state(
     )
 
 
-@router.get("/ending", response_model=EndingOut)
+@router.get("/ending", response_model=EndingSummaryOut)
 def story_ending(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> EndingOut:
-    """The ending the player reached, with its summary; 404 while the story goes on."""
+) -> EndingSummaryOut:
+    """The ending the player reached, with its summary, the decisions that led there, the XP
+    earned and the skill that improved most; 404 while the story goes on."""
     ending = story_service.reached_ending(db, current_user.id)
-    if ending is None:
+    progress = player_service.get_progress(db, current_user.id)
+    if ending is None or progress is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Your story has not ended yet.")
-    return EndingOut(slug=ending.slug, title=ending.title, summary=ending.summary)
+    improved = most_improved_skill(learning_service.get_skill_scores(db, current_user.id))
+    return EndingSummaryOut(
+        slug=ending.slug,
+        title=ending.title,
+        summary=ending.summary,
+        xp=progress.profile.xp,
+        level=progress.profile.level,
+        quests_completed=progress.completed_quests,
+        decisions=[
+            KeyDecisionOut(quest_title=made.quest.title, prompt=made.point.prompt, choice=made.choice)
+            for made in story_service.made_decisions(db, current_user.id)
+        ],
+        most_improved_skill=(
+            ImprovedSkillOut(category=improved.category, start_score=PRIOR_SCORE, score=improved.score)
+            if improved
+            else None
+        ),
+    )
 
 
 # not_started and already_made are about the order of play, not about a bad request

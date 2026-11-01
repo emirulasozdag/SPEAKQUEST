@@ -21,6 +21,7 @@ from app.engines.learning import (
     SkillStatus,
     TargetReason,
     choose_learning_target,
+    most_improved_skill,
     rank_learning_targets,
     skill_score,
     skill_scores,
@@ -296,3 +297,19 @@ def test_level_changes_the_order_of_otherwise_equal_skills():
 
     assert [t.category for t in rank_learning_targets(scores, EnglishLevel.A2)] == list(LEVEL_ORDER[EnglishLevel.A2])
     assert [t.category for t in rank_learning_targets(scores, EnglishLevel.B1)] == list(LEVEL_ORDER[EnglishLevel.B1])
+
+
+# --- most improved skill (ending screen) -----------------------------------------------------
+
+
+def test_the_most_improved_skill_is_the_one_furthest_above_the_start():
+    scores = Player().says((PAST, True)).says((PREPS, True), (PAST, True)).says((PRESENT, False)).scores()
+
+    improved = most_improved_skill(scores)
+
+    assert improved.category == PAST and improved.score > scores[PREPS].score > PRIOR_SCORE
+
+
+def test_no_skill_improved_without_practice_or_only_mistakes():
+    assert most_improved_skill(Player().scores()) is None
+    assert most_improved_skill(Player().says((PAST, False)).says((PRESENT, False)).scores()) is None

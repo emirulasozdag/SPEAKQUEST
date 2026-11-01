@@ -331,9 +331,13 @@ içinde anlatılır. Yeni bir tablo ekleyen PR bu dokümanı da günceller.
 4. **City Map** üzerinden bir mekâna tıklayın.
 5. **Dialogue** ekranında NPC ile İngilizce yazışın. Görev hedefi ve ilerleme göstergesi ekranda yer
    alır; hata yaptığınızda düzeltme ve kısa açıklama gösterilir.
-6. **Quest Journal** ekranında aktif, tamamlanan ve kilitli görevleri ve ödüllerini inceleyin.
+6. **Quest Journal** ekranında aktif, tamamlanan ve kilitli görevleri ve ödüllerini inceleyin. Önerilen
+   görev _"Why this quest was suggested for you"_ açıklamasıyla, kilitli görevler de neyi beklediğiyle
+   birlikte gösterilir.
 7. **Learning Progress** ekranında hata kategorilerinizi, sık yaptığınız hataları ve zaman içindeki
    gelişiminizi takip edin.
+8. Oynanabilecek görev kalmadığında hikâye biter. **Ending** ekranı (`/pages/ending.html`) ulaştığınız
+   sonu, sizi oraya götüren kararları, kazandığınız XP'yi ve en çok gelişen becerinizi gösterir.
 
 ## Verilerimi nasıl silerim?
 
