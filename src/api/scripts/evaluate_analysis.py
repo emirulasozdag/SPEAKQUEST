@@ -131,7 +131,8 @@ def context_for(sentence: Sentence, content=None, practice_focus: SkillCategory 
     quest = next(q for q in content.quests if q.slug == sentence.scene)
     npc = next(n for n in content.npcs if n.slug == quest.npc)
     return DialogueContext(
-        npc=NpcProfile.from_content(npc),
+        # With the quest, as in the game: the NPC also knows this quest's own facts (#64)
+        npc=NpcProfile.from_content(npc, quest),
         quest=QuestBrief.from_template(quest),
         level=sentence.level,
         history=(HistoryLine(speaker="npc", text=sentence.npc_line),),

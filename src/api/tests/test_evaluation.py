@@ -363,3 +363,15 @@ def test_another_prompt_file_can_be_measured_with_the_same_pipeline(tmp_path, mo
     assert "TEACHING RULES (OTHER VERSION)" in fake.calls[0][0]
     # The run records which prompt it measured
     assert evaluation.prompt_fingerprint(sentences) != own_fingerprint
+
+
+def test_the_evaluation_gives_the_npc_the_same_knowledge_as_the_game():
+    # The game adds the quest's own facts to what the NPC knows (services/dialogue.py); a context
+    # without them would measure a different prompt from the one players get
+    from app.content.schema import load_content
+
+    content = load_content()
+    for item in load_dataset(dataset()):
+        quest = next(q for q in content.quests if q.slug == item.scene)
+        npc = next(n for n in content.npcs if n.slug == quest.npc)
+        assert context_for(item, content).npc.knows == (*npc.knows, *quest.npc_knows), item.id
