@@ -234,7 +234,8 @@ def _dialogue_context(
     npc: Npc = quest.npc
     recent = _messages_of(db, progress.id)[-MAX_HISTORY_MESSAGES:]
     return DialogueContext(
-        npc=NpcProfile(npc.name, npc.role, npc.personality, npc.speaking_style, tuple(npc.knows)),
+        # The quest's own facts are added, so story events reach the NPC only in their own quest
+        npc=NpcProfile(npc.name, npc.role, npc.personality, npc.speaking_style, (*npc.knows, *quest.npc_knows)),
         quest=QuestBrief(
             title=quest.title,
             summary=quest.summary,

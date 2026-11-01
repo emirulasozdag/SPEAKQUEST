@@ -71,6 +71,7 @@ def seed_content(db: Session, content: Content | None = None) -> SeedReport:
             rewards=item.rewards.model_dump(mode="json"),
             allowed_story_actions=list(item.allowed_story_actions),
             decision_points=[p.model_dump(mode="json") for p in item.decision_points],
+            locked_summary=item.locked_summary, npc_knows=list(item.npc_knows),
         )
 
     db.commit()

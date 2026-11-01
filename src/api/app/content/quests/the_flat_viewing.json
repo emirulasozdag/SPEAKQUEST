@@ -8,6 +8,11 @@
   "min_level": "A2",
   "max_level": "B1",
   "summary": "Alex remembers your help with the boxes and tells you that the bigger flat upstairs is free. Ask the right questions before you decide.",
+  "locked_summary": "Something is changing in Linden House, and Alex may have news for you.",
+  "npc_knows": [
+    "The bigger flat upstairs (4B) has just become empty. The rent is 650 a month, bills are extra, and it has two rooms and a small balcony.",
+    "The landlord, Mr. Patel, trusts Alex and lets Alex show the empty flat."
+  ],
   "npc_opening": "Thanks again for helping me the other day! Guess what, the flat upstairs is empty now. I have the key. Do you want to see it? Ask me anything.",
   "objectives": [
     { "id": "ask_price", "description": "Ask how much the rent is." },

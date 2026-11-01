@@ -90,6 +90,7 @@ def test_two_decisions_unlock_different_quests():
             "can never be reached",
         ),
         (lambda c: c["endings"].reverse(), "last ending must have no conditions"),
+        (lambda c: quest(c, "the_job_interview").pop("locked_summary"), "needs a locked_summary"),
     ],
     ids=[
         "unknown-npc",
@@ -108,6 +109,7 @@ def test_two_decisions_unlock_different_quests():
         "flag-never-used",
         "unreachable-trust",
         "no-fallback-ending",
+        "no-locked-summary",
     ],
 )
 def test_broken_content_is_rejected(raw_content, break_content, message):
@@ -115,3 +117,17 @@ def test_broken_content_is_rejected(raw_content, break_content, message):
 
     with pytest.raises(ValidationError, match=message):
         Content.model_validate(raw_content)
+
+
+def test_story_events_are_known_only_in_their_own_quest():
+    """#64: an NPC's own knows go into every quest with that NPC, so a story event that happens in
+    one quest belongs in that quest's npc_knows, or the NPC talks about it before it happens."""
+    content = load_content()
+    npcs = {npc.slug: npc for npc in content.npcs}
+    backpack = next(q for q in content.quests if q.slug == "the_missing_backpack")
+    flat = next(q for q in content.quests if q.slug == "the_flat_viewing")
+
+    assert not any("backpack" in fact for fact in npcs["mia"].knows)
+    assert any("backpack" in fact for fact in backpack.npc_knows)
+    assert not any("4B" in fact for fact in npcs["alex"].knows)
+    assert any("4B" in fact for fact in flat.npc_knows)

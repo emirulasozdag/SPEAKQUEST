@@ -8,6 +8,7 @@
   "min_level": "A2",
   "max_level": "B1",
   "summary": "Bright Path Travel needs a new customer assistant. Olivia, the hiring manager, wants to hear about you and your experience.",
+  "locked_summary": "Bright Path Travel is looking for a new customer assistant.",
   "npc_opening": "Hello, thank you for coming in. Please, have a seat. To start, can you tell me a little about yourself?",
   "objectives": [
     { "id": "introduce_yourself", "description": "Introduce yourself to Olivia." },

@@ -28,15 +28,20 @@ dil bilgisi gerekmez.
 Her NPC'nin `knows` listesi, AI'ın o karakter adına bilebileceği şeylerdir. AI bunların dışında
 oyun durumu uyduramaz (yeni mekân, görev, ödül).
 
+`knows` NPC'nin **her** görevinde prompt'a girer. Bu yüzden belli bir görevde olan bir hikâye olayı
+(kaybolan çanta, boşalan daire) NPC'nin `knows` listesine değil, o görevin `npc_knows` alanına
+yazılır. Yoksa NPC olayı daha olmadan, önceki görevlerde anlatır (#64).
+
 ### Alex · komşu (`apartment`)
 
 - **Kişilik:** Arkadaş canlısı, biraz utangaç. Evden çalışan bir grafik tasarımcı, bitkileri
   seviyor ve sürekli mobilya taşıyor.
 - **Konuşma tarzı:** Rahat ve gündelik. Kısa cümleler, "oh", "you know"; basit kelimeler ve
   samimi takip soruları.
-- **Bildikleri:** Dört yıldır Linden House'da yaşıyor. Üst kattaki daire (4B) boşaldı: kira
-  ayda 650, faturalar ayrı, iki oda ve küçük bir balkon. Ev sahibi Mr. Patel, Alex'e güvenip
-  daireyi göstermesine izin veriyor.
+- **Bildikleri:** Dört yıldır Linden House'da yaşıyor.
+- **Yalnızca The Flat Viewing'de bildikleri:** Üst kattaki daire (4B) boşaldı: kira ayda 650,
+  faturalar ayrı, iki oda ve küçük bir balkon. Ev sahibi Mr. Patel, Alex'e güvenip daireyi
+  göstermesine izin veriyor.
 
 ### Mia · kafe sahibi (`cafe`)
 
@@ -44,10 +49,10 @@ oyun durumu uyduramaz (yeni mekân, görev, ödül).
   haberlerini paylaşmayı sever.
 - **Konuşma tarzı:** Parlak ve davetkâr. Kafe kelimeleri kullanır (latte, oat milk, to take
   away, croissant) ve müşteriye siparişini nasıl sevdiğini sorar.
-- **Bildikleri:** Menü (kahve, çay, sıcak çikolata, kruvasan, tost, günün çorbası). Mavi sırt
-  çantası (içinde not defteri ve anahtarları) dün öğleden sonra tezgâhın arkasından kayboldu.
-  Saat üç civarında çok benzer mavi çantası olan bir kurye geldi; bunu yalnızca oyuncu dünle
-  ilgili doğru sorular sorarsa hatırlar.
+- **Bildikleri:** Menü (kahve, çay, sıcak çikolata, kruvasan, tost, günün çorbası).
+- **Yalnızca The Missing Backpack'te bildikleri:** Mavi sırt çantası (içinde not defteri ve
+  anahtarları) dün öğleden sonra tezgâhın arkasından kayboldu. Saat üç civarında çok benzer mavi
+  çantası olan bir kurye geldi; bunu yalnızca oyuncu dünle ilgili doğru sorular sorarsa hatırlar.
 
 ### Olivia · işe alım müdürü (`office`)
 
@@ -166,7 +171,9 @@ modelindedir. Bilinmeyen alan adı hatadır.
 | `location`, `npc` | Mekân ve NPC slug'ı. NPC o mekânda yaşamalıdır. |
 | `target_skills` | Görevin çalıştırdığı hata kategorileri (`app/engines/categories.py`). En az bir tane. |
 | `min_level`, `max_level` | Uygun İngilizce seviyesi aralığı (`A2`, `B1`). |
-| `summary` | Sahnenin kısa anlatımı; oyuncuya ve AI'ya bağlam olarak verilir. |
+| `summary` | Sahnenin kısa anlatımı; oyuncuya ve AI'ya bağlam olarak verilir. Görevi açan kararları anlatabilir, çünkü görev açıldığında gösterilir. |
+| `locked_summary` | Görev kilitliyken Quest Journal'da ve haritada `summary` yerine gösterilen kısa, tarafsız metin. Oyuncunun vermediği bir kararı varsaymaz. Ön koşulu olan her görevde zorunludur (#65). |
+| `npc_knows` | NPC'nin yalnızca bu görevde bildikleri; `knows` listesine eklenerek prompt'a girer, API'den hiç dönmez. Bu görevde olan hikâye olayları buraya yazılır (#64). İsteğe bağlı. |
 | `npc_opening` | NPC'nin konuşmayı açan ilk cümlesi. |
 | `objectives` | `[{id, description}]`. Ölçülebilir iletişim hedefleri; görev bunlar karşılanınca tamamlanır, dil bilgisi hataları tamamlamayı engellemez. |
 | `prerequisites` | `quests_completed` (tamamlanmış görevler), `flags` (kararlarla açılan bayraklar), `min_trust` (`{npc: 0–100}`). Hepsi sağlanmalıdır. Boşsa görev başlangıç görevidir; tam bir tane olabilir. |
@@ -208,6 +215,10 @@ aksiyonların geçerli olduğunu söyler; etkilerini Story Engine (`engines/stor
   "min_level": "A2",
   "max_level": "B1",
   "summary": "Alex remembers your help with the boxes and tells you that the bigger flat upstairs is free.",
+  "locked_summary": "Something is changing in Linden House, and Alex may have news for you.",
+  "npc_knows": [
+    "The bigger flat upstairs (4B) has just become empty. The rent is 650 a month, bills are extra, and it has two rooms and a small balcony."
+  ],
   "npc_opening": "Thanks again for helping me the other day! The flat upstairs is empty now. Ask me anything.",
   "objectives": [
     { "id": "ask_price", "description": "Ask how much the rent is." },
@@ -231,6 +242,8 @@ aksiyonların geçerli olduğunu söyler; etkilerini Story Engine (`engines/stor
 - Koşullarda geçen her bayrağı bir karar açar; kararların açtığı her bayrak bir yerde kullanılır.
 - Her güven eşiği, oyunda kazanılabilecek güvenle ulaşılabilirdir.
 - Son ending koşulsuzdur, böylece her oyuncu bir sona ulaşır.
+- Ön koşulu olan her görevin bir `locked_summary` metni vardır.
+- Mia'nın çantası ve Alex'in boş dairesi yalnızca kendi görevlerinin `npc_knows` alanındadır.
 
 ### Yeni görev eklemek
 

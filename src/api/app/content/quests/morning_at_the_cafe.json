@@ -8,6 +8,7 @@
   "min_level": "A2",
   "max_level": "B1",
   "summary": "Your first morning in the city. Mia runs the Corner Café next to your building. Order breakfast and chat about the neighbourhood.",
+  "locked_summary": "Mia runs the Corner Café next to Linden House. Order breakfast and chat about the neighbourhood.",
   "npc_opening": "Good morning and welcome to the Corner Café! I haven't seen you before. What can I get you today?",
   "objectives": [
     { "id": "greet", "description": "Greet Mia." },

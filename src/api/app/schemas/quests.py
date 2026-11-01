@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.engines.categories import SkillCategory
-from app.services.quests import CompletedQuest, PlayerQuest, QuestStatus
+from app.services.quests import CompletedQuest, PlayerQuest, QuestStatus, visible_summary
 
 
 class QuestSummaryOut(BaseModel):
@@ -31,7 +31,7 @@ class QuestSummaryOut(BaseModel):
             slug=quest.slug,
             title=quest.title,
             chapter=quest.chapter,
-            summary=quest.summary,
+            summary=visible_summary(quest, item.status),
             location_slug=quest.location.slug,
             npc_slug=quest.npc.slug,
             status=item.status,

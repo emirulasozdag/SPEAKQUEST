@@ -53,7 +53,7 @@ def job_interview_context(
     quest = next(q for q in content.quests if q.slug == "the_job_interview")
     npc = next(n for n in content.npcs if n.slug == quest.npc)
     return DialogueContext(
-        npc=NpcProfile.from_content(npc),
+        npc=NpcProfile.from_content(npc, quest),
         quest=QuestBrief.from_template(quest),
         level=level,
         story_summary=story_summary,
