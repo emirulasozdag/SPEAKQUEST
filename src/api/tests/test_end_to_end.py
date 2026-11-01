@@ -3,7 +3,7 @@
 Only the AI provider is faked; every other step goes through the same endpoints the frontend
 calls, in the order a player meets them: register -> log in -> create a character -> pick a quest
 -> talk to the NPC -> make a story decision -> complete the quest -> see the learning results and
-the progress -> start the next quest.
+the progress -> follow the Adaptive Quest Engine's recommendation to the next quest.
 """
 
 import pytest
@@ -26,6 +26,10 @@ def quests_by_slug(client, headers) -> dict[str, dict]:
     return {quest["slug"]: quest for quest in client.get("/api/quests", headers=headers).json()}
 
 
+def recommended(quests: dict[str, dict]) -> list[dict]:
+    return [quest for quest in quests.values() if quest["recommended"]]
+
+
 def test_a_player_goes_from_registration_to_the_next_quest(client):
     # 1. Account and login
     assert client.post("/api/auth/register", json={"email": EMAIL, "password": PASSWORD}).status_code == 201
@@ -43,6 +47,8 @@ def test_a_player_goes_from_registration_to_the_next_quest(client):
     assert quests["meet_your_neighbor"]["status"] == "available"
     assert {quests[slug]["status"] for slug in quests if slug != "meet_your_neighbor"} == {"locked"}
     assert client.get("/api/quests/active", headers=headers).status_code == 404
+    # The only open quest is also the recommended one
+    assert [quest["slug"] for quest in recommended(quests)] == ["meet_your_neighbor"]
 
     # 4. Start it: the NPC opens the conversation
     first = quests["meet_your_neighbor"]
@@ -50,6 +56,8 @@ def test_a_player_goes_from_registration_to_the_next_quest(client):
     assert started.status_code == 201
     history = client.get(f"/api/dialogue/history/{first['id']}", headers=headers).json()["messages"]
     assert [m["role"] for m in history] == ["npc"]
+    # Nothing is recommended while a quest is active
+    assert recommended(quests_by_slug(client, headers)) == []
     # Completing before the goals are met is refused
     assert client.post(f"/api/quests/{first['id']}/complete", headers=headers).status_code == 409
 
@@ -96,6 +104,10 @@ def test_a_player_goes_from_registration_to_the_next_quest(client):
         "available"
     }
     assert quests["the_missing_backpack"]["status"] == "locked"
+    # The Adaptive Quest Engine recommends exactly one of the open quests, and says why
+    [suggestion] = recommended(quests)
+    assert suggestion["status"] == "available"
+    assert suggestion["recommendation_reason"]
 
     # 8. What the conversation taught: the mistake, the skill, the summary and the progress
     errors = client.get("/api/learning/errors", headers=headers).json()
@@ -109,10 +121,10 @@ def test_a_player_goes_from_registration_to_the_next_quest(client):
     assert (progress["level"], progress["xp"], progress["completed_quests"]) == (2, 50, 1)
     assert progress["weakest_skill"]["category"] == "present_simple"
 
-    # 9. The next quest starts with a fresh conversation
-    nxt = quests["morning_at_the_cafe"]
+    # 9. The player follows the recommendation: the next quest starts with a fresh conversation
+    nxt = suggestion
     assert client.post(f"/api/quests/{nxt['id']}/start", headers=headers).status_code == 201
     active = client.get("/api/quests/active", headers=headers).json()
-    assert active["slug"] == "morning_at_the_cafe"
+    assert active["slug"] == nxt["slug"]
     assert not any(goal["met"] for goal in active["objectives"])
     assert len(client.get(f"/api/dialogue/history/{nxt['id']}", headers=headers).json()["messages"]) == 1
