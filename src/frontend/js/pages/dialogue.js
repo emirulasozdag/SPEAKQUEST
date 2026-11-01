@@ -12,6 +12,7 @@ import {
   handleApiError,
   sendDialogueMessage,
 } from "../api.js";
+import { showDecisions } from "../components/decisions.js";
 import { showAlert } from "../components/form.js";
 import { portraitUrl } from "../components/quests.js";
 
@@ -381,6 +382,7 @@ async function loadDialogue() {
       [state.npc?.role, state.place?.name].filter(Boolean).join(" · ");
 
     showHistory(history.messages);
+    showDecisions(document.querySelector("#decision-panel"), summary.id);
     if (isActive) {
       showObjectives(active.objectives);
     } else {

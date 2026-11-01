@@ -312,7 +312,7 @@ Satırı olmayan NPC'nin güveni 0'dır. Güven yalnızca Story Engine üzerinde
 bayraklarını, sonunu ve her NPC için `{slug, name, trust}` listesini döner. Karakter yoksa `404`.
 NPC'lerin prompt bilgileri (`personality`, `knows`) bu cevapta yoktur.
 
-### `story_decisions` · #17
+### `story_decisions` · uygulandı (#17)
 
 | Alan | Tip | Not |
 |---|---|---|
@@ -324,6 +324,12 @@ NPC'lerin prompt bilgileri (`personality`, `knows`) bu cevapta yoktur.
 | created_at | timestamptz | |
 
 `(user_id, quest_template_id, decision_key)` unique'tir. Aynı karar iki kez verilemez.
+
+Karar yalnızca başlatılmış (aktif ya da tamamlanmış) bir görev için verilebilir
+(`POST /api/story/decision`). Seçeneğin etkileri (bayraklar ve güven) Story Engine'in
+`apply_decision()` fonksiyonuyla `story_states.flags` ve `npc_relationships` tablolarına yazılır.
+`GET /api/story/decisions/{quest_id}` seçenekleri etkileri olmadan döner. Hikâye sonu
+`choose_ending()` fonksiyonunda, `endings.json` sırasıyla seçilir.
 
 ## Modüller arası sınırlar
 

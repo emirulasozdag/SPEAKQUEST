@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 from app.engines.trust import TRUST_MAX, TRUST_MIN
-from app.models.content import Location, Npc
+from app.models.content import Location, Npc, QuestTemplate
 
 
 class StoryState(Base):
@@ -44,3 +44,22 @@ class NpcRelationship(Base):
     trust: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
 
     npc: Mapped[Npc] = relationship()
+
+
+class StoryDecision(Base):
+    """A choice the player made at one of a quest's decision points. Each decision is made once."""
+
+    __tablename__ = "story_decisions"
+    __table_args__ = (
+        UniqueConstraint("user_id", "quest_template_id", "decision_key", name="uq_story_decisions_user_quest_key"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    quest_template_id: Mapped[int] = mapped_column(ForeignKey("quest_templates.id"))
+    # The decision point id and the chosen option id from the quest template
+    decision_key: Mapped[str] = mapped_column(String(60))
+    choice: Mapped[str] = mapped_column(String(60))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    quest: Mapped[QuestTemplate] = relationship()
