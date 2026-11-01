@@ -7,7 +7,7 @@ from app.core.placeholders import not_implemented
 from app.models.user import User
 from app.schemas.player import ProfileResponse, ProfileUpdateRequest
 from app.services.players import get_profile as find_profile
-from app.services.players import save_profile
+from app.services.players import reset_progress, save_profile
 
 router = APIRouter(prefix="/player", tags=["player"])
 
@@ -42,6 +42,21 @@ def update_profile(
     profile, created = save_profile(db, current_user.id, payload)
     if created:
         response.status_code = status.HTTP_201_CREATED
+    return ProfileResponse.model_validate(profile)
+
+
+@router.post("/reset", response_model=ProfileResponse)
+def reset_game(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> ProfileResponse:
+    """Delete all quest, dialogue, learning and story progress and start the game again.
+
+    The account and the character stay; XP and level go back to the start.
+    """
+    profile = reset_progress(db, current_user.id)
+    if profile is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Create your character first.")
     return ProfileResponse.model_validate(profile)
 
 

@@ -33,6 +33,17 @@ class DeleteAccountRequest(BaseModel):
     password: str = Field(min_length=1, max_length=72)
 
 
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(min_length=1, max_length=72)
+    # Same rules as a new account's password
+    new_password: str = Field(min_length=8, max_length=72)
+
+    @field_validator("new_password")
+    @classmethod
+    def fits_bcrypt_limit(cls, value: str) -> str:
+        return _Credentials.fits_bcrypt_limit(value)
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
