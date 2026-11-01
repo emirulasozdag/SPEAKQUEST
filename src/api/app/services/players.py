@@ -1,15 +1,21 @@
 """Player profile operations, kept out of the routers so they can be reused and tested."""
 
-from sqlalchemy import delete, select
+from dataclasses import dataclass
+from datetime import datetime, timezone
+
+from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.models.content import QuestTemplate
 from app.models.dialogue import DialogueMessage
 from app.models.learning import LanguageError, SkillObservation
 from app.models.player import PlayerProfile
-from app.models.quest_progress import QuestProgress
+from app.models.quest_progress import QuestProgress, QuestProgressStatus
 from app.models.story import NpcRelationship, StoryDecision, StoryState
+from app.engines.learning import SkillScore
 from app.schemas.player import ProfileUpdateRequest
+from app.services.learning import get_skill_scores
 from app.services.story import get_story_state, new_story_state
 
 
@@ -99,3 +105,43 @@ def reset_progress(db: Session, user_id: int) -> PlayerProfile | None:
     db.commit()
     db.refresh(profile)
     return profile
+
+
+@dataclass(frozen=True)
+class PlayerProgress:
+    profile: PlayerProfile
+    completed_quests: int
+    total_quests: int
+    last_activity_at: datetime | None
+    # The practised skill with the lowest Learning Engine score; None before any practice
+    weakest_skill: SkillScore | None
+
+
+def get_progress(db: Session, user_id: int) -> PlayerProgress | None:
+    """Level, XP, quest counts and the last activity of this player; None without a character."""
+    profile = get_profile(db, user_id)
+    if profile is None:
+        return None
+    mine = QuestProgress.user_id == user_id
+    completed = db.scalar(
+        select(func.count()).select_from(QuestProgress).where(mine, QuestProgress.status == QuestProgressStatus.COMPLETED)
+    )
+    total = db.scalar(select(func.count()).select_from(QuestTemplate))
+    activity = [
+        db.scalar(select(func.max(QuestProgress.started_at)).where(mine)),
+        db.scalar(select(func.max(QuestProgress.completed_at)).where(mine)),
+        db.scalar(
+            select(func.max(DialogueMessage.created_at))
+            .join(QuestProgress, QuestProgress.id == DialogueMessage.quest_progress_id)
+            .where(mine)
+        ),
+    ]
+    times = [_as_aware(value) for value in activity if value is not None]
+    practised = [score for score in get_skill_scores(db, user_id).values() if score.opportunities]
+    weakest = min(practised, key=lambda score: score.score, default=None)
+    return PlayerProgress(profile, completed, total, max(times, default=None), weakest)
+
+
+def _as_aware(value: datetime) -> datetime:
+    # SQLite returns naive datetimes; PostgreSQL returns them with a time zone (both are UTC)
+    return value if value.tzinfo else value.replace(tzinfo=timezone.utc)

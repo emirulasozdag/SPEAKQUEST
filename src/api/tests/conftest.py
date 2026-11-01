@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -21,20 +23,31 @@ def reset_rate_limits():
     register_limiter.clear()
 
 
+# Set to a PostgreSQL URL (an empty database used only for tests) to run the tests there instead of
+# SQLite, as the CI's PostgreSQL job does. Every table in it is dropped and created again per test.
+TEST_DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "")
+
+
 @pytest.fixture
 def db_session():
-    """A fresh in-memory SQLite database per test, so tests never touch PostgreSQL."""
-    engine = create_engine(
-        "sqlite://",
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-    )
+    """A fresh database per test: in-memory SQLite by default, PostgreSQL with TEST_DATABASE_URL."""
+    if TEST_DATABASE_URL:
+        engine = create_engine(TEST_DATABASE_URL)
+        Base.metadata.drop_all(engine)
+    else:
+        engine = create_engine(
+            "sqlite://",
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
+        )
     Base.metadata.create_all(engine)
     session = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)()
     try:
         yield session
     finally:
         session.close()
+        if TEST_DATABASE_URL:
+            Base.metadata.drop_all(engine)
         engine.dispose()
 
 
