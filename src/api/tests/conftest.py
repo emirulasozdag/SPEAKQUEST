@@ -9,6 +9,7 @@ from sqlalchemy.pool import StaticPool
 from app.core.database import get_db
 from app.main import app
 from app.routers.auth import login_limiter, register_limiter
+from app.routers.dialogue import message_limiter
 from app.models import Base
 from app.services.ai.client import get_ai_client
 
@@ -16,11 +17,11 @@ from app.services.ai.client import get_ai_client
 @pytest.fixture(autouse=True)
 def reset_rate_limits():
     """Rate limit counters are process-wide, so each test starts with empty ones."""
-    login_limiter.clear()
-    register_limiter.clear()
+    for limiter in (login_limiter, register_limiter, message_limiter):
+        limiter.clear()
     yield
-    login_limiter.clear()
-    register_limiter.clear()
+    for limiter in (login_limiter, register_limiter, message_limiter):
+        limiter.clear()
 
 
 # Set to a PostgreSQL URL (an empty database used only for tests) to run the tests there instead of

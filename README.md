@@ -377,6 +377,22 @@ Tüm endpointler kimlik doğrulama, yetkilendirme ve girdi doğrulaması içerir
 kendi verisine erişebilir. Görev tamamlama gibi kritik işlemler istemciden gelen değerlere güvenilerek
 değil, backend kurallarıyla doğrulanarak yapılır.
 
+**Hata formatı:** her hata cevabı aynı şekildedir: `{"detail": "...", "request_id": "..."}`. Doğrulama
+hatalarında (`422`) `detail`, gönderilen değerleri tekrar etmeyen bir alan listesidir. Beklenmeyen bir
+hata iç ayrıntı göstermeden `500` ve genel bir cümleyle döner; ayrıntı yalnızca loga yazılır.
+
+**İstek kimliği ve loglama:** her `/api` cevabında `X-Request-ID` başlığı vardır (çağıran geçerli bir
+kimlik gönderirse o kullanılır). Backend logları `key=value` satırlarıdır ve her satır o isteğin
+kimliğini taşır: istek başına bir satır (`endpoint` rota şablonu olarak, `status`, `ms`) ve diyalogda
+AI adımının süresi (`ai analysis ... ms`). Loga istek/cevap gövdesi, sorgu parametreleri, e-posta,
+şifre, token, API anahtarı veya oyuncu mesajı yazılmaz. Bir hata bildirildiğinde `request_id` ile
+`docker compose logs api | grep <request_id>` o isteğin bütün satırlarını bulur.
+
+**Diyalog hız sınırı:** bir oyuncu dakikada en fazla 10 mesaj gönderebilir
+(backend ayarları `dialogue_rate_limit` ve `dialogue_rate_window_seconds`, `app/core/config.py`); sonraki mesaj `429` ve `Retry-After`
+başlığıyla reddedilir ve AI çağrılmaz. Bu, paylaşılan ücretsiz AI kotasını tek bir oyuncunun
+tüketmesini önler.
+
 ## Test
 
 Backend testleri `pytest` ile yazılır. Her Pull Request'te GitHub Actions üzerinde otomatik çalışır.

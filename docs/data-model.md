@@ -216,7 +216,7 @@ hesap silinirken mesajlar `quest_progress` satırlarından önce açıkça silin
 |---|---|---|
 | id | int PK | |
 | user_id | int FK → users | cascade, `(user_id, category)` index |
-| message_id | int FK → dialogue_messages | cascade |
+| message_id | int FK → dialogue_messages | cascade, index (#19) |
 | category | varchar(30) | `present_simple`, `past_simple`, `question_formation`, `prepositions`, `vocabulary_usage` |
 | original | text | |
 | corrected | text | |
@@ -233,7 +233,7 @@ Past Simple puanını artırmaz.
 |---|---|---|
 | id | int PK | |
 | user_id | int FK → users | cascade, `(user_id, category, created_at)` index |
-| message_id | int FK → dialogue_messages | cascade |
+| message_id | int FK → dialogue_messages | cascade, index (#19) |
 | category | varchar(30) | `language_errors` ile aynı enum |
 | result | varchar(9) | `correct`, `incorrect` |
 | created_at | timestamptz | |

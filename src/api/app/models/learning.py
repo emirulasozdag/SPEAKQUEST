@@ -24,6 +24,9 @@ class LanguageError(Base):
     __table_args__ = (
         CheckConstraint(_one_of("category", SkillCategory), name="ck_language_errors_category"),
         Index("ix_language_errors_user_category", "user_id", "category"),
+        # PostgreSQL does not index foreign keys by itself: corrections are read by message, and
+        # deleting a message (account deletion) must find its rows without a full table scan
+        Index("ix_language_errors_message_id", "message_id"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -49,6 +52,7 @@ class SkillObservation(Base):
         CheckConstraint(_one_of("category", SkillCategory), name="ck_skill_observations_category"),
         CheckConstraint(_one_of("result", ObservationResult), name="ck_skill_observations_result"),
         Index("ix_skill_observations_user_category_created", "user_id", "category", "created_at"),
+        Index("ix_skill_observations_message_id", "message_id"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
