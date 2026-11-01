@@ -359,7 +359,7 @@ artık çalışmaz (`401`).
 | Locations | `GET /locations`, `GET /locations/{id}` |
 | Quests | `GET /quests`, `GET /quests/active`, `POST /quests/{id}/start`, `POST /quests/{id}/complete` |
 | Dialogue | `POST /dialogue/message`, `GET /dialogue/history/{quest_id}` |
-| Learning | `GET /learning/errors`, `GET /learning/skills`, `GET /learning/recommendations` |
+| Learning | `GET /learning/errors`, `GET /learning/skills`, `GET /learning/recommendations`, `GET /learning/timeline` |
 | Story | `GET /story/state`, `GET /story/decisions/{quest_id}`, `POST /story/decision`, `GET /story/ending` |
 
 **Oyuncu profili:** `PUT /api/player/profile` gövdesi `character_name` (1–30 karakter), `avatar`

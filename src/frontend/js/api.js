@@ -175,6 +175,22 @@ export async function getStoryEnding() {
   }
 }
 
+export function getSkills() {
+  return authRequest("/learning/skills");
+}
+
+export function getLearningErrors(limit = 100) {
+  return authRequest(`/learning/errors?limit=${limit}`);
+}
+
+export function getLearningTimeline() {
+  return authRequest("/learning/timeline");
+}
+
+export function getRecommendations() {
+  return authRequest("/learning/recommendations");
+}
+
 export function getHealth() {
   return apiRequest("/health");
 }
