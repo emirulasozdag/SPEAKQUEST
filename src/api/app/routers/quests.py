@@ -16,16 +16,20 @@ def list_quests(
     db: Session = Depends(get_db),
 ) -> list[QuestListItemOut]:
     """Every quest with the logged-in player's status for it. The quest the Adaptive Quest Engine
-    recommends next is marked, with the reason; none is marked while a quest is active."""
+    recommends next is marked, with the reason; none is marked while a quest is active. Locked
+    quests say what they are still waiting for."""
     recommendation = quest_service.recommend_quest(db, current_user.id)
+    quests = quest_service.list_player_quests(db, current_user.id)
+    locked = quest_service.lock_reasons(db, current_user.id, quests)
     items = []
-    for item in quest_service.list_player_quests(db, current_user.id):
+    for item in quests:
         recommended = recommendation is not None and item.quest.slug == recommendation.slug
         items.append(
             QuestListItemOut(
                 **QuestSummaryOut.from_player_quest(item).model_dump(),
                 recommended=recommended,
                 recommendation_reason=recommendation.reason if recommended else None,
+                locked_reason=locked.get(item.quest.slug),
             )
         )
     return items

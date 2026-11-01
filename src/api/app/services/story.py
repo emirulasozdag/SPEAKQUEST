@@ -176,6 +176,32 @@ def make_decision(db: Session, user_id: int, quest_id: int, decision_id: str, op
     return DecisionResult(flags=after.flags, trust=changed)
 
 
+@dataclass(frozen=True)
+class MadeDecision:
+    quest: QuestTemplate
+    point: DecisionPoint
+    # The label of the option the player chose
+    choice: str
+
+
+def made_decisions(db: Session, user_id: int) -> list[MadeDecision]:
+    """Every decision the player made, in the order they made them; for the ending screen."""
+    rows = db.execute(
+        select(StoryDecision, QuestTemplate)
+        .join(QuestTemplate, QuestTemplate.id == StoryDecision.quest_template_id)
+        .where(StoryDecision.user_id == user_id)
+        .order_by(StoryDecision.id)
+    ).tuples()
+    made = []
+    for decision, quest in rows:
+        point = next((p for p in _decision_points(quest) if p.id == decision.decision_key), None)
+        option = next((o for o in point.options if o.id == decision.choice), None) if point else None
+        # A decision whose point was later removed from the content is left out
+        if option is not None:
+            made.append(MadeDecision(quest, point, option.label))
+    return made
+
+
 @cache
 def content_endings() -> tuple[Ending, ...]:
     """Endings come straight from endings.json; they are not stored in the database."""

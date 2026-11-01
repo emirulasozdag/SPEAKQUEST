@@ -63,6 +63,18 @@ def is_unlocked(conditions: Conditions, progress: StoryProgress) -> bool:
     )
 
 
+def unmet_conditions(conditions: Conditions, progress: StoryProgress) -> Conditions:
+    """The part of the conditions that does not hold yet; empty exactly when is_unlocked() is True.
+    Used to tell the player why a quest is still locked."""
+    return Conditions(
+        quests_completed=[slug for slug in conditions.quests_completed if slug not in progress.completed_quests],
+        flags=[flag for flag in conditions.flags if flag not in progress.flags],
+        min_trust={
+            npc: minimum for npc, minimum in conditions.min_trust.items() if progress.trust.get(npc, 0) < minimum
+        },
+    )
+
+
 def apply_story_action(progress: StoryProgress, quest: QuestRules, action: str) -> StoryActionOutcome:
     """Apply an AI-suggested story action if the quest allows it.
 

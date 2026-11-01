@@ -14,7 +14,7 @@ import {
 } from "../api.js";
 import { showDecisions } from "../components/decisions.js";
 import { showAlert } from "../components/form.js";
-import { portraitUrl } from "../components/quests.js";
+import { ENDING_PAGE, portraitUrl } from "../components/quests.js";
 
 const loading = document.querySelector("#dialogue-loading");
 const alertBox = document.querySelector("#dialogue-alert");
@@ -339,6 +339,9 @@ async function finishQuest() {
       ending.querySelector(".fw-bold").textContent = done.ending.title;
       ending.querySelector(".small.mb-0").textContent = done.ending.summary;
       resultBox.append(ending);
+      // The ending screen replaces the dashboard as the next step
+      link.href = ENDING_PAGE;
+      link.textContent = "See how your story ended";
     }
     resultBox.append(link);
     resultBox.hidden = false;

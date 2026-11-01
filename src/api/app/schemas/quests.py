@@ -71,6 +71,8 @@ class QuestListItemOut(QuestSummaryOut):
     recommended: bool = False
     # Why the engine picked it, for the player; set only on the recommended quest
     recommendation_reason: str | None = None
+    # What the player still needs before the quest opens; set only on locked quests
+    locked_reason: str | None = None
 
 
 class EndingOut(BaseModel):

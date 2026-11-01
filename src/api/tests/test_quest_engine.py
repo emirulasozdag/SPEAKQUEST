@@ -260,6 +260,41 @@ def test_the_quest_list_marks_one_recommendation_with_a_reason(client, db_sessio
     assert all(quest["recommendation_reason"] is None for quest in quests if not quest["recommended"])
 
 
+def locked_reasons(client, headers) -> dict[str, str | None]:
+    return {q["slug"]: q["locked_reason"] for q in client.get("/api/quests", headers=headers).json()}
+
+
+def test_locked_quests_say_what_they_wait_for_without_giving_the_choice_away(client, db_session, seeded):
+    headers = login_headers(client, "new@example.com")
+    client.put("/api/player/profile", json=VALID_PROFILE, headers=headers)
+
+    reasons = locked_reasons(client, headers)
+
+    assert reasons["meet_your_neighbor"] is None
+    assert reasons["the_job_interview"] == "Complete Meet Your Neighbor first."
+    assert reasons["the_flat_viewing"] == (
+        "Complete Meet Your Neighbor first. Opens through a choice you make in Meet Your Neighbor."
+    )
+    assert "Help Alex" not in reasons["the_flat_viewing"]
+
+
+def test_a_choice_made_the_other_way_closes_the_quest_for_good(client, db_session, seeded):
+    headers = login_headers(client, "new@example.com")
+    client.put("/api/player/profile", json=VALID_PROFILE, headers=headers)
+    starter = quest_by_slug(db_session, "meet_your_neighbor")
+    client.post(f"/api/quests/{starter.id}/start", headers=headers)
+    payload = {"quest_id": starter.id, "decision_id": "help_alex_move", "option_id": "not_now"}
+    client.post("/api/story/decision", json=payload, headers=headers)
+
+    reasons = locked_reasons(client, headers)
+
+    assert reasons["the_flat_viewing"] == (
+        "Your choice in Meet Your Neighbor took the story another way, so this quest stays closed."
+    )
+    # Not about a choice, so it still only waits for the quest
+    assert reasons["the_job_interview"] == "Complete Meet Your Neighbor first."
+
+
 def test_no_recommendation_while_a_quest_is_active(client, db_session, seeded):
     headers = login_headers(client, "new@example.com")
     client.put("/api/player/profile", json=VALID_PROFILE, headers=headers)
@@ -312,6 +347,23 @@ def test_helping_everyone_plays_all_five_quests_and_reaches_home_at_last(client,
     assert client.get("/api/story/state", headers=story_player).json()["ending"] == "home_at_last"
     ending = client.get("/api/story/ending", headers=story_player).json()
     assert ending["title"] == "Home at Last" and ending["summary"]
+    assert ending["quests_completed"] == 5
+    assert ending["xp"] == 50 + 60 + 80 + 100 + 120
+    assert [(d["quest_title"], d["choice"]) for d in ending["decisions"]] == [
+        ("Meet Your Neighbor", "Help Alex carry the boxes upstairs."),
+        ("Morning at the Café", "Say yes and watch the backpack until Mia comes back."),
+    ]
+
+
+def test_the_ending_names_the_skill_that_improved_most(client, db_session, story_player):
+    play_through(client, db_session, story_player, help_neighbours=False)
+    add_results(db_session, EMAIL, "meet_your_neighbor", (PS, True), (PS, True), (QF, True), (QF, False))
+
+    ending = client.get("/api/story/ending", headers=story_player).json()
+
+    assert ending["most_improved_skill"]["category"] == "past_simple"
+    assert ending["most_improved_skill"]["start_score"] == 50
+    assert ending["most_improved_skill"]["score"] > 50
 
 
 def test_saying_no_skips_two_quests_and_reaches_new_in_town(client, db_session, story_player):
@@ -320,6 +372,12 @@ def test_saying_no_skips_two_quests_and_reaches_new_in_town(client, db_session, 
     statuses = {q["slug"]: q["status"] for q in client.get("/api/quests", headers=story_player).json()}
     assert statuses["the_flat_viewing"] == statuses["the_missing_backpack"] == "locked"
     assert last["ending"]["slug"] == "new_in_town"
+    ending = client.get("/api/story/ending", headers=story_player).json()
+    assert ending["quests_completed"] == 3 and ending["most_improved_skill"] is None
+    assert [d["choice"] for d in ending["decisions"]] == [
+        "Say you are too tired after the journey.",
+        "Say sorry, you are in a hurry.",
+    ]
 
 
 def test_only_the_last_quest_ends_the_story(client, db_session, story_player):

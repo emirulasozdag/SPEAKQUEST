@@ -1,5 +1,8 @@
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.engines.categories import SkillCategory
+from app.schemas.quests import EndingOut
+
 
 class StoryLocationOut(BaseModel):
     slug: str
@@ -58,3 +61,28 @@ class DecisionResultOut(BaseModel):
     npcs: list[NpcRelationshipOut]
     # Quests that this decision unlocked just now
     unlocked_quests: list[UnlockedQuestOut]
+
+
+class KeyDecisionOut(BaseModel):
+    quest_title: str
+    prompt: str
+    # The label of the option the player chose
+    choice: str
+
+
+class ImprovedSkillOut(BaseModel):
+    category: SkillCategory
+    # Where every skill starts and where this one is now, both 0-100
+    start_score: int
+    score: int
+
+
+class EndingSummaryOut(EndingOut):
+    """The ending with what the player's story added up to. Every value is the backend's own."""
+
+    xp: int
+    level: int
+    quests_completed: int
+    decisions: list[KeyDecisionOut]
+    # The skill that rose furthest above its starting score; null when none rose
+    most_improved_skill: ImprovedSkillOut | None

@@ -3,7 +3,7 @@
 import pytest
 
 from app.content.schema import Conditions, load_content
-from app.engines.story import StoryProgress, is_unlocked
+from app.engines.story import StoryProgress, is_unlocked, unmet_conditions
 
 
 def progress(completed=(), flags=(), trust=None) -> StoryProgress:
@@ -51,6 +51,15 @@ def test_all_kinds_of_condition_must_hold_together():
     assert not is_unlocked(needs, progress([], ["f"], {"alex": 10}))
     assert not is_unlocked(needs, progress(["a"], [], {"alex": 10}))
     assert not is_unlocked(needs, progress(["a"], ["f"], {"alex": 9}))
+
+
+def test_unmet_conditions_lists_only_what_is_still_missing():
+    needs = Conditions(quests_completed=["a", "b"], flags=["f", "g"], min_trust={"alex": 10, "mia": 30})
+
+    missing = unmet_conditions(needs, progress(["a"], ["g"], {"alex": 10, "mia": 29}))
+
+    assert missing == Conditions(quests_completed=["b"], flags=["f"], min_trust={"mia": 30})
+    assert unmet_conditions(needs, progress(["a", "b"], ["f", "g"], {"alex": 10, "mia": 30})).is_empty()
 
 
 def unlocked_quests(state: StoryProgress) -> set[str]:

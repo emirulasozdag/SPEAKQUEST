@@ -636,6 +636,38 @@ span.sq-avatar {
   background: var(--sq-apartment-tint);
 }
 
+/* A locked quest keeps a grey station dot and says what opens it */
+.sq-quest-locked { --sq-line-color: var(--sq-locked); }
+
+.sq-lock-reason {
+  padding: var(--sq-space-2) var(--sq-space-3);
+  border-left: 4px solid var(--sq-locked);
+  border-radius: var(--sq-radius-sm);
+  background: var(--sq-paper);
+}
+
+/* Ending screen: the story's numbers, one per tile */
+.sq-stat {
+  height: 100%;
+  padding: var(--sq-space-3);
+  border-radius: var(--sq-radius-sm);
+  background: var(--sq-paper);
+}
+
+.sq-stat-value {
+  display: block;
+  font-family: var(--sq-font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.sq-decision + .sq-decision {
+  border-top: 1px solid var(--sq-line);
+  margin-top: var(--sq-space-3);
+  padding-top: var(--sq-space-3);
+}
+
 /* ---------- Progress ---------- */
 
 .sq-xp {

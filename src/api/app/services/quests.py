@@ -21,11 +21,12 @@ from app.content.schema import Conditions, Ending
 from app.engines.categories import SkillCategory
 from app.engines.progression import XpGain, add_xp
 from app.engines.quest import PlayerSnapshot, QuestCandidate, QuestRecommendation, choose_next_quest
-from app.engines.story import StoryProgress, current_chapter, is_unlocked
-from app.models.content import QuestTemplate
+from app.engines.story import StoryProgress, current_chapter, is_unlocked, unmet_conditions
+from app.models.content import Npc, QuestTemplate
 from app.models.dialogue import DialogueMessage, MessageRole
 from app.models.quest_progress import QuestProgress, QuestProgressStatus
 from app.models.player import EnglishLevel, LearningGoal
+from app.models.story import StoryDecision
 from app.services.learning import get_skill_scores
 from app.services.players import get_profile
 from app.services.story import add_trust, ending_for, get_story_state, load_story_progress
@@ -95,6 +96,57 @@ def list_player_quests(db: Session, user_id: int) -> list[PlayerQuest]:
         PlayerQuest(quest, _status_of(quest, progress_by_quest.get(quest.id), story), progress_by_quest.get(quest.id))
         for quest in quests
     ]
+
+
+def lock_reasons(db: Session, user_id: int, items: Iterable[PlayerQuest]) -> dict[str, str]:
+    """Why each locked quest is still locked, for the player, keyed by quest slug.
+
+    Built from the Story Engine's unmet_conditions(), so it always matches what is_unlocked()
+    decides. A flag only says which quest's choice opens the quest, never which option, so the
+    story keeps its surprises. When that choice was already made the other way, the quest stays
+    closed for good and the reason says so.
+    """
+    items = list(items)
+    locked = [item for item in items if item.status == QuestStatus.LOCKED]
+    if not locked:
+        return {}
+    titles = {item.quest.slug: item.quest.title for item in items}
+    # The quest and decision point whose option sets each flag
+    flag_sources = {
+        flag: (item.quest, point["id"])
+        for item in items
+        for point in item.quest.decision_points
+        for option in point["options"]
+        for flag in option.get("effects", {}).get("flags", [])
+    }
+    decided = set(
+        db.execute(
+            select(StoryDecision.quest_template_id, StoryDecision.decision_key).where(StoryDecision.user_id == user_id)
+        ).tuples()
+    )
+    npc_names = dict(db.execute(select(Npc.slug, Npc.name)).tuples().all())
+    story = load_story_progress(db, user_id)
+
+    reasons = {}
+    for item in locked:
+        missing = unmet_conditions(Conditions.model_validate(item.quest.prerequisites), story)
+        sources = [flag_sources[flag] for flag in missing.flags if flag in flag_sources]
+        closed = [quest for quest, point in sources if (quest.id, point) in decided]
+        if closed:
+            reasons[item.quest.slug] = (
+                f"Your choice in {closed[0].title} took the story another way, so this quest stays closed."
+            )
+            continue
+        parts = []
+        if missing.quests_completed:
+            parts.append(f"Complete {_join([titles[slug] for slug in missing.quests_completed])} first.")
+        open_choices = list(dict.fromkeys(quest.title for quest, _ in sources))
+        if open_choices:
+            parts.append(f"Opens through a choice you make in {_join(open_choices)}.")
+        for npc, minimum in missing.min_trust.items():
+            parts.append(f"{npc_names.get(npc, npc)} needs to trust you more ({story.trust.get(npc, 0)} of {minimum}).")
+        reasons[item.quest.slug] = " ".join(parts)
+    return reasons
 
 
 def get_active_quest(db: Session, user_id: int) -> PlayerQuest | None:
@@ -277,6 +329,10 @@ def _already_started(progress: QuestProgress) -> QuestStartRefusedError:
     if progress.status == QuestProgressStatus.COMPLETED:
         return QuestStartRefusedError("already_completed", "You have already completed this quest.")
     return QuestStartRefusedError("already_active", "This quest is already active.")
+
+
+def _join(names: list[str]) -> str:
+    return names[0] if len(names) == 1 else f"{', '.join(names[:-1])} and {names[-1]}"
 
 
 def _progress_by_quest(db: Session, user_id: int) -> dict[int, QuestProgress]:

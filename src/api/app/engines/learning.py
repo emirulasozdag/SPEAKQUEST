@@ -228,6 +228,13 @@ def skill_scores(
     return scores
 
 
+def most_improved_skill(scores: Mapping[SkillCategory, SkillScore]) -> SkillScore | None:
+    """The practised skill that rose furthest above PRIOR_SCORE, where every skill starts; None
+    when no skill is above it. Ties follow SkillCategory order. Shown on the ending screen."""
+    improved = [item for item in scores.values() if item.opportunities and item.score > PRIOR_SCORE]
+    return max(improved, key=lambda item: item.score, default=None)
+
+
 def rank_learning_targets(scores: Mapping[SkillCategory, SkillScore], level: EnglishLevel) -> list[LearningTarget]:
     """Every category, best next target first. Deterministic: the same input always gives the
     same order.
