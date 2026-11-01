@@ -433,7 +433,8 @@ Testlerde öncelik verilen alanlar:
 
 **Demo senaryosu:** İki kullanıcı aynı başlangıç görevini oynar. Birincisi Past Simple'da, ikincisi
 Question Formation'da zorlanır. Sistem bu farkı kaydeder ve iki kullanıcıya farklı sonraki görevler
-önerir. Kullanıcıların farklı kararları da NPC ilişkilerini ve hikâye sonunu değiştirir.
+önerir. Kullanıcıların farklı kararları da NPC ilişkilerini ve hikâye sonunu değiştirir. Adım adım
+yol, yazılacak mesajlar ve gerçek AI ile oynanışın sonuçları [docs/demo.md](docs/demo.md) içindedir.
 
 ## Geliştirme Süreci
 
