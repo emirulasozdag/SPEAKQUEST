@@ -1,7 +1,15 @@
 // Dashboard: the player's character, level and XP, the active quest and completed quests.
 // Everything shown here comes from the API; nothing is calculated in the browser.
 
-import { ApiError, getActiveQuest, getLocations, getProfile, getQuests, handleApiError } from "../api.js";
+import {
+  ApiError,
+  getActiveQuest,
+  getLocations,
+  getProfile,
+  getQuests,
+  getStoryEnding,
+  handleApiError,
+} from "../api.js";
 import { showAlert } from "../components/form.js";
 import { avatarUrl, dialogueUrl, portraitUrl } from "../components/quests.js";
 import { CHARACTER_PAGE } from "../session.js";
@@ -35,15 +43,35 @@ function showProfile(profile) {
   }
 }
 
-function showActiveQuest(quest, places) {
+// With no active quest: the Adaptive Quest Engine's suggestion, or the ending once the story is over
+function showNextStep(body, recommended, places, ending) {
+  if (recommended) {
+    const place = places.get(recommended.location_slug);
+    body.innerHTML = `
+      <p class="small text-secondary mb-1">Suggested next quest</p>
+      <h3></h3>
+      <p class="quest-reason"></p>
+      <a class="btn btn-outline-primary" href="${MAP_PAGE}">Find it on the city map</a>`;
+    body.querySelector("h3").textContent = [recommended.title, place?.name].filter(Boolean).join(" · ");
+    body.querySelector(".quest-reason").textContent = recommended.recommendation_reason;
+  } else if (ending) {
+    body.innerHTML = '<p class="small text-secondary mb-1">Your story has ended</p><h3></h3><p class="mb-0"></p>';
+    body.querySelector("h3").textContent = ending.title;
+    body.querySelector("p.mb-0").textContent = ending.summary;
+  } else {
+    body.innerHTML = `
+      <p>You have no active quest right now. Pick a place on the city map to start one.</p>
+      <a class="btn btn-outline-primary" href="${MAP_PAGE}">Open the city map</a>`;
+  }
+}
+
+function showActiveQuest(quest, places, recommended, ending) {
   const panel = document.querySelector("#active-quest");
   const body = document.querySelector("#active-quest-body");
   const continueButton = document.querySelector("#continue-button");
 
   if (!quest) {
-    body.innerHTML = `
-      <p>You have no active quest right now. Pick a place on the city map to start one.</p>
-      <a class="btn btn-outline-primary" href="${MAP_PAGE}">Open the city map</a>`;
+    showNextStep(body, recommended, places, ending);
     continueButton.href = MAP_PAGE;
     return;
   }
@@ -102,7 +130,10 @@ async function loadDashboard() {
     ]);
     const places = new Map(locations.map((place) => [place.slug, place]));
     showProfile(profile);
-    showActiveQuest(activeQuest, places);
+    const recommended = quests.find((item) => item.recommended);
+    // Only needed when there is nothing left to play
+    const ending = activeQuest || recommended ? null : await getStoryEnding();
+    showActiveQuest(activeQuest, places, recommended, ending);
     showCompleted(quests, places);
     content.hidden = false;
   } catch (error) {

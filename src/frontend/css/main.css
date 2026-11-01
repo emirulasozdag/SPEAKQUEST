@@ -616,6 +616,20 @@ span.sq-avatar {
 .sq-quest-status[data-status="active"] { background: var(--sq-cafe-tint); color: var(--sq-cafe-ink); }
 .sq-quest-status[data-status="completed"] { background: var(--sq-apartment-tint); color: var(--sq-ink); }
 
+/* The Adaptive Quest Engine's suggestion and the story's ending */
+.sq-recommended {
+  padding: var(--sq-space-2) var(--sq-space-3);
+  border-left: 4px solid var(--sq-office);
+  border-radius: var(--sq-radius-sm);
+  background: var(--sq-office-tint);
+}
+
+.sq-ending {
+  padding: var(--sq-space-2) var(--sq-space-3);
+  border-radius: var(--sq-radius-sm);
+  background: var(--sq-apartment-tint);
+}
+
 /* ---------- Progress ---------- */
 
 .sq-xp {

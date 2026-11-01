@@ -119,6 +119,6 @@ Ayrıntılar [data-model.md](data-model.md) içindedir.
 
 ## Kapsam dışı
 
-- Öğrenme amacı (`learning_goal`: everyday, work, grammar) bu sürümde sıralamayı etkilemez.
-  Diyalogların zayıf beceriye göre kişiselleştirilmesi #20'de, görevin bu hedefe göre seçilmesi
-  #21'dedir (Adaptive Quest Engine `choose_learning_target()`'ı kullanır).
+- Öğrenme amacı (`learning_goal`: everyday, work, grammar) beceri sıralamasını etkilemez. Veri azken
+  görev seçimine Adaptive Quest Engine yön verir ([quest-engine.md](quest-engine.md)).
+  Diyalogların zayıf beceriye göre kişiselleştirilmesi #20'dedir.

@@ -155,6 +155,8 @@ def make_decision(db: Session, user_id: int, quest_id: int, decision_id: str, op
     state = get_story_state(db, user_id)
     if state is None:
         raise DecisionRefusedError("not_started", "Create your character first.")
+    if state.ending is not None:
+        raise DecisionRefusedError("story_ended", "Your story has ended. Reset your progress to play again.")
     if _decision_exists(db, user_id, quest.id, decision_id):
         raise _already_made()
 
@@ -178,6 +180,14 @@ def make_decision(db: Session, user_id: int, quest_id: int, decision_id: str, op
 def content_endings() -> tuple[Ending, ...]:
     """Endings come straight from endings.json; they are not stored in the database."""
     return tuple(load_content().endings)
+
+
+def reached_ending(db: Session, user_id: int) -> Ending | None:
+    """The ending stored when the player's story closed, or None while it goes on."""
+    state = get_story_state(db, user_id)
+    if state is None or state.ending is None:
+        return None
+    return next((ending for ending in content_endings() if ending.slug == state.ending), None)
 
 
 def ending_for(db: Session, user_id: int) -> Ending:

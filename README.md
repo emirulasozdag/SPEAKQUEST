@@ -110,6 +110,7 @@ Learning Engine ve Story Engine'i birleştirerek bir sonraki görevi seçer. Se�
 şu kriterlere bakılır: dil seviyesi, tekrar eden hata kategorileri, önceki görevler, hikâye durumu,
 görev ön koşulları, NPC ilişkileri ve son çalışılan konular. İlk sürümde görevler önceden hazırlanmış
 şablonlardan seçilir; yapay zekâ bu şablonların diyaloglarını kişiselleştirir.
+Kurallar ve puanlama [docs/quest-engine.md](docs/quest-engine.md) içindedir.
 
 ### Yapay Zekânın Rolü ve Sınırları
 
@@ -359,7 +360,7 @@ artık çalışmaz (`401`).
 | Quests | `GET /quests`, `GET /quests/active`, `POST /quests/{id}/start`, `POST /quests/{id}/complete` |
 | Dialogue | `POST /dialogue/message`, `GET /dialogue/history/{quest_id}` |
 | Learning | `GET /learning/errors`, `GET /learning/skills`, `GET /learning/recommendations` |
-| Story | `GET /story/state`, `GET /story/decisions/{quest_id}`, `POST /story/decision` |
+| Story | `GET /story/state`, `GET /story/decisions/{quest_id}`, `POST /story/decision`, `GET /story/ending` |
 
 **Oyuncu profili:** `PUT /api/player/profile` gövdesi `character_name` (1–30 karakter), `avatar`
 (1–3), `english_level` (`A2`, `B1`) ve `learning_goal` (`everyday`, `work`, `grammar`) alır. İlk
