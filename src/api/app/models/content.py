@@ -72,6 +72,10 @@ class QuestTemplate(Base):
     rewards: Mapped[dict] = mapped_column(JSON)
     allowed_story_actions: Mapped[list] = mapped_column(JSON)
     decision_points: Mapped[list] = mapped_column(JSON)
+    # Shown while the quest is locked; null for the starting quest, which is never locked
+    locked_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Facts the NPC knows only in this quest; they go into the AI prompt and never leave the server
+    npc_knows: Mapped[list] = mapped_column(JSON, default=list)
 
     location: Mapped[Location] = relationship(back_populates="quests")
     npc: Mapped[Npc] = relationship()

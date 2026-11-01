@@ -92,7 +92,12 @@ def test_a_new_quest_in_the_files_is_added(db_session):
 
     def add_quest(raw):
         extra = copy.deepcopy(raw["quests"][0])
-        extra.update(slug="extra_quest", title="Extra", prerequisites={"quests_completed": ["meet_your_neighbor"]})
+        extra.update(
+            slug="extra_quest",
+            title="Extra",
+            prerequisites={"quests_completed": ["meet_your_neighbor"]},
+            locked_summary="Something new is waiting.",
+        )
         raw["quests"].append(extra)
 
     report = seed_content(db_session, changed_content(add_quest))

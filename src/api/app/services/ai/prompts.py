@@ -92,8 +92,10 @@ class NpcProfile:
     knows: tuple[str, ...] = ()
 
     @classmethod
-    def from_content(cls, npc: Npc) -> "NpcProfile":
-        return cls(npc.name, npc.role, npc.personality, npc.speaking_style, tuple(npc.knows))
+    def from_content(cls, npc: Npc, quest: QuestTemplate | None = None) -> "NpcProfile":
+        """The NPC as it is in this quest: its own knows plus what it knows only in this quest."""
+        knows = tuple(npc.knows) + (tuple(quest.npc_knows) if quest else ())
+        return cls(npc.name, npc.role, npc.personality, npc.speaking_style, knows)
 
 
 @dataclass(frozen=True)

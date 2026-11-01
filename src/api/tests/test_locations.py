@@ -91,9 +91,26 @@ def test_prompt_only_character_data_is_never_returned(client, headers, seeded):
         assert npc.speaking_style not in raw
         for fact in npc.knows:
             assert fact not in raw
-    for forbidden in ("personality", "speaking_style", "knows", "npc_opening", "rewards", "prerequisites"):
+    for quest in load_content().quests:
+        for fact in quest.npc_knows:
+            assert fact not in raw
+    secret_fields = (
+        "personality", "speaking_style", "knows", "npc_knows", "locked_summary", "npc_opening", "rewards",
+        "prerequisites",
+    )
+    for forbidden in secret_fields:
         assert f'"{forbidden}"' not in raw
 
 
 def test_before_the_content_is_seeded_the_map_is_simply_empty(client, headers):
     assert client.get(LOCATIONS_URL, headers=headers).json() == []
+
+
+def test_a_locked_quest_on_the_map_shows_its_neutral_summary(client, headers, seeded):
+    places = client.get(LOCATIONS_URL, headers=headers)
+    flat = next(q for q in load_content().quests if q.slug == "the_flat_viewing")
+    on_map = next(q for place in places.json() for q in place["quests"] if q["slug"] == "the_flat_viewing")
+
+    assert on_map["status"] == "locked"
+    assert on_map["summary"] == flat.locked_summary
+    assert flat.summary not in places.text

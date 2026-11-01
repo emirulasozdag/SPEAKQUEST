@@ -113,6 +113,8 @@ Mekânın kilitli olup olmadığı saklanmaz. Story Engine bunu oyuncunun durumu
 | rewards | JSON | XP ve güven değişimi |
 | allowed_story_actions | JSON | AI'nın önerebileceği aksiyonların whitelist'i |
 | decision_points | JSON | oyuncu kararları ve seçenekleri |
+| locked_summary | text, null | kilitliyken gösterilen tarafsız özet; başlangıç görevinde boş |
+| npc_knows | JSON | NPC'nin yalnızca bu görevde bildikleri; yalnızca prompt'a girer |
 
 Şablonların içeriği `src/api/app/content/` altındaki JSON dosyalarıdır (`locations.json`,
 `npcs.json`, `quests/<slug>.json`); format ve hikâye [story-bible.md](story-bible.md) içindedir.

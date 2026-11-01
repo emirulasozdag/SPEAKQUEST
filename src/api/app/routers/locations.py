@@ -7,7 +7,7 @@ from app.core.dependencies import get_current_user
 from app.models.content import Location, QuestTemplate
 from app.models.user import User
 from app.schemas.locations import LocationOut, LocationQuestOut, NpcOut
-from app.services.quests import quest_statuses
+from app.services.quests import quest_statuses, visible_summary
 
 router = APIRouter(prefix="/locations", tags=["locations"])
 
@@ -61,7 +61,7 @@ def _to_output(location: Location, statuses) -> LocationOut:
                 slug=quest.slug,
                 title=quest.title,
                 chapter=quest.chapter,
-                summary=quest.summary,
+                summary=visible_summary(quest, statuses[quest.slug]),
                 npc_slug=quest.npc.slug,
                 status=statuses[quest.slug],
             )
