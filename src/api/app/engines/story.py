@@ -9,10 +9,10 @@ it changes. Quests and endings both describe what they need as Conditions, and e
 decision goes through is_unlocked().
 """
 
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 
-from app.content.schema import Conditions
+from app.content.schema import Conditions, Effects, Ending
 # Re-exported so callers of the Story Engine find the trust bounds here
 from app.engines.trust import TRUST_MAX, TRUST_MIN, clamp_trust
 
@@ -88,6 +88,28 @@ def apply_trust_changes(progress: StoryProgress, changes: Mapping[str, int]) -> 
     for npc, change in changes.items():
         trust[npc] = clamp_trust(trust.get(npc, 0) + change)
     return replace(progress, trust=trust)
+
+
+def apply_decision(progress: StoryProgress, effects: Effects) -> StoryProgress:
+    """The story after a decision: its flags are added and its trust changes applied (0-100).
+
+    Which decisions are valid, and that each is made only once, is checked before this is called;
+    here a decision only ever adds flags, it never removes one.
+    """
+    updated = apply_trust_changes(progress, effects.trust)
+    return replace(updated, flags=updated.flags | frozenset(effects.flags))
+
+
+def choose_ending(endings: Sequence[Ending], progress: StoryProgress) -> Ending:
+    """The one place that decides a player's ending: the first ending whose conditions hold.
+
+    Endings are checked in content order (endings.json); the last one has no conditions, so every
+    player reaches an ending (the content schema guarantees this).
+    """
+    for ending in endings:
+        if is_unlocked(ending.conditions, progress):
+            return ending
+    raise ValueError("no ending matches; the last ending in endings.json must have no conditions")
 
 
 def current_chapter(open_quest_chapters: Iterable[int], completed_quest_chapters: Iterable[int]) -> int:

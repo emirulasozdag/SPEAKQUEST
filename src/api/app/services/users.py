@@ -9,7 +9,7 @@ from app.models.dialogue import DialogueMessage
 from app.models.learning import LanguageError, SkillObservation
 from app.models.player import PlayerProfile
 from app.models.quest_progress import QuestProgress
-from app.models.story import NpcRelationship, StoryState
+from app.models.story import NpcRelationship, StoryDecision, StoryState
 from app.models.user import User
 
 # Every model that stores data of one player, keyed by user_id. A PR that adds such a table
@@ -17,7 +17,15 @@ from app.models.user import User
 # The rows are deleted explicitly as well as through ON DELETE CASCADE, so deletion does not
 # depend on the database enforcing foreign keys (SQLite does not by default).
 # Learning rows point at dialogue messages, so they come before them
-PLAYER_DATA_MODELS = (LanguageError, SkillObservation, PlayerProfile, QuestProgress, StoryState, NpcRelationship)
+PLAYER_DATA_MODELS = (
+    LanguageError,
+    SkillObservation,
+    PlayerProfile,
+    QuestProgress,
+    StoryState,
+    NpcRelationship,
+    StoryDecision,
+)
 
 
 class EmailAlreadyRegisteredError(Exception):

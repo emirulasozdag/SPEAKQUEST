@@ -355,7 +355,7 @@ artık çalışmaz (`401`).
 | Quests | `GET /quests`, `GET /quests/active`, `POST /quests/{id}/start`, `POST /quests/{id}/complete` |
 | Dialogue | `POST /dialogue/message`, `GET /dialogue/history/{quest_id}` |
 | Learning | `GET /learning/errors`, `GET /learning/skills`, `GET /learning/recommendations` |
-| Story | `GET /story/state`, `POST /story/decision` |
+| Story | `GET /story/state`, `GET /story/decisions/{quest_id}`, `POST /story/decision` |
 
 **Oyuncu profili:** `PUT /api/player/profile` gövdesi `character_name` (1–30 karakter), `avatar`
 (1–3), `english_level` (`A2`, `B1`) ve `learning_goal` (`everyday`, `work`, `grammar`) alır. İlk

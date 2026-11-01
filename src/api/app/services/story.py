@@ -7,14 +7,26 @@ flow in #12), so a failure there leaves the story untouched.
 """
 
 from collections.abc import Mapping
+from dataclasses import dataclass
+from functools import cache
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
-from app.engines.story import QuestRules, StoryActionOutcome, StoryProgress, apply_story_action, apply_trust_changes
+from app.content.schema import DecisionPoint, Ending, load_content
+from app.engines.story import (
+    QuestRules,
+    StoryActionOutcome,
+    StoryProgress,
+    apply_decision,
+    apply_story_action,
+    apply_trust_changes,
+    choose_ending,
+)
 from app.models.content import Npc, QuestTemplate
 from app.models.quest_progress import QuestProgress, QuestProgressStatus
-from app.models.story import NpcRelationship, StoryState
+from app.models.story import NpcRelationship, StoryDecision, StoryState
 
 
 def new_story_state(user_id: int) -> StoryState:
@@ -95,3 +107,112 @@ def _store_trust(db: Session, user_id: int, trust: Mapping[str, int]) -> None:
         else:
             db.add(NpcRelationship(user_id=user_id, npc_id=npc_id, trust=value))
     db.flush()
+
+
+class DecisionRefusedError(Exception):
+    """Why a decision cannot be made. reason: not_found, not_started, invalid or already_made."""
+
+    def __init__(self, reason: str, message: str) -> None:
+        super().__init__(message)
+        self.reason = reason
+        self.message = message
+
+
+@dataclass(frozen=True)
+class QuestDecision:
+    point: DecisionPoint
+    # The option the player chose, or None while the decision is still open
+    chosen: str | None
+
+
+@dataclass(frozen=True)
+class DecisionResult:
+    flags: frozenset[str]
+    # New trust of every NPC the decision changed, by NPC slug
+    trust: dict[str, int]
+
+
+def list_decisions(db: Session, user_id: int, quest_id: int) -> list[QuestDecision]:
+    """The quest's decision points and what the player chose so far. The quest must be started."""
+    quest = _load_started_quest(db, user_id, quest_id)
+    chosen = dict(
+        db.execute(
+            select(StoryDecision.decision_key, StoryDecision.choice).where(
+                StoryDecision.user_id == user_id, StoryDecision.quest_template_id == quest.id
+            )
+        ).tuples().all()
+    )
+    return [QuestDecision(point, chosen.get(point.id)) for point in _decision_points(quest)]
+
+
+def make_decision(db: Session, user_id: int, quest_id: int, decision_id: str, option_id: str) -> DecisionResult:
+    """Record a decision once and apply its flags and trust through the Story Engine. Commits."""
+    quest = _load_started_quest(db, user_id, quest_id)
+    point = next((p for p in _decision_points(quest) if p.id == decision_id), None)
+    option = next((o for o in point.options if o.id == option_id), None) if point else None
+    if option is None:
+        raise DecisionRefusedError("invalid", "This quest has no such decision or option.")
+    state = get_story_state(db, user_id)
+    if state is None:
+        raise DecisionRefusedError("not_started", "Create your character first.")
+    if _decision_exists(db, user_id, quest.id, decision_id):
+        raise _already_made()
+
+    before = StoryProgress(flags=frozenset(state.flags), trust=load_trust(db, user_id))
+    after = apply_decision(before, option.effects)
+    db.add(StoryDecision(user_id=user_id, quest_template_id=quest.id, decision_key=decision_id, choice=option_id))
+    # A new list, so SQLAlchemy sees the JSON column change
+    state.flags = sorted(after.flags)
+    changed = {npc: after.trust[npc] for npc in option.effects.trust}
+    try:
+        _store_trust(db, user_id, changed)
+        db.commit()
+    except IntegrityError:
+        # The same decision sent twice at once: the unique constraint lets only one through
+        db.rollback()
+        raise _already_made() from None
+    return DecisionResult(flags=after.flags, trust=changed)
+
+
+@cache
+def content_endings() -> tuple[Ending, ...]:
+    """Endings come straight from endings.json; they are not stored in the database."""
+    return tuple(load_content().endings)
+
+
+def ending_for(db: Session, user_id: int) -> Ending:
+    """The ending this player's story leads to now, decided by the Story Engine's choose_ending()."""
+    return choose_ending(content_endings(), load_story_progress(db, user_id))
+
+
+def _load_started_quest(db: Session, user_id: int, quest_id: int) -> QuestTemplate:
+    quest = db.get(QuestTemplate, quest_id)
+    if quest is None:
+        raise DecisionRefusedError("not_found", "Quest not found.")
+    started = db.scalar(
+        select(QuestProgress.id).where(QuestProgress.user_id == user_id, QuestProgress.quest_template_id == quest.id)
+    )
+    if started is None:
+        raise DecisionRefusedError("not_started", "Start this quest before making its decisions.")
+    return quest
+
+
+def _decision_points(quest: QuestTemplate) -> list[DecisionPoint]:
+    return [DecisionPoint.model_validate(point) for point in quest.decision_points]
+
+
+def _decision_exists(db: Session, user_id: int, quest_id: int, decision_id: str) -> bool:
+    return (
+        db.scalar(
+            select(StoryDecision.id).where(
+                StoryDecision.user_id == user_id,
+                StoryDecision.quest_template_id == quest_id,
+                StoryDecision.decision_key == decision_id,
+            )
+        )
+        is not None
+    )
+
+
+def _already_made() -> DecisionRefusedError:
+    return DecisionRefusedError("already_made", "You already made this decision.")

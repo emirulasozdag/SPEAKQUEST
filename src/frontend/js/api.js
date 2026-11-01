@@ -143,6 +143,17 @@ export function sendDialogueMessage(message) {
   return authRequest("/dialogue/message", { method: "POST", body: { message } });
 }
 
+export function getDecisions(questId) {
+  return authRequest(`/story/decisions/${questId}`);
+}
+
+export function makeDecision(questId, decisionId, optionId) {
+  return authRequest("/story/decision", {
+    method: "POST",
+    body: { quest_id: questId, decision_id: decisionId, option_id: optionId },
+  });
+}
+
 export function getHealth() {
   return apiRequest("/health");
 }

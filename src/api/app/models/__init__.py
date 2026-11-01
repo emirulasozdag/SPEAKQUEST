@@ -10,7 +10,7 @@ from app.models.dialogue import DialogueMessage
 from app.models.learning import LanguageError, SkillObservation
 from app.models.player import PlayerProfile
 from app.models.quest_progress import QuestProgress
-from app.models.story import NpcRelationship, StoryState
+from app.models.story import NpcRelationship, StoryDecision, StoryState
 from app.models.user import User
 
 __all__ = [
@@ -24,6 +24,7 @@ __all__ = [
     "QuestProgress",
     "QuestTemplate",
     "SkillObservation",
+    "StoryDecision",
     "StoryState",
     "User",
 ]
