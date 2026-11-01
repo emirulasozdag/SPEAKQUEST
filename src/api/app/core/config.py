@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     # One call may take longer than this only if the provider hangs; one retry follows a timeout
     ai_timeout_seconds: float = 20.0
 
+    # Dialogue messages one player may send inside the window; the next one gets 429. It protects
+    # the AI quota (the free Gemini tier allows only a few requests per minute) from one player
+    dialogue_rate_limit: int = 10
+    dialogue_rate_window_seconds: int = 60
+
     # Failed logins allowed per email + IP inside the window; the next attempt gets 429
     login_rate_limit: int = 5
     login_rate_window_seconds: int = 60

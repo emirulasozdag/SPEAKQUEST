@@ -10,6 +10,7 @@ If the AI is missing, down or answers with something unusable, the result has st
 """
 
 import logging
+import time
 from dataclasses import dataclass
 from typing import Literal
 
@@ -45,17 +46,26 @@ def analyze_message(client: AiClient | None, context: DialogueContext, player_me
         return _unavailable("not_configured")
 
     prompt = build_prompt(context, player_message)
+    started = time.perf_counter()
     try:
         outcome = _validated_reply(client, prompt)
         if isinstance(outcome, AnalysisFailure):
             # One correction attempt, repeating only our own validation message (not the bad reply)
             outcome = _validated_reply(client, build_repair_prompt(prompt, outcome))
     except AiError as exc:
+        _log_duration(started, "error")
         return _unavailable(exc.reason)
 
     if isinstance(outcome, AnalysisFailure):
+        _log_duration(started, "invalid_reply")
         return _unavailable("invalid_reply", detail=outcome.reason)
+    _log_duration(started, "ok")
     return AnalysisResult(status="ok", npc_reply=outcome.npc_reply, analysis=outcome)
+
+
+def _log_duration(started: float, outcome: str) -> None:
+    # The whole AI step of one message, retries included, for any provider; only metadata is logged
+    logger.info("ai analysis outcome=%s ms=%d", outcome, (time.perf_counter() - started) * 1000)
 
 
 def _validated_reply(client: AiClient, prompt: Prompt) -> DialogueAnalysis | AnalysisFailure:

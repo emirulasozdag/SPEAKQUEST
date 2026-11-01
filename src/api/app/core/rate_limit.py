@@ -51,13 +51,15 @@ class RateLimiter:
         return hits
 
 
-def raise_if_limited(limiter: RateLimiter, key: str, limit: int, window: float) -> None:
+def raise_if_limited(
+    limiter: RateLimiter, key: str, limit: int, window: float, detail: str = TOO_MANY_ATTEMPTS
+) -> None:
     """Answer 429 with a Retry-After header when the key has used up its attempts."""
     retry_after = limiter.retry_after(key, limit, window)
     if retry_after is not None:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail=TOO_MANY_ATTEMPTS,
+            detail=detail,
             headers={"Retry-After": str(retry_after)},
         )
 

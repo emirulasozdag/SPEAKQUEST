@@ -72,7 +72,10 @@ def test_blocked_answer_does_not_reveal_whether_account_exists(client, low_limit
     unknown = login(client, email="nobody@example.com")
 
     assert known.status_code == unknown.status_code == 429
-    assert known.json() == unknown.json()
+    # Only the request id (different for every request) may differ
+    known_body, unknown_body = known.json(), unknown.json()
+    assert known_body.pop("request_id") != unknown_body.pop("request_id")
+    assert known_body == unknown_body
 
 
 def test_register_is_limited_per_ip(client, low_limits):

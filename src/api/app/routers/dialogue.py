@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
+from app.core.rate_limit import RateLimiter, raise_if_limited
 from app.models.user import User
 from app.schemas.dialogue import (
     CorrectionOut,
@@ -18,6 +20,10 @@ from app.services import dialogue as dialogue_service
 from app.services.ai.client import AiClient, get_ai_client
 
 router = APIRouter(prefix="/dialogue", tags=["dialogue"])
+
+# Messages per player, so one player cannot use up the shared AI quota (settings.dialogue_rate_*)
+message_limiter = RateLimiter()
+TOO_MANY_MESSAGES = "You are sending messages very fast. Please wait a moment and try again."
 
 _REFUSAL_STATUS = {
     "empty": status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -36,10 +42,17 @@ def send_message(
 ) -> DialogueTurnOut:
     """Send a message to the NPC of the active quest and get the reply and language feedback.
 
-    422 for an empty or too long message; 409 without a character or an active quest. When the AI
+    422 for an empty or too long message; 409 without a character or an active quest; 429 when the
+    player sent more than settings.dialogue_rate_limit messages inside the window. When the AI
     is unavailable the answer is still 200, with status "ai_unavailable", a fallback reply and
     nothing saved, so the player can send the message again.
     """
+    settings = get_settings()
+    key = str(current_user.id)
+    window = settings.dialogue_rate_window_seconds
+    raise_if_limited(message_limiter, key, settings.dialogue_rate_limit, window, detail=TOO_MANY_MESSAGES)
+    # Every attempt counts, also one the AI could not answer: each of them may call the provider
+    message_limiter.hit(key, window)
     try:
         turn = dialogue_service.send_message(db, current_user.id, payload.message, client)
     except dialogue_service.MessageRefusedError as refused:
