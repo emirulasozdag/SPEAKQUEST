@@ -17,14 +17,18 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
-from app.content.schema import Conditions
+from app.content.schema import Conditions, Ending
+from app.engines.categories import SkillCategory
 from app.engines.progression import XpGain, add_xp
+from app.engines.quest import PlayerSnapshot, QuestCandidate, QuestRecommendation, choose_next_quest
 from app.engines.story import StoryProgress, current_chapter, is_unlocked
 from app.models.content import QuestTemplate
 from app.models.dialogue import DialogueMessage, MessageRole
 from app.models.quest_progress import QuestProgress, QuestProgressStatus
+from app.models.player import EnglishLevel, LearningGoal
+from app.services.learning import get_skill_scores
 from app.services.players import get_profile
-from app.services.story import add_trust, get_story_state, load_story_progress
+from app.services.story import add_trust, ending_for, get_story_state, load_story_progress
 
 
 class QuestStatus(StrEnum):
@@ -147,6 +151,8 @@ def start_quest(db: Session, user_id: int, quest_id: int) -> PlayerQuest:
 class CompletedQuest:
     item: PlayerQuest
     gain: XpGain
+    # Set when this was the last quest the player could play: the story has ended
+    ending: Ending | None = None
 
 
 def complete_quest(db: Session, user_id: int, quest_id: int) -> CompletedQuest:
@@ -191,9 +197,54 @@ def complete_quest(db: Session, user_id: int, quest_id: int) -> CompletedQuest:
     profile.level = gain.level
     add_trust(db, user_id, quest.rewards.get("trust", {}))
     _update_chapter(db, user_id)
+    ending = _close_story_if_finished(db, user_id)
     db.commit()
     db.refresh(progress)
-    return CompletedQuest(PlayerQuest(quest, QuestStatus.COMPLETED, progress), gain)
+    return CompletedQuest(PlayerQuest(quest, QuestStatus.COMPLETED, progress), gain, ending)
+
+
+def recommend_quest(db: Session, user_id: int) -> QuestRecommendation | None:
+    """The Adaptive Quest Engine's choice for this player; None without a character, while a
+    quest is active, or when nothing can be started."""
+    profile = get_profile(db, user_id)
+    if profile is None or get_active_quest(db, user_id) is not None:
+        return None
+    quests = list_player_quests(db, user_id)
+    player = PlayerSnapshot(
+        level=EnglishLevel(profile.english_level),
+        goal=LearningGoal(profile.learning_goal),
+        skills=get_skill_scores(db, user_id),
+        story=load_story_progress(db, user_id),
+        started=frozenset(item.quest.slug for item in quests if item.progress is not None),
+    )
+    return choose_next_quest(player, [_candidate(item.quest) for item in quests])
+
+
+def _candidate(quest: QuestTemplate) -> QuestCandidate:
+    return QuestCandidate(
+        slug=quest.slug,
+        title=quest.title,
+        npc=quest.npc.slug,
+        npc_name=quest.npc.name,
+        chapter=quest.chapter,
+        target_skills=tuple(SkillCategory(skill) for skill in quest.target_skills),
+        min_level=EnglishLevel(quest.min_level),
+        max_level=EnglishLevel(quest.max_level),
+        prerequisites=Conditions.model_validate(quest.prerequisites),
+    )
+
+
+def _close_story_if_finished(db: Session, user_id: int) -> Ending | None:
+    """When no quest is left to play, the Story Engine picks the ending and the story closes."""
+    story = get_story_state(db, user_id)
+    if story is None or story.ending is not None:
+        return None
+    statuses = {item.status for item in list_player_quests(db, user_id)}
+    if statuses & {QuestStatus.AVAILABLE, QuestStatus.ACTIVE}:
+        return None
+    ending = ending_for(db, user_id)
+    story.ending = ending.slug
+    return ending
 
 
 def _update_chapter(db: Session, user_id: int) -> None:

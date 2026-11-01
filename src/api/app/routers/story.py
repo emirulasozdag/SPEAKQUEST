@@ -6,6 +6,7 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_user
 from app.models.content import Npc
 from app.models.user import User
+from app.schemas.quests import EndingOut
 from app.schemas.story import (
     DecisionOptionOut,
     DecisionOut,
@@ -47,12 +48,25 @@ def story_state(
     )
 
 
+@router.get("/ending", response_model=EndingOut)
+def story_ending(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> EndingOut:
+    """The ending the player reached, with its summary; 404 while the story goes on."""
+    ending = story_service.reached_ending(db, current_user.id)
+    if ending is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Your story has not ended yet.")
+    return EndingOut(slug=ending.slug, title=ending.title, summary=ending.summary)
+
+
 # not_started and already_made are about the order of play, not about a bad request
 _REFUSAL_STATUS = {
     "not_found": status.HTTP_404_NOT_FOUND,
     "invalid": status.HTTP_400_BAD_REQUEST,
     "not_started": status.HTTP_409_CONFLICT,
     "already_made": status.HTTP_409_CONFLICT,
+    "story_ended": status.HTTP_409_CONFLICT,
 }
 
 

@@ -1,7 +1,7 @@
 // City map: draws each place's state from the API, lists its characters and quests,
 // and starts a quest. Quest status and locks are decided by the backend only.
 
-import { ApiError, getLocations, handleApiError, startQuest } from "../api.js";
+import { ApiError, getLocations, getQuests, handleApiError, startQuest } from "../api.js";
 import { showAlert } from "../components/form.js";
 import { QUEST_STATUS_LABELS, dialogueUrl, portraitUrl } from "../components/quests.js";
 
@@ -11,6 +11,8 @@ const list = document.querySelector("#places-list");
 const detail = document.querySelector("#place-detail");
 
 let places = new Map();
+// The quest the Adaptive Quest Engine suggests next, from GET /api/quests
+let recommended = null;
 
 // One state per place, shown on the map with a style and always with text as well
 function placeState(place) {
@@ -73,6 +75,13 @@ function questItem(quest) {
   item.querySelector("h4").textContent = quest.title;
   item.querySelector(".sq-quest-status").textContent = QUEST_STATUS_LABELS[quest.status] ?? quest.status;
   item.querySelector("p").textContent = quest.summary;
+  if (recommended?.id === quest.id) {
+    const note = document.createElement("p");
+    note.className = "sq-recommended small mb-2";
+    note.innerHTML = "<strong>Recommended for you.</strong> ";
+    note.append(recommended.recommendation_reason);
+    item.querySelector("p").after(note);
+  }
 
   if (quest.status === "available") {
     const start = document.createElement("button");
@@ -162,7 +171,8 @@ document.addEventListener("click", (event) => {
 
 async function loadMap() {
   try {
-    const locations = await getLocations();
+    const [locations, quests] = await Promise.all([getLocations(), getQuests()]);
+    recommended = quests.find((quest) => quest.recommended) ?? null;
     places = new Map(locations.map((place) => [place.slug, place]));
     drawMap();
     drawList();

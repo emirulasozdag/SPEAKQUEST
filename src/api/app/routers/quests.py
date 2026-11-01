@@ -4,19 +4,31 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
 from app.models.user import User
-from app.schemas.quests import ActiveQuestOut, QuestCompletedOut, QuestSummaryOut
+from app.schemas.quests import ActiveQuestOut, QuestCompletedOut, QuestListItemOut, QuestSummaryOut
 from app.services import quests as quest_service
 
 router = APIRouter(prefix="/quests", tags=["quests"])
 
 
-@router.get("", response_model=list[QuestSummaryOut])
+@router.get("", response_model=list[QuestListItemOut])
 def list_quests(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> list[QuestSummaryOut]:
-    """Every quest with the logged-in player's status for it."""
-    return [QuestSummaryOut.from_player_quest(item) for item in quest_service.list_player_quests(db, current_user.id)]
+) -> list[QuestListItemOut]:
+    """Every quest with the logged-in player's status for it. The quest the Adaptive Quest Engine
+    recommends next is marked, with the reason; none is marked while a quest is active."""
+    recommendation = quest_service.recommend_quest(db, current_user.id)
+    items = []
+    for item in quest_service.list_player_quests(db, current_user.id):
+        recommended = recommendation is not None and item.quest.slug == recommendation.slug
+        items.append(
+            QuestListItemOut(
+                **QuestSummaryOut.from_player_quest(item).model_dump(),
+                recommended=recommended,
+                recommendation_reason=recommendation.reason if recommended else None,
+            )
+        )
+    return items
 
 
 @router.get("/active", response_model=ActiveQuestOut)
