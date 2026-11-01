@@ -23,6 +23,12 @@
   --sq-office-hover: #2f51a8;
   --sq-office-pressed: #284690;
   --sq-park: #b9dec8;
+  /* The five skill lines on the progress chart, told apart by colour and by the legend */
+  --sq-series-1: #3a62c9;
+  --sq-series-2: #c2412d;
+  --sq-series-3: #2f8a5f;
+  --sq-series-4: #b26a00;
+  --sq-series-5: #6b4fb3;
 
   --sq-error: #c2412d;
   --sq-error-on-dark: #ffb4a6;
@@ -616,6 +622,20 @@ span.sq-avatar {
 .sq-quest-status[data-status="active"] { background: var(--sq-cafe-tint); color: var(--sq-cafe-ink); }
 .sq-quest-status[data-status="completed"] { background: var(--sq-apartment-tint); color: var(--sq-ink); }
 
+/* The Adaptive Quest Engine's suggestion and the story's ending */
+.sq-recommended {
+  padding: var(--sq-space-2) var(--sq-space-3);
+  border-left: 4px solid var(--sq-office);
+  border-radius: var(--sq-radius-sm);
+  background: var(--sq-office-tint);
+}
+
+.sq-ending {
+  padding: var(--sq-space-2) var(--sq-space-3);
+  border-radius: var(--sq-radius-sm);
+  background: var(--sq-apartment-tint);
+}
+
 /* ---------- Progress ---------- */
 
 .sq-xp {
@@ -633,6 +653,73 @@ span.sq-avatar {
 
 .sq-skill-row + .sq-skill-row {
   border-top: 1px solid var(--sq-line);
+}
+
+/* Learning progress: skill bars coloured by state, the chart and its legend */
+.sq-skill-bar {
+  height: 0.75rem;
+  background: var(--sq-line);
+}
+
+.sq-skill-bar .progress-bar { background: var(--sq-office); }
+[data-status="weak"] .sq-skill-bar .progress-bar { background: var(--sq-error); }
+[data-status="strong"] .sq-skill-bar .progress-bar { background: var(--sq-fix); }
+
+.sq-target {
+  padding: var(--sq-space-3);
+  border-left: 4px solid var(--sq-cafe);
+  border-radius: var(--sq-radius-sm);
+  background: var(--sq-cafe-tint);
+  color: var(--sq-cafe-ink);
+}
+
+.sq-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.sq-chart-grid {
+  stroke: var(--sq-line);
+  stroke-width: 1;
+}
+
+.sq-chart-label {
+  font-size: 13px;
+  fill: var(--sq-ink-soft);
+}
+
+.sq-chart-series {
+  fill: none;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+circle.sq-chart-series { fill: var(--sq-surface); stroke-width: 2.5; }
+
+.sq-series-1 { --sq-series: var(--sq-series-1); }
+.sq-series-2 { --sq-series: var(--sq-series-2); }
+.sq-series-3 { --sq-series: var(--sq-series-3); }
+.sq-series-4 { --sq-series: var(--sq-series-4); }
+.sq-series-5 { --sq-series: var(--sq-series-5); }
+.sq-chart-series { stroke: var(--sq-series); }
+
+.sq-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sq-space-2) var(--sq-space-4);
+  margin-top: var(--sq-space-3);
+  font-size: var(--sq-text-sm);
+}
+
+.sq-legend-swatch {
+  display: inline-block;
+  width: 1.25rem;
+  height: 0.25rem;
+  margin-right: var(--sq-space-2);
+  vertical-align: middle;
+  border-radius: var(--sq-radius-pill);
+  background: var(--sq-series);
 }
 
 /* ---------- Placeholder notice ---------- */

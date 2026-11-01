@@ -65,6 +65,20 @@ class ActiveQuestOut(QuestSummaryOut):
         )
 
 
+class QuestListItemOut(QuestSummaryOut):
+    """A quest in the list, marked when the Adaptive Quest Engine recommends it as the next one."""
+
+    recommended: bool = False
+    # Why the engine picked it, for the player; set only on the recommended quest
+    recommendation_reason: str | None = None
+
+
+class EndingOut(BaseModel):
+    slug: str
+    title: str
+    summary: str
+
+
 class QuestCompletedOut(BaseModel):
     """The finished quest and what it paid. XP and level are the player's new totals."""
 
@@ -73,6 +87,8 @@ class QuestCompletedOut(BaseModel):
     xp: int
     level: int
     leveled_up: bool
+    # Set when this was the last quest the player could play and the story has ended
+    ending: EndingOut | None = None
 
     @classmethod
     def from_completed(cls, completed: CompletedQuest) -> "QuestCompletedOut":
@@ -83,4 +99,9 @@ class QuestCompletedOut(BaseModel):
             xp=gain.xp,
             level=gain.level,
             leveled_up=gain.leveled_up,
+            ending=(
+                EndingOut(slug=completed.ending.slug, title=completed.ending.title, summary=completed.ending.summary)
+                if completed.ending
+                else None
+            ),
         )

@@ -114,11 +114,14 @@ kendiliğinden yeni formüle uyar.
 - `GET /api/learning/skills`: her kategorinin puanı, durumu, sayaçları ve tekrar eden hatalar.
 - `GET /api/learning/recommendations`: öğrenme hedefi, gerekçesi ve tam sıralama.
 - `GET /api/learning/errors`: oyuncunun hataları, en yeniden eskiye, görev adıyla.
+- `GET /api/learning/timeline`: her becerinin, oyuncunun pratik yaptığı her günün sonundaki puanı
+  (en eskiden yeniye, en fazla son 30 gün). `score_timeline()` aynı formülü kullanır, son nokta
+  her zaman güncel puana eşittir. Learning Progress ekranındaki grafik bunu çizer.
 
 Ayrıntılar [data-model.md](data-model.md) içindedir.
 
 ## Kapsam dışı
 
-- Öğrenme amacı (`learning_goal`: everyday, work, grammar) bu sürümde sıralamayı etkilemez.
-  Diyalogların zayıf beceriye göre kişiselleştirilmesi #20'de, görevin bu hedefe göre seçilmesi
-  #21'dedir (Adaptive Quest Engine `choose_learning_target()`'ı kullanır).
+- Öğrenme amacı (`learning_goal`: everyday, work, grammar) beceri sıralamasını etkilemez. Veri azken
+  görev seçimine Adaptive Quest Engine yön verir ([quest-engine.md](quest-engine.md)).
+  Diyalogların zayıf beceriye göre kişiselleştirilmesi #20'dedir.

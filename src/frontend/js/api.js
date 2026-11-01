@@ -165,6 +165,32 @@ export function makeDecision(questId, decisionId, optionId) {
   });
 }
 
+// Resolves to null while the story goes on (the API answers 404)
+export async function getStoryEnding() {
+  try {
+    return await authRequest("/story/ending");
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw error;
+  }
+}
+
+export function getSkills() {
+  return authRequest("/learning/skills");
+}
+
+export function getLearningErrors(limit = 100) {
+  return authRequest(`/learning/errors?limit=${limit}`);
+}
+
+export function getLearningTimeline() {
+  return authRequest("/learning/timeline");
+}
+
+export function getRecommendations() {
+  return authRequest("/learning/recommendations");
+}
+
 export function getHealth() {
   return apiRequest("/health");
 }

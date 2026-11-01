@@ -13,6 +13,9 @@ from app.schemas.learning import (
     RecommendationsOut,
     SkillScoreOut,
     SkillsOut,
+    TimelineOut,
+    TimelinePointOut,
+    TimelineScoreOut,
 )
 from app.services import learning as learning_service
 from app.services.players import get_profile
@@ -80,3 +83,20 @@ def recommendations(
     ranking = learning_service.get_learning_targets(db, current_user.id, EnglishLevel(profile.english_level))
     out = [LearningTargetOut.from_target(target) for target in ranking]
     return RecommendationsOut(target=out[0], ranking=out)
+
+
+@router.get("/timeline", response_model=TimelineOut)
+def timeline(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> TimelineOut:
+    """Each skill's score at the end of every day the player practised, for the progress chart."""
+    return TimelineOut(
+        points=[
+            TimelinePointOut(
+                day=point.day,
+                scores=[TimelineScoreOut(category=category, score=score) for category, score in point.scores.items()],
+            )
+            for point in learning_service.get_timeline(db, current_user.id)
+        ]
+    )

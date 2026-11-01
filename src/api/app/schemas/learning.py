@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel
 
@@ -88,3 +88,19 @@ class LanguageErrorsOut(BaseModel):
     errors: list[LanguageErrorOut]
     # All matching mistakes, for paging
     total: int
+
+
+class TimelineScoreOut(BaseModel):
+    category: SkillCategory
+    # None until the skill was first practised
+    score: int | None
+
+
+class TimelinePointOut(BaseModel):
+    day: date
+    scores: list[TimelineScoreOut]
+
+
+class TimelineOut(BaseModel):
+    # One point per day with practice, oldest first (at most the last 30 such days)
+    points: list[TimelinePointOut]

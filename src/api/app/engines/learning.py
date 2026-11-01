@@ -13,7 +13,7 @@ and skill_observations; services/learning.py loads the records for the read side
 
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime, timezone
 from enum import StrEnum
 
 from sqlalchemy.orm import Session
@@ -266,3 +266,42 @@ def _reason(item: SkillScore) -> TargetReason:
     if item.score >= STRONG_FROM:
         return TargetReason.REVIEW
     return TargetReason.WEAKEST_SKILL
+
+
+# --- Progress over time --------------------------------------------------------------------
+# The most recent days with practice that the timeline keeps; older days are left out
+TIMELINE_MAX_DAYS = 30
+
+
+@dataclass(frozen=True)
+class TimelinePoint:
+    day: date
+    # The score each category had at the end of that day; None until it was first practised
+    scores: Mapping[SkillCategory, int | None]
+
+
+def score_timeline(observations: Iterable[Observation]) -> list[TimelinePoint]:
+    """Each category's score at the end of every day the player practised, oldest first.
+
+    observations: all of the player's opportunities, oldest first. The score on a day uses every
+    result up to and including that day, with the same formula as skill_score(), so the last point
+    always equals the current score. Observations without a time are left out.
+    """
+    by_day: dict[date, list[Observation]] = {}
+    for item in observations:
+        if item.at is not None:
+            at = item.at if item.at.tzinfo else item.at.replace(tzinfo=timezone.utc)
+            by_day.setdefault(at.astimezone(timezone.utc).date(), []).append(item)
+
+    results: dict[SkillCategory, list[bool]] = {category: [] for category in SkillCategory}
+    points = []
+    for day in sorted(by_day):
+        for item in by_day[day]:
+            results[SkillCategory(item.category)].append(item.correct)
+        points.append(
+            TimelinePoint(
+                day=day,
+                scores={category: skill_score(items) if items else None for category, items in results.items()},
+            )
+        )
+    return points[-TIMELINE_MAX_DAYS:]

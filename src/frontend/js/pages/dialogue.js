@@ -330,7 +330,17 @@ async function finishQuest() {
     link.className = "btn btn-sm btn-outline-primary";
     link.href = "/pages/dashboard.html";
     link.textContent = "Back to dashboard";
-    resultBox.append(title, total, link);
+    resultBox.append(title, total);
+    if (done.ending) {
+      // This was the last quest the story allows: show how it ended
+      const ending = document.createElement("div");
+      ending.className = "sq-ending mb-2";
+      ending.innerHTML = '<p class="small text-secondary mb-1">The end</p><p class="fw-bold mb-1"></p><p class="small mb-0"></p>';
+      ending.querySelector(".fw-bold").textContent = done.ending.title;
+      ending.querySelector(".small.mb-0").textContent = done.ending.summary;
+      resultBox.append(ending);
+    }
+    resultBox.append(link);
     resultBox.hidden = false;
     await showSummary();
   } catch (error) {
