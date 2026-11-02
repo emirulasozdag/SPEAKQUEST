@@ -366,6 +366,11 @@ içinde anlatılır. Yeni bir tablo ekleyen PR bu dokümanı da günceller.
 
 ## Verilerimi nasıl silerim?
 
+Oyunun hangi verileri sakladığı, mesajların hangi AI servisine gönderildiği ve silme yolları oyun içindeki
+**Privacy** sayfasında ([src/frontend/pages/privacy.html](src/frontend/pages/privacy.html), footer'dan ve
+kayıt sayfasından bağlantılı) sade İngilizceyle anlatılır. Kayıt formunda ve diyalog ekranında mesaj
+kutusunun altında "gerçek kişisel bilgi yazma" uyarısı vardır.
+
 **Profile** sayfasında _Delete account_ butonuna basın, mevcut şifrenizi girin ve onay kutusunu
 işaretleyin. Hesabınız, karakteriniz ve size ait tüm oyun ve öğrenme verisi (görev ilerlemesi,
 diyaloglar, dil hataları, beceri puanları, hikâye durumu ve kararlar) kalıcı olarak silinir; oturumunuz

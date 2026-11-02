@@ -82,8 +82,11 @@
 
           <form id="message-form" class="sq-panel p-3" novalidate>
             <label for="player-message" class="form-label">Your reply</label>
-            <textarea class="form-control mb-1" id="player-message" name="message" rows="2" maxlength="500" placeholder="Write your answer in English. Enter sends, Shift+Enter adds a new line."></textarea>
-            <p id="message-count" class="small text-secondary text-end mb-2">0 / 500</p>
+            <textarea class="form-control mb-1" id="player-message" name="message" rows="2" maxlength="500" aria-describedby="message-privacy" placeholder="Write your answer in English. Enter sends, Shift+Enter adds a new line."></textarea>
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+              <p id="message-privacy" class="sq-privacy-note small mb-0">Sent to an AI service. Don't type real personal information. <a href="/pages/privacy.html">Privacy</a></p>
+              <p id="message-count" class="small text-secondary text-end text-nowrap mb-0">0 / 500</p>
+            </div>
             <div class="d-flex justify-content-between gap-2">
               <a class="btn btn-outline-secondary" href="/pages/map.html">Back to map</a>
               <button id="send-button" type="submit" class="btn btn-primary">Send</button>
