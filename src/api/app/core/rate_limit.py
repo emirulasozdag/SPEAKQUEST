@@ -30,7 +30,9 @@ class RateLimiter:
         # The window each key was last hit with, so the sweep knows when the key has expired
         self._windows: dict[str, float] = {}
         self._lock = Lock()
-        self._next_sweep = time.monotonic() + self.SWEEP_INTERVAL
+        # The first hit sweeps (the dict is still empty, so it is cheap) and sets the next time.
+        # Starting from 0 keeps the schedule tied to the clock the hits use, not to start-up time.
+        self._next_sweep = 0.0
 
     def retry_after(self, key: str, limit: int, window: float) -> int | None:
         """Seconds until the key may try again, or None when it is under the limit."""
@@ -56,9 +58,11 @@ class RateLimiter:
             self._windows.pop(key, None)
 
     def clear(self) -> None:
+        """Forget everything, including when the next sweep is due."""
         with self._lock:
             self._hits.clear()
             self._windows.clear()
+            self._next_sweep = 0.0
 
     def __len__(self) -> int:
         """Keys currently stored (for tests and monitoring)."""
