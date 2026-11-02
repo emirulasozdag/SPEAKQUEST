@@ -58,8 +58,12 @@ KINDS = ("error", "correct", "unclear")
 MIN_SENTENCES = 40
 # The free Gemini tier allows a few requests per minute; one sentence may need two calls (repair)
 DEFAULT_DELAY_SECONDS = 4.5
-RATE_LIMIT_PAUSE_SECONDS = 30
-RATE_LIMIT_RETRIES = 4
+# Provider problems that pass by themselves (quota per minute, overload, slow or broken network):
+# the sentence is tried again after a pause instead of being recorded as unanswered. Anything
+# else (a wrong key, an invalid reply after the repair attempt) is a real result and is kept.
+TRANSIENT_REASONS = frozenset({"rate_limited", "unavailable", "timeout", "network"})
+RETRY_PAUSE_SECONDS = 15
+RETRY_ATTEMPTS = 6
 
 
 # --- dataset ---------------------------------------------------------------------------------
@@ -168,12 +172,13 @@ def outcome_record(sentence: Sentence, result: AnalysisResult, seconds: float) -
 
 
 def analyse_with_retry(client, context: DialogueContext, text: str, sleep: Callable[[float], None]) -> AnalysisResult:
-    """analyze_message(), waiting and trying again while the provider says the quota is used up."""
-    for _ in range(RATE_LIMIT_RETRIES):
+    """analyze_message(), waiting and trying again while the provider has a passing problem."""
+    for attempt in range(RETRY_ATTEMPTS):
+        if attempt:
+            sleep(RETRY_PAUSE_SECONDS)
         result = analyze_message(client, context, text)
-        if result.ok or result.reason != "rate_limited":
+        if result.ok or result.reason not in TRANSIENT_REASONS:
             return result
-        sleep(RATE_LIMIT_PAUSE_SECONDS)
     return result
 
 

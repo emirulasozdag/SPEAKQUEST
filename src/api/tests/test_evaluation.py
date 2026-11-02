@@ -273,17 +273,44 @@ def test_a_run_sends_every_sentence_through_the_real_analysis_path():
     assert sentences[0].player in user and sentences[0].npc_line in user
 
 
-def test_a_rate_limited_sentence_is_retried_after_a_pause():
+@pytest.mark.parametrize("reason", ["rate_limited", "unavailable", "timeout", "network"])
+def test_a_passing_provider_problem_is_retried_after_a_pause(reason):
     from app.services.ai.client import AiError
 
     sentences = load_dataset(dataset())[:1]
-    fake = FakeAiClient(AiError("rate_limited"), reply_json())
+    fake = FakeAiClient(AiError(reason), reply_json())
     pauses = []
 
     records = run_analysis(fake, sentences, delay=0, repeat=1, sleep=pauses.append)
 
     assert records[0]["status"] == "ok"
     assert pauses  # it waited before trying again
+
+
+def test_a_lasting_problem_is_recorded_without_retrying():
+    from app.services.ai.client import AiError
+
+    sentences = load_dataset(dataset())[:1]
+    fake = FakeAiClient(AiError("auth"))  # a second call would fail the fake: no retry allowed
+
+    records = run_analysis(fake, sentences, delay=0, repeat=1, sleep=lambda _: None)
+
+    assert (records[0]["status"], records[0]["reason"]) == ("ai_unavailable", "auth")
+
+
+def test_a_problem_that_does_not_pass_is_recorded_after_the_last_attempt():
+    from app.services.ai.client import AiError
+    from scripts.evaluate_analysis import RETRY_ATTEMPTS
+
+    sentences = load_dataset(dataset())[:1]
+    fake = FakeAiClient(*[AiError("unavailable")] * RETRY_ATTEMPTS)
+    pauses = []
+
+    records = run_analysis(fake, sentences, delay=0, repeat=1, sleep=pauses.append)
+
+    assert (records[0]["status"], records[0]["reason"]) == ("ai_unavailable", "unavailable")
+    assert len(fake.calls) == RETRY_ATTEMPTS
+    assert len(pauses) == RETRY_ATTEMPTS - 1  # no pointless wait after the last attempt
 
 
 # --- practice focus heuristics ---------------------------------------------------------------

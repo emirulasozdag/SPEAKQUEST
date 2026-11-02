@@ -107,8 +107,11 @@ sahnede, beş becerinin her biri için NPC cevabı iki kez alınır: **odak aç�
 Betik, uygulamanın kendi prompt'unu, doğrulamasını ve tek tekrar denemesini kullanır; yani
 ölçülen şey oyunda olanın aynısıdır. Gerçek AI sağlayıcısını çağırır. API anahtarı yalnızca
 Docker konteynerindedir, bu yüzden betik orada çalıştırılır ve dosyalar bilgisayarda kalır.
-Ücretsiz Gemini katmanının dakikalık sınırı için istekler arasında 4,5 saniye beklenir; kota
-dolarsa betik bekleyip tekrar dener.
+Ücretsiz Gemini katmanının dakikalık sınırı için istekler arasında 4,5 saniye beklenir. Geçici
+sağlayıcı hatalarında (dakikalık kota, aşırı yük, zaman aşımı, ağ) betik her seferinde 15 saniye
+bekleyerek aynı cümleyi toplam en çok 6 kez dener; yalnızca kalıcı hatalar (ör. yanlış anahtar) cevapsız olarak kaydedilir. Günlük
+ücretsiz kota (yaklaşık birkaç yüz istek) dolarsa ölçümü ertesi güne bırakın. Bütün ölçümler
+(ana set ve kontrol seti için önce ve sonra, 2 tur, artı odak ölçümü) yaklaşık 300 istektir.
 
 ```bash
 docker compose exec -T api python scripts/evaluate_analysis.py analyse --label after --repeat 2 < docs/evaluation/sentences.json > docs/evaluation/runs/after.json
