@@ -59,8 +59,6 @@ export function handleApiError(error, { onFieldErrors } = {}) {
     redirectToLogin();
   } else if (error.status === 422 && onFieldErrors) {
     onFieldErrors(error.fieldErrors);
-  } else if (error.status === 501) {
-    showToast("This feature is coming soon.");
   } else if (error.status === 0) {
     showToast("The server could not be reached. Check that it is running and try again.");
   } else {

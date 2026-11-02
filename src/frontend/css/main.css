@@ -72,6 +72,10 @@
   --bs-link-color: var(--sq-office);
   --bs-border-color: var(--sq-line);
   --bs-secondary-color: var(--sq-ink-soft);
+  /* Links and .text-secondary read these -rgb variables, not the ones above */
+  --bs-link-color-rgb: 58, 98, 201;
+  --bs-link-hover-color-rgb: 47, 81, 168;
+  --bs-secondary-rgb: 74, 86, 114;
 }
 
 /* Bootstrap buttons read their own variables, so they are mapped to the tokens here */
@@ -139,6 +143,17 @@ h3 { font-size: 1.25rem; }
 :focus-visible {
   outline: 3px solid var(--sq-cafe);
   outline-offset: 2px;
+}
+
+/* Bootstrap replaces the outline with its own faint blue glow; keep one focus ring everywhere */
+.btn:focus-visible,
+.btn-close:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible,
+.form-check-input:focus-visible {
+  outline: 3px solid var(--sq-cafe);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 /* ---------- Header / navigation ---------- */
@@ -384,38 +399,6 @@ span.sq-avatar {
   font-size: var(--sq-text-sm);
   color: var(--sq-ink-soft);
   margin: 0;
-}
-
-/* Collapsible language feedback */
-.sq-feedback summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--sq-space-2);
-  cursor: pointer;
-  list-style: none;
-  font-family: var(--sq-font-display);
-  font-weight: 700;
-}
-
-.sq-feedback summary::-webkit-details-marker {
-  display: none;
-}
-
-.sq-feedback summary::after {
-  content: "Show";
-  font-family: var(--sq-font-body);
-  font-weight: 400;
-  font-size: var(--sq-text-sm);
-  color: var(--sq-office);
-}
-
-.sq-feedback[open] summary::after {
-  content: "Hide";
-}
-
-.sq-feedback[open] summary {
-  margin-bottom: var(--sq-space-3);
 }
 
 .sq-count {
@@ -781,16 +764,6 @@ circle.sq-chart-series { fill: var(--sq-surface); stroke-width: 2.5; }
   border-radius: var(--sq-radius-sm);
   background: var(--sq-cafe-tint);
   color: var(--sq-cafe-ink);
-}
-
-/* ---------- Placeholder notice ---------- */
-
-.sq-draft-note {
-  background: var(--sq-cafe-tint);
-  border: 1px dashed var(--sq-cafe);
-  color: var(--sq-cafe-ink);
-  border-radius: var(--sq-radius-sm);
-  font-size: var(--sq-text-sm);
 }
 
 @media (prefers-reduced-motion: reduce) {
