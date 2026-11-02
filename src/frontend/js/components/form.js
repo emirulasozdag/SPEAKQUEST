@@ -18,6 +18,14 @@ export function setFieldError(field, message) {
   feedback.classList.toggle("d-block", Boolean(message));
 }
 
+// Moves focus to the first field with an error so screen readers read its message.
+// Returns true when there was one, so the caller can stop before submitting.
+export function focusFirstInvalid(form) {
+  const field = form.querySelector(".is-invalid");
+  field?.focus();
+  return Boolean(field);
+}
+
 // Hides a field's error as soon as the player changes that field, so an old message never
 // sits next to a value that has already been fixed.
 export function clearErrorsOnEdit(form) {

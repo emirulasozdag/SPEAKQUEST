@@ -11,7 +11,7 @@ import {
   resetProgress,
 } from "../api.js";
 import { fillCharacterForm, saveCharacterForm } from "../components/character-form.js";
-import { clearErrorsOnEdit, setFieldError, showAlert } from "../components/form.js";
+import { clearErrorsOnEdit, focusFirstInvalid, setFieldError, showAlert } from "../components/form.js";
 import { CHARACTER_PAGE } from "../session.js";
 import { clearSession } from "../state.js";
 
@@ -64,7 +64,7 @@ deleteForm.addEventListener("submit", async (event) => {
   deleteAlert.hidden = true;
   setFieldError(deletePassword, deletePassword.value ? null : "Enter your current password.");
   setFieldError(deleteConfirm, deleteConfirm.checked ? null : "Tick the box to confirm.");
-  if (!deletePassword.value || !deleteConfirm.checked) return;
+  if (focusFirstInvalid(deleteForm)) return;
 
   deleteButton.disabled = true;
   deleteButton.textContent = "Deleting…";
@@ -76,6 +76,7 @@ deleteForm.addEventListener("submit", async (event) => {
   } catch (error) {
     if (error instanceof ApiError && error.status === 403) {
       setFieldError(deletePassword, error.message);
+      deletePassword.focus();
     } else if (error instanceof ApiError && error.status !== 401) {
       showAlert(deleteAlert, "Your account could not be deleted. Please try again.");
     } else {
@@ -105,7 +106,7 @@ passwordForm.addEventListener("submit", async (event) => {
   setFieldError(currentPassword, currentPassword.value ? null : "Enter your current password.");
   setFieldError(newPassword, newPassword.value.length >= 8 ? null : "Use at least 8 characters.");
   setFieldError(repeatPassword, repeatPassword.value === newPassword.value ? null : "The two new passwords do not match.");
-  if (passwordForm.querySelector(".is-invalid")) return;
+  if (focusFirstInvalid(passwordForm)) return;
 
   passwordButton.disabled = true;
   try {
@@ -116,8 +117,10 @@ passwordForm.addEventListener("submit", async (event) => {
   } catch (error) {
     if (error instanceof ApiError && error.status === 403) {
       setFieldError(currentPassword, error.message);
+      currentPassword.focus();
     } else if (error instanceof ApiError && error.status === 422) {
       setFieldError(newPassword, error.message);
+      newPassword.focus();
     } else if (error instanceof ApiError && error.status !== 401) {
       showAlert(passwordAlert, "Your password could not be changed. Please try again.");
     } else {
@@ -138,7 +141,7 @@ resetForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   resetAlert.hidden = true;
   setFieldError(resetConfirm, resetConfirm.checked ? null : "Tick the box to confirm.");
-  if (!resetConfirm.checked) return;
+  if (focusFirstInvalid(resetForm)) return;
 
   resetButton.disabled = true;
   try {

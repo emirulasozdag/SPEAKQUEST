@@ -61,13 +61,19 @@ token'larla aynı değerleri kullanır. Bir token değişirse bu dosyalar da gü
   beyaz zemin üzerindedir, böylece metnin kontrastı illüstrasyona bağlı kalmaz.
 - **Konuşma balonları:** `.sq-bubble-npc` (soldaki küçük portre `.sq-bubble-row` ile) ve
   `.sq-bubble-player`. Düzeltmeler `.sq-wrong` / `.sq-right` ile gösterilir.
-- **Dil geri bildirimi:** `<details class="sq-feedback">`. Klavyeyle açılıp kapanır, ek JS gerekmez.
-  Başlıktaki `.sq-count` düzeltme sayısını gösterir.
+- **Dil geri bildirimi:** `.sq-turn-feedback` içindeki `.sq-correction-badge` butonu düzeltmeleri açıp
+  kapatır. Varsayılan olarak kapalıdır; `aria-expanded` ve `aria-controls` ile durumunu duyurur.
 - **Avatar ve portre:** `.sq-avatar`, `.sq-portrait`, küçük sürümü `.sq-portrait-sm`.
 
 ## Erişilebilirlik
 
 - Metin renk çiftleri WCAG AA'yı (normal metin için 4.5:1) karşılar. En düşük metin çifti `--sq-error`
   beyaz üzerinde 5.1:1'dir. Odak halkası (`--sq-cafe`) metin dışı öğeler için gereken 3:1'i karşılar.
+  Bootstrap'ın buton ve form alanlarındaki kendi mavi odak gölgesi kapatılır; her öğede aynı halka görünür.
+- Bootstrap linkleri ve `.text-secondary` rengi `-rgb` değişkenlerinden okur (`--bs-link-color-rgb`,
+  `--bs-secondary-rgb`). Bunlar `:root` içinde token renklerine bağlıdır; yalnızca `--bs-link-color`
+  değiştirmek yetmez.
+- Formlarda hata metni alanın altındadır (`aria-describedby`, `aria-invalid`) ve gönderimde odak ilk
+  hatalı alana gider, böylece ekran okuyucu mesajı okur.
 - Dekoratif görseller `alt=""` taşır. Anlam taşıyan bilgi (NPC adı, durum) her zaman metin olarak da vardır.
 - `prefers-reduced-motion: reduce` açıkken geçişler ve haritadaki yükselme efekti kapanır.
