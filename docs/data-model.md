@@ -249,7 +249,7 @@ tek fırsattır: aynı kategoride hem hata hem doğru kullanım varsa sonuç `in
 **API:** `POST /api/dialogue/message` (`{"message": "..."}`) aktif görevdeki NPC'ye mesaj gönderir.
 Akış `services/dialogue.send_message()` içindedir: mesaj kırpılır; boşsa ya da 500 karakteri
 aşıyorsa `422`, karakter ya da aktif görev yoksa `409`. Dil modeline yalnızca NPC, görev, seviye,
-kısa bir hikâye özeti ve son mesajlar gider. Cevap doğrulandıktan sonra tek transaction'da oyuncu
+kısa bir hikâye özeti, son mesajlar ve oyuncunun pratik odağı (bir beceri adı, #20) gider. Cevap doğrulandıktan sonra tek transaction'da oyuncu
 mesajı (`communication_success` ile) ve NPC cevabı saklanır, hatalar ve fırsatlar Learning Engine
 üzerinden yazılır, önerilen hikâye aksiyonu Story Engine'e (`apply_suggested_action`) iletilir. Cevap
 `npc_reply`, `communication_success`, `corrections` (`original → corrected` + Türkçe açıklama),

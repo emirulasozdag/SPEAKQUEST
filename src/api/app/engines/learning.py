@@ -275,6 +275,36 @@ def _reason(item: SkillScore) -> TargetReason:
     return TargetReason.WEAKEST_SKILL
 
 
+# --- Practice focus of a conversation (#20) --------------------------------------------------
+
+# Learning targets that come from the player's own mistakes. Only these steer the conversation;
+# without such evidence the scene's own skill does (see choose_practice_focus).
+EVIDENCE_REASONS = frozenset({TargetReason.REPEATED_MISTAKE, TargetReason.WEAKEST_SKILL})
+SCENE_REASON = "scene"
+
+
+@dataclass(frozen=True)
+class PracticeFocus:
+    category: SkillCategory
+    # A TargetReason value when the player's mistakes chose it, SCENE_REASON when the quest did
+    reason: str
+
+
+def choose_practice_focus(
+    scores: Mapping[SkillCategory, SkillScore], level: EnglishLevel, scene_skills: Sequence[SkillCategory]
+) -> PracticeFocus:
+    """The one structure the NPC should get the player to use in this conversation.
+
+    The Learning Engine's target when it is based on evidence (a repeated mistake or a practised
+    weak skill). Otherwise, for a new player or one whose skills are all strong, the first skill
+    the quest was written for: the scene gives the most natural chances to use it.
+    """
+    target = choose_learning_target(scores, level)
+    if target.reason in EVIDENCE_REASONS or not scene_skills:
+        return PracticeFocus(target.category, target.reason.value)
+    return PracticeFocus(SkillCategory(scene_skills[0]), SCENE_REASON)
+
+
 # --- Progress over time --------------------------------------------------------------------
 # The most recent days with practice that the timeline keeps; older days are left out
 TIMELINE_MAX_DAYS = 30

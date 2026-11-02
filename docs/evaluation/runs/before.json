@@ -1,0 +1,1880 @@
+{
+  "label": "before",
+  "model": "gemini-3.1-flash-lite",
+  "started": "2026-11-02T18:04:39+00:00",
+  "prompt": "deb451b633fc",
+  "repeat": 2,
+  "metrics": {
+    "records": 96,
+    "answered": 96,
+    "unavailable": {
+      "count": 0,
+      "of": 96,
+      "rate": 0.0
+    },
+    "categories": {
+      "present_simple": {
+        "expected": 14,
+        "recall": 1.0,
+        "precision": 1.0,
+        "accuracy": 1.0,
+        "tp": 14,
+        "fp": 0,
+        "fn": 0,
+        "tn": 72
+      },
+      "past_simple": {
+        "expected": 14,
+        "recall": 1.0,
+        "precision": 0.875,
+        "accuracy": 0.977,
+        "tp": 14,
+        "fp": 2,
+        "fn": 0,
+        "tn": 70
+      },
+      "question_formation": {
+        "expected": 14,
+        "recall": 1.0,
+        "precision": 1.0,
+        "accuracy": 1.0,
+        "tp": 14,
+        "fp": 0,
+        "fn": 0,
+        "tn": 72
+      },
+      "prepositions": {
+        "expected": 14,
+        "recall": 0.857,
+        "precision": 1.0,
+        "accuracy": 0.977,
+        "tp": 12,
+        "fp": 0,
+        "fn": 2,
+        "tn": 72
+      },
+      "vocabulary_usage": {
+        "expected": 14,
+        "recall": 0.929,
+        "precision": 0.867,
+        "accuracy": 0.965,
+        "tp": 13,
+        "fp": 2,
+        "fn": 1,
+        "tn": 70
+      }
+    },
+    "exact_match": {
+      "count": 81,
+      "of": 86,
+      "rate": 0.942
+    },
+    "error_found": {
+      "count": 67,
+      "of": 70,
+      "rate": 0.957
+    },
+    "clean_false_positive": {
+      "count": 2,
+      "of": 16,
+      "rate": 0.125
+    },
+    "minor_error_false_failure": {
+      "count": 0,
+      "of": 70,
+      "rate": 0.0
+    },
+    "correct_false_failure": {
+      "count": 0,
+      "of": 16,
+      "rate": 0.0
+    },
+    "unclear_flagged": {
+      "count": 8,
+      "of": 10,
+      "rate": 0.8
+    },
+    "confusion": {
+      "present_simple": {
+        "present_simple": 14
+      },
+      "past_simple": {
+        "past_simple": 14
+      },
+      "question_formation": {
+        "question_formation": 14
+      },
+      "prepositions": {
+        "prepositions": 12,
+        "vocabulary_usage": 2
+      },
+      "vocabulary_usage": {
+        "vocabulary_usage": 13,
+        "(none)": 1
+      }
+    },
+    "misses": [
+      {
+        "id": "pr6",
+        "player": "I usually listen music.",
+        "expected": [
+          "prepositions"
+        ],
+        "detected": [
+          "vocabulary_usage"
+        ]
+      },
+      {
+        "id": "ok5",
+        "player": "Mia left her bag on the chair, and when she came back, it was gone.",
+        "expected": [],
+        "detected": [
+          "past_simple"
+        ]
+      },
+      {
+        "id": "pr6",
+        "player": "I usually listen music.",
+        "expected": [
+          "prepositions"
+        ],
+        "detected": [
+          "vocabulary_usage"
+        ]
+      },
+      {
+        "id": "vu6",
+        "player": "It was very hard, but I won a lot of money.",
+        "expected": [
+          "vocabulary_usage"
+        ],
+        "detected": []
+      },
+      {
+        "id": "ok5",
+        "player": "Mia left her bag on the chair, and when she came back, it was gone.",
+        "expected": [],
+        "detected": [
+          "past_simple"
+        ]
+      }
+    ],
+    "communication_misses": [
+      {
+        "id": "un3",
+        "player": "The dog is purple on Sundays.",
+        "expected": false,
+        "got": true
+      },
+      {
+        "id": "un3",
+        "player": "The dog is purple on Sundays.",
+        "expected": false,
+        "got": true
+      }
+    ]
+  },
+  "records": [
+    {
+      "id": "ps1",
+      "status": "ok",
+      "seconds": 9.57,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "I works",
+          "corrected": "I work",
+          "explanation": "I, you, we, they özneleriyle fiile -s takısı gelmez."
+        }
+      ],
+      "npc_reply": "Oh, that is nice! I like that station area. Do you like your job there?",
+      "round": 1
+    },
+    {
+      "id": "ps2",
+      "status": "ok",
+      "seconds": 6.07,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "come",
+          "corrected": "comes",
+          "explanation": "Özne üçüncü tekil şahıs olduğu için fiile -s takısı gelmelidir."
+        }
+      ],
+      "npc_reply": "Oh, how lovely! It's always great to see family members in the café. Since it's your first time, can I get you a nice hot latte and a fresh croissant to start your day?",
+      "round": 1
+    },
+    {
+      "id": "ps3",
+      "status": "ok",
+      "seconds": 2.73,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "don't",
+          "corrected": "doesn't",
+          "explanation": "Üçüncü tekil şahıslarda olumsuz cümle yaparken 'doesn't' kullanılır."
+        },
+        {
+          "category": "present_simple",
+          "original": "study",
+          "corrected": "studies",
+          "explanation": "Üçüncü tekil şahıslarda geniş zamanda fiilin sonuna -s takısı gelir."
+        }
+      ],
+      "npc_reply": "Oh, I see. University is hard work! Do you study at university too?",
+      "round": 1
+    },
+    {
+      "id": "ps4",
+      "status": "ok",
+      "seconds": 5.1,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "wakes",
+          "corrected": "wake",
+          "explanation": "I, you, we, they özneleriyle fiile -s takısı gelmez."
+        },
+        {
+          "category": "present_simple",
+          "original": "checks",
+          "corrected": "check",
+          "explanation": "I, you, we, they özneleriyle fiile -s takısı gelmez."
+        }
+      ],
+      "npc_reply": "That sounds like a productive start to your morning. Could you tell me a bit about your past work experience and if you have ever helped customers before?",
+      "round": 1
+    },
+    {
+      "id": "ps5",
+      "status": "ok",
+      "seconds": 3.58,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "it taste",
+          "corrected": "it tastes",
+          "explanation": "Üçüncü tekil şahıslarda fiile -s takısı gelir."
+        }
+      ],
+      "npc_reply": "I am so glad you like it! Would you like a croissant to go with your coffee?",
+      "round": 1
+    },
+    {
+      "id": "ps6",
+      "status": "ok",
+      "seconds": 25.21,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "she live",
+          "corrected": "she lives",
+          "explanation": "Üçüncü tekil şahıslarda fiile -s takısı gelir."
+        }
+      ],
+      "npc_reply": "Oh, I see. That makes sense. Do you want to see the flat upstairs now?",
+      "round": 1
+    },
+    {
+      "id": "ps7",
+      "status": "ok",
+      "seconds": 2.68,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "she always leave",
+          "corrected": "she always leaves",
+          "explanation": "Üçüncü tekil şahıslarda fiile -s takısı getirilmelidir."
+        }
+      ],
+      "npc_reply": "Oh, you're right! I usually keep it by the window where I can see it. But yesterday, it just vanished while I was busy making lattes. Did you notice anyone suspicious near the window around three o'clock?",
+      "round": 1
+    },
+    {
+      "id": "pa1",
+      "status": "ok",
+      "seconds": 2.4,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "work",
+          "corrected": "worked",
+          "explanation": "Geçmişte gerçekleşen bir eylemden bahsederken fiilin ikinci hali kullanılmalıdır."
+        }
+      ],
+      "npc_reply": "That sounds like a busy environment! Working in a restaurant requires great people skills. What were your main responsibilities there?",
+      "round": 1
+    },
+    {
+      "id": "pa2",
+      "status": "ok",
+      "seconds": 7.66,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "see",
+          "corrected": "saw",
+          "explanation": "Geçmişten bahsederken fiilin ikinci hali kullanılmalıdır."
+        }
+      ],
+      "npc_reply": "Oh, a man near the door? Was he carrying a blue bag? I am so worried about my backpack.",
+      "round": 1
+    },
+    {
+      "id": "pa3",
+      "status": "ok",
+      "seconds": 3.96,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "seed",
+          "corrected": "saw",
+          "explanation": "See fiilinin geçmiş zaman hali 'saw' şeklindedir."
+        }
+      ],
+      "npc_reply": "Oh, nine o'clock in the morning? That was before I lost it. Did you see anyone near my counter later?",
+      "round": 1
+    },
+    {
+      "id": "pa4",
+      "status": "ok",
+      "seconds": 3.41,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "arrive",
+          "corrected": "arrived",
+          "explanation": "Geçmişte gerçekleşen bir eylemden bahsederken fiilin ikinci hali kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, two days ago? That is nice. I am Alex. I work here at home. Do you like your new flat?",
+      "round": 1
+    },
+    {
+      "id": "pa5",
+      "status": "ok",
+      "seconds": 7.42,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "leaved",
+          "corrected": "left",
+          "explanation": "Leave fiilinin geçmiş zaman hali 'left' şeklindedir."
+        }
+      ],
+      "npc_reply": "I understand, that is a difficult situation to be in. Could you tell me a bit more about what you did while working at that shop?",
+      "round": 1
+    },
+    {
+      "id": "pa6",
+      "status": "ok",
+      "seconds": 3.58,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "didn't slept",
+          "corrected": "didn't sleep",
+          "explanation": "Yardımcı fiil 'did' kullanıldığında ana fiil yalın halde kalmalıdır."
+        }
+      ],
+      "npc_reply": "Oh, I'm so sorry to hear that! The city can be quite loud at night. Would you like a strong coffee or a soothing tea to help you wake up?",
+      "round": 1
+    },
+    {
+      "id": "pa7",
+      "status": "ok",
+      "seconds": 1.9,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "tell",
+          "corrected": "told",
+          "explanation": "Geçmiş zamanlı bir olaydan bahsederken fiilin ikinci halini kullanmalısın."
+        }
+      ],
+      "npc_reply": "Oh, that is nice! A friend is always good. Do you want to see the flat upstairs?",
+      "round": 1
+    },
+    {
+      "id": "qf1",
+      "status": "ok",
+      "seconds": 58.67,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "Where you live?",
+          "corrected": "Where do you live?",
+          "explanation": "Soru cümlelerinde yardımcı fiil (do/does) kullanmalısın."
+        }
+      ],
+      "npc_reply": "Oh, I live in flat 3B, right next to you! I am just moving my plants inside. Do you have many plants?",
+      "round": 1
+    },
+    {
+      "id": "qf2",
+      "status": "ok",
+      "seconds": 1.49,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "How much costs the rent?",
+          "corrected": "How much does the rent cost?",
+          "explanation": "Soru cümlelerinde yardımcı fiil (does) öznenin önüne gelmelidir."
+        }
+      ],
+      "npc_reply": "Oh, it's 650 a month, but bills are extra, you know. It's a nice space with two rooms and a balcony. Do you need a lot of room for your things?",
+      "round": 1
+    },
+    {
+      "id": "qf3",
+      "status": "ok",
+      "seconds": 2.97,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "When I can start?",
+          "corrected": "When can I start?",
+          "explanation": "Soru cümlelerinde yardımcı fiil özneden önce gelmelidir."
+        }
+      ],
+      "npc_reply": "That is a great question! If you are successful, we would love for you to start as soon as possible. Before we talk about dates, could you tell me a little bit about yourself and your background?",
+      "round": 1
+    },
+    {
+      "id": "qf4",
+      "status": "ok",
+      "seconds": 3.07,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "What time the cafe opens?",
+          "corrected": "What time does the cafe open?",
+          "explanation": "Soru cümlelerinde yardımcı fiil (does) öznenin önüne gelmelidir."
+        }
+      ],
+      "npc_reply": "We open at seven o'clock every morning! Would you like a coffee to start your day?",
+      "round": 1
+    },
+    {
+      "id": "qf5",
+      "status": "ok",
+      "seconds": 1.82,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "Why Mia left the bag there?",
+          "corrected": "Why did Mia leave the bag there?",
+          "explanation": "Soru cümlelerinde yardımcı fiil (did) öznenin önüne gelmelidir."
+        }
+      ],
+      "npc_reply": "Oh, I just set it down behind the counter while I was busy making a latte! I feel so silly for leaving it unattended. Do you remember seeing anyone near the counter around three o'clock yesterday?",
+      "round": 1
+    },
+    {
+      "id": "qf6",
+      "status": "ok",
+      "seconds": 2.0,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "How old it is?",
+          "corrected": "How old is it?",
+          "explanation": "Soru cümlelerinde yardımcı fiil özneden önce gelir."
+        }
+      ],
+      "npc_reply": "Oh, it is about twenty years old, I think. It works well, though! Do you need a new kitchen for your cooking?",
+      "round": 1
+    },
+    {
+      "id": "qf7",
+      "status": "ok",
+      "seconds": 2.12,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "What you do on weekends?",
+          "corrected": "What do you do on weekends?",
+          "explanation": "Soru cümlelerinde 'do' yardımcı fiilini kullanmalısın."
+        }
+      ],
+      "npc_reply": "Oh, hi! I usually draw pictures on my computer. What about you? What do you do for fun?",
+      "round": 1
+    },
+    {
+      "id": "pr1",
+      "status": "ok",
+      "seconds": 5.83,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "good in",
+          "corrected": "good at",
+          "explanation": "Bir konuda iyi olduğunuzu belirtirken 'good at' kalıbı kullanılır."
+        },
+        {
+          "category": "prepositions",
+          "original": "interested on",
+          "corrected": "interested in",
+          "explanation": "Bir şeye ilgi duyduğunuzu belirtirken 'interested in' kalıbı kullanılır."
+        }
+      ],
+      "npc_reply": "It's great to hear you're interested in the position. Could you tell me about any previous jobs or projects where you worked with customers?",
+      "round": 1
+    },
+    {
+      "id": "pr2",
+      "status": "ok",
+      "seconds": 1.72,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "arrived to",
+          "corrected": "arrived in",
+          "explanation": "Şehirler ve ülkeler için 'arrive in' kullanılır."
+        }
+      ],
+      "npc_reply": "Welcome to the neighbourhood! It's lovely to have a new face here. Would you like to start your morning with a coffee or maybe a fresh croissant?",
+      "round": 1
+    },
+    {
+      "id": "pr3",
+      "status": "ok",
+      "seconds": 10.78,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "at the third floor",
+          "corrected": "on the third floor",
+          "explanation": "Katlar için 'on' edatı kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, that's right above me! I'm Alex. I work from home as a designer. Do you like your new flat?",
+      "round": 1
+    },
+    {
+      "id": "pr4",
+      "status": "ok",
+      "seconds": 2.76,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "in the table",
+          "corrected": "on the table",
+          "explanation": "Masa yüzeyleri için 'on' edatı kullanılır."
+        },
+        {
+          "category": "prepositions",
+          "original": "next of the window",
+          "corrected": "next to the window",
+          "explanation": "'Next to' bir kalıptır ve 'to' ile kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, right by the window! I remember now. I think I left it there while I was cleaning up. Do you remember seeing anyone near that table around three o'clock?",
+      "round": 1
+    },
+    {
+      "id": "pr5",
+      "status": "ok",
+      "seconds": 18.78,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "in Monday",
+          "corrected": "on Monday",
+          "explanation": "Günlerden önce 'on' kullanılır."
+        }
+      ],
+      "npc_reply": "That is great. Can you tell me about your past work experience?",
+      "round": 1
+    },
+    {
+      "id": "pr6",
+      "status": "ok",
+      "seconds": 2.14,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "listen music",
+          "corrected": "listen to music",
+          "explanation": "Listen fiilinden sonra 'to' edatı kullanılmalıdır."
+        }
+      ],
+      "npc_reply": "Oh, music is nice! I usually listen to podcasts while I work. Do you like pop music or something else?",
+      "round": 1
+    },
+    {
+      "id": "pr7",
+      "status": "ok",
+      "seconds": 1.76,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "at the city centre",
+          "corrected": "in the city centre",
+          "explanation": "Şehir merkezleri gibi geniş alanlar için 'in' edatı kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, right in the heart of the city! That's a busy spot to work. Would you like to grab a coffee or a croissant to start your morning?",
+      "round": 1
+    },
+    {
+      "id": "vu1",
+      "status": "ok",
+      "seconds": 2.51,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "make a good job",
+          "corrected": "do a good job",
+          "explanation": "İngilizcede 'iş yapmak' anlamında 'do a job' kalıbı kullanılır."
+        }
+      ],
+      "npc_reply": "It is great to hear you are enthusiastic about the role. Could you tell me a bit more about your past work experience with customers?",
+      "round": 1
+    },
+    {
+      "id": "vu2",
+      "status": "ok",
+      "seconds": 1.78,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "make my homework",
+          "corrected": "do my homework",
+          "explanation": "Ev ödevi yapmak için 'do' fiili kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, I see. You need a quiet space to study. That makes sense! Do you want to see the flat upstairs now?",
+      "round": 1
+    },
+    {
+      "id": "vu3",
+      "status": "ok",
+      "seconds": 1.72,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "make me a favour",
+          "corrected": "do me a favour",
+          "explanation": "İngilizcede 'favour' kelimesi ile 'do' fiili kullanılır."
+        }
+      ],
+      "npc_reply": "Of course! I am worried because my blue backpack is missing. Can you help me find it?",
+      "round": 1
+    },
+    {
+      "id": "vu4",
+      "status": "ok",
+      "seconds": 3.71,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "funny",
+          "corrected": "fun",
+          "explanation": "Funny komik demektir, eğlenceli demek için fun kullanılır."
+        }
+      ],
+      "npc_reply": "That's wonderful to hear! It's so exciting to start something new. Would you like a coffee or a croissant to celebrate your first week?",
+      "round": 1
+    },
+    {
+      "id": "vu5",
+      "status": "ok",
+      "seconds": 2.08,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "The travel",
+          "corrected": "The trip",
+          "explanation": "Genel bir yolculuktan bahsederken 'trip' veya 'journey' kelimeleri daha doğal durur."
+        }
+      ],
+      "npc_reply": "Oh, that sounds exhausting! I'm Alex, by the way, from 3B. I'm just moving some boxes around. Where are you from?",
+      "round": 1
+    },
+    {
+      "id": "vu6",
+      "status": "ok",
+      "seconds": 5.34,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "won a lot of money",
+          "corrected": "earned a lot of money",
+          "explanation": "Bir işte çalışarak para kazanmak için 'earn' fiili kullanılır."
+        }
+      ],
+      "npc_reply": "That sounds like a challenging experience! Could you tell me what your specific responsibilities were in that role?",
+      "round": 1
+    },
+    {
+      "id": "vu7",
+      "status": "ok",
+      "seconds": 19.18,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "borrow",
+          "corrected": "lend",
+          "explanation": "Birinden bir şey alırken 'borrow', birine bir şey verirken 'lend' kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, sure! Here is my pen. Do you need a new place to live, by the way?",
+      "round": 1
+    },
+    {
+      "id": "ok1",
+      "status": "ok",
+      "seconds": 1.57,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, welcome! I am Alex from 3B. Do you like your new flat?",
+      "round": 1
+    },
+    {
+      "id": "ok2",
+      "status": "ok",
+      "seconds": 2.6,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Coming right up! Do you want your cappuccino with regular or oat milk?",
+      "round": 1
+    },
+    {
+      "id": "ok3",
+      "status": "ok",
+      "seconds": 2.27,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "That sounds like great experience! Working at a hotel reception is very similar to what we do here. What was your favorite part of that job?",
+      "round": 1
+    },
+    {
+      "id": "ok4",
+      "status": "ok",
+      "seconds": 1.8,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "That is wonderful to hear! Helping people create great memories is exactly what we do here. Could you tell me about a time you helped someone with their travel plans or a similar task?",
+      "round": 1
+    },
+    {
+      "id": "ok5",
+      "status": "ok",
+      "seconds": 1.82,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "Mia left",
+          "corrected": "I left",
+          "explanation": "Kendi kendinden bahsederken 'I' zamirini kullanmalısın."
+        }
+      ],
+      "npc_reply": "Oh, that's right! I remember leaving it on that chair near the window. I feel so silly. Did you happen to see anyone suspicious near my bag while you were sitting there?",
+      "round": 1
+    },
+    {
+      "id": "ok6",
+      "status": "ok",
+      "seconds": 1.89,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, the rent is 650 a month. But the bills are extra, you know? It's a nice place, though. Do you need a lot of space for your things?",
+      "round": 1
+    },
+    {
+      "id": "ok7",
+      "status": "ok",
+      "seconds": 2.24,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that sounds hard! I am a graphic designer. Do you like your university?",
+      "round": 1
+    },
+    {
+      "id": "ok8",
+      "status": "ok",
+      "seconds": 4.63,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "I am so happy you like it! Would you like a croissant with your coffee today?",
+      "round": 1
+    },
+    {
+      "id": "un1",
+      "status": "ok",
+      "seconds": 3.42,
+      "communication_success": false,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "I'm sorry, I think I might have misunderstood you. Could you tell me a little bit more about your previous work experience with customers?",
+      "round": 1
+    },
+    {
+      "id": "un2",
+      "status": "ok",
+      "seconds": 1.45,
+      "communication_success": false,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "Window the go tomorrow me.",
+          "corrected": "I would like a coffee tomorrow.",
+          "explanation": "Cümlenizdeki kelimeler bir anlam ifade etmiyor."
+        }
+      ],
+      "npc_reply": "I am sorry, I do not understand. Would you like a coffee or some tea?",
+      "round": 1
+    },
+    {
+      "id": "un3",
+      "status": "ok",
+      "seconds": 2.06,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that's a funny thing to say! I'm not sure if the flat is right for a purple dog, you know? Are you looking for a quiet place to live?",
+      "round": 1
+    },
+    {
+      "id": "un4",
+      "status": "ok",
+      "seconds": 15.8,
+      "communication_success": false,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "Because maybe yes the train.",
+          "corrected": "I came by train.",
+          "explanation": "Bu cümle kurduğunuz anlamı tam olarak karşılamıyor."
+        }
+      ],
+      "npc_reply": "Oh, that is okay! I am Alex. I live in 3B. Do you like your new flat?",
+      "round": 1
+    },
+    {
+      "id": "un5",
+      "status": "ok",
+      "seconds": 2.33,
+      "communication_success": false,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "Sandwich forty run bag",
+          "corrected": "Someone ran away with the bag while buying a sandwich.",
+          "explanation": "Cümlenizin anlamı tam olarak anlaşılmıyor, daha açık bir ifade kullanabilirsiniz."
+        }
+      ],
+      "npc_reply": "Oh, I'm sorry, I don't quite follow! Are you saying someone took my blue bag while they were buying a sandwich? Could you tell me more about what you saw?",
+      "round": 1
+    },
+    {
+      "id": "ps1",
+      "status": "ok",
+      "seconds": 8.71,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "I works",
+          "corrected": "I work",
+          "explanation": "I, you, we, they özneleriyle fiile -s takısı gelmez."
+        }
+      ],
+      "npc_reply": "Oh, that sounds nice! I am a graphic designer, you know. Do you like your job?",
+      "round": 2
+    },
+    {
+      "id": "ps2",
+      "status": "ok",
+      "seconds": 8.52,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "come",
+          "corrected": "comes",
+          "explanation": "Üçüncü tekil şahıs özneleriyle fiile -s takısı getirilmelidir."
+        }
+      ],
+      "npc_reply": "Oh, how lovely! It's always nice to meet family of our regulars. Since you're here now, can I get you a coffee or maybe a warm croissant to start your day?",
+      "round": 2
+    },
+    {
+      "id": "ps3",
+      "status": "ok",
+      "seconds": 8.48,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "don't",
+          "corrected": "doesn't",
+          "explanation": "Üçüncü tekil şahıslarda olumsuz cümle için 'doesn't' kullanılır."
+        },
+        {
+          "category": "present_simple",
+          "original": "study",
+          "corrected": "studies",
+          "explanation": "Üçüncü tekil şahıslarda fiile 's' takısı eklenmelidir."
+        }
+      ],
+      "npc_reply": "Oh, I see. University is a busy time! Do you live with your brother?",
+      "round": 2
+    },
+    {
+      "id": "ps4",
+      "status": "ok",
+      "seconds": 3.58,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "wakes",
+          "corrected": "wake",
+          "explanation": "I öznesi ile fiil -s takısı almaz."
+        },
+        {
+          "category": "present_simple",
+          "original": "checks",
+          "corrected": "check",
+          "explanation": "I öznesi ile fiil -s takısı almaz."
+        }
+      ],
+      "npc_reply": "That sounds like a productive start to your morning! It is great to stay on top of your messages early. Could you tell me a bit about your past work experience with customers?",
+      "round": 2
+    },
+    {
+      "id": "ps5",
+      "status": "ok",
+      "seconds": 6.07,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "it taste",
+          "corrected": "it tastes",
+          "explanation": "Üçüncü tekil şahıslarda fiile -s takısı gelir."
+        }
+      ],
+      "npc_reply": "I am so happy you like it! Do you want a croissant with your coffee?",
+      "round": 2
+    },
+    {
+      "id": "ps6",
+      "status": "ok",
+      "seconds": 5.9,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "she live",
+          "corrected": "she lives",
+          "explanation": "Üçüncü tekil şahıslarda fiile -s takısı gelir."
+        }
+      ],
+      "npc_reply": "Oh, I see. That makes sense. Do you need a big flat for yourself?",
+      "round": 2
+    },
+    {
+      "id": "ps7",
+      "status": "ok",
+      "seconds": 3.76,
+      "communication_success": true,
+      "detected": [
+        "present_simple"
+      ],
+      "corrections": [
+        {
+          "category": "present_simple",
+          "original": "leave",
+          "corrected": "leaves",
+          "explanation": "Üçüncü tekil şahıslarda fiile -s takısı getirmelisin."
+        }
+      ],
+      "npc_reply": "Oh, you're right! I usually keep it by the window where I can see it. But yesterday, it just vanished while I was busy making lattes. Do you remember seeing anyone near the counter around three o'clock?",
+      "round": 2
+    },
+    {
+      "id": "pa1",
+      "status": "ok",
+      "seconds": 1.59,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "work",
+          "corrected": "worked",
+          "explanation": "Geçmiş zamandan bahsederken fiilin ikinci hali kullanılmalıdır."
+        }
+      ],
+      "npc_reply": "That sounds like a busy environment! Working in a restaurant is great experience for customer service. What were your main responsibilities there?",
+      "round": 2
+    },
+    {
+      "id": "pa2",
+      "status": "ok",
+      "seconds": 1.73,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "see",
+          "corrected": "saw",
+          "explanation": "Geçmiş zamandan bahsederken fiilin ikinci halini kullanmalısın."
+        }
+      ],
+      "npc_reply": "Oh, a man near the door? Was he carrying a blue bag? I am so worried about my backpack.",
+      "round": 2
+    },
+    {
+      "id": "pa3",
+      "status": "ok",
+      "seconds": 6.17,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "seed",
+          "corrected": "saw",
+          "explanation": "See fiilinin geçmiş zaman hali 'saw' şeklindedir."
+        }
+      ],
+      "npc_reply": "Oh, nine o'clock in the morning? I still had it then! Did you see anyone near the counter later?",
+      "round": 2
+    },
+    {
+      "id": "pa4",
+      "status": "ok",
+      "seconds": 4.32,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "arrive",
+          "corrected": "arrived",
+          "explanation": "Geçmişten bahsederken fiilin ikinci halini kullanmalısın."
+        }
+      ],
+      "npc_reply": "Oh, two days ago! I am Alex. I live in 3B. What do you do every day?",
+      "round": 2
+    },
+    {
+      "id": "pa5",
+      "status": "ok",
+      "seconds": 3.19,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "leaved",
+          "corrected": "left",
+          "explanation": "Leave fiilinin geçmiş zaman hali 'left' şeklindedir."
+        }
+      ],
+      "npc_reply": "I see, that is a shame. It is always difficult when a business has to close down. Have you worked in a customer-facing role like this before?",
+      "round": 2
+    },
+    {
+      "id": "pa6",
+      "status": "ok",
+      "seconds": 3.21,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "didn't slept",
+          "corrected": "didn't sleep",
+          "explanation": "Did yardımcı fiilinden sonra fiilin yalın hali kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, I'm so sorry to hear that! The city can be quite loud at night. Would you like a strong coffee or a soothing tea to help you wake up?",
+      "round": 2
+    },
+    {
+      "id": "pa7",
+      "status": "ok",
+      "seconds": 6.18,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "tell",
+          "corrected": "told",
+          "explanation": "Geçmiş zamanlı bir eylemden bahsettiğin için fiilin ikinci halini kullanmalısın."
+        }
+      ],
+      "npc_reply": "Oh, that is nice! My friend told me about it too. Do you want to see the flat upstairs?",
+      "round": 2
+    },
+    {
+      "id": "qf1",
+      "status": "ok",
+      "seconds": 3.59,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "Where you live?",
+          "corrected": "Where do you live?",
+          "explanation": "Soru cümlelerinde 'do' yardımcı fiili öznenin önüne gelmelidir."
+        }
+      ],
+      "npc_reply": "Oh, I live in flat 3B, right next to you! Do you like your new flat?",
+      "round": 2
+    },
+    {
+      "id": "qf2",
+      "status": "ok",
+      "seconds": 5.49,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "How much costs the rent?",
+          "corrected": "How much does the rent cost?",
+          "explanation": "Soru cümlelerinde 'do/does' yardımcı fiili öznenin önüne gelmelidir."
+        }
+      ],
+      "npc_reply": "Oh, the rent is 650 a month, but bills are extra. It's a nice place, you know? Do you need a lot of space for your things?",
+      "round": 2
+    },
+    {
+      "id": "qf3",
+      "status": "ok",
+      "seconds": 7.12,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "When I can start?",
+          "corrected": "When can I start?",
+          "explanation": "Soru cümlelerinde yardımcı fiil özneden önce gelmelidir."
+        }
+      ],
+      "npc_reply": "That is a great question! If we decide to move forward, we usually like to have our new team members start within two weeks. Could you tell me a little bit about yourself and your previous work experience?",
+      "round": 2
+    },
+    {
+      "id": "qf4",
+      "status": "ok",
+      "seconds": 23.52,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "What time the cafe opens?",
+          "corrected": "What time does the cafe open?",
+          "explanation": "Soru cümlelerinde 'does' yardımcı fiilini kullanmalısın."
+        }
+      ],
+      "npc_reply": "We open at seven in the morning every day! Would you like a coffee to start your day?",
+      "round": 2
+    },
+    {
+      "id": "qf5",
+      "status": "ok",
+      "seconds": 4.36,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "Why Mia left the bag there?",
+          "corrected": "Why did Mia leave the bag there?",
+          "explanation": "Soru cümlelerinde yardımcı fiil (did) öznenin önüne gelmelidir."
+        }
+      ],
+      "npc_reply": "Oh, I just set it down behind the counter while I was busy making lattes! I feel so silly for losing it. Do you remember seeing anyone near the counter around three o'clock yesterday?",
+      "round": 2
+    },
+    {
+      "id": "qf6",
+      "status": "ok",
+      "seconds": 2.99,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "How old it is?",
+          "corrected": "How old is it?",
+          "explanation": "Soru cümlelerinde yardımcı fiil özneden önce gelir."
+        }
+      ],
+      "npc_reply": "Oh, it is about ten years old, I think. It still works well though! Do you need a big kitchen for cooking?",
+      "round": 2
+    },
+    {
+      "id": "qf7",
+      "status": "ok",
+      "seconds": 1.86,
+      "communication_success": true,
+      "detected": [
+        "question_formation"
+      ],
+      "corrections": [
+        {
+          "category": "question_formation",
+          "original": "What you do on weekends?",
+          "corrected": "What do you do on weekends?",
+          "explanation": "Soru cümlelerinde 'do' yardımcı fiilini kullanmalısın."
+        }
+      ],
+      "npc_reply": "Oh, hi! I usually draw pictures or water my plants. What about you? What do you do for fun?",
+      "round": 2
+    },
+    {
+      "id": "pr1",
+      "status": "ok",
+      "seconds": 2.61,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "good in",
+          "corrected": "good at",
+          "explanation": "Bir konuda iyi olduğumuzu belirtirken 'good at' kalıbı kullanılır."
+        },
+        {
+          "category": "prepositions",
+          "original": "interested on",
+          "corrected": "interested in",
+          "explanation": "'Interested' kelimesi her zaman 'in' edatı ile kullanılır."
+        }
+      ],
+      "npc_reply": "That's great to hear! We value good communication here. Could you tell me about a job or project where you worked with people before?",
+      "round": 2
+    },
+    {
+      "id": "pr2",
+      "status": "ok",
+      "seconds": 2.04,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "arrived to",
+          "corrected": "arrived in",
+          "explanation": "Şehirler ve ülkeler için 'arrive in' kullanılır."
+        }
+      ],
+      "npc_reply": "Welcome to the neighbourhood! I'm so glad you stopped by. Would you like to try our signature latte or maybe a fresh croissant to start your day?",
+      "round": 2
+    },
+    {
+      "id": "pr3",
+      "status": "ok",
+      "seconds": 5.62,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "at the third floor",
+          "corrected": "on the third floor",
+          "explanation": "Katları belirtirken 'on' edatı kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, that is right next to me! I am Alex. Do you like your new flat?",
+      "round": 2
+    },
+    {
+      "id": "pr4",
+      "status": "ok",
+      "seconds": 2.15,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "in the table",
+          "corrected": "on the table",
+          "explanation": "Masa gibi yüzeyler için 'on' edatı kullanılır."
+        },
+        {
+          "category": "prepositions",
+          "original": "next of the window",
+          "corrected": "next to the window",
+          "explanation": "'Next' kelimesi 'to' edatı ile kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, right by the window! I remember now. I usually keep it behind the counter, but I must have left it there while I was cleaning. Do you remember seeing anyone near that table around three o'clock yesterday?",
+      "round": 2
+    },
+    {
+      "id": "pr5",
+      "status": "ok",
+      "seconds": 1.56,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "in Monday",
+          "corrected": "on Monday",
+          "explanation": "Günlerden önce 'on' kullanılır."
+        }
+      ],
+      "npc_reply": "That sounds good. Have you worked with customers before?",
+      "round": 2
+    },
+    {
+      "id": "pr6",
+      "status": "ok",
+      "seconds": 1.84,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "listen music",
+          "corrected": "listen to music",
+          "explanation": "Listen fiilinden sonra 'to' edatı gelmelidir."
+        }
+      ],
+      "npc_reply": "Oh, music is nice! I like to listen to music too. Do you have a favourite band?",
+      "round": 2
+    },
+    {
+      "id": "pr7",
+      "status": "ok",
+      "seconds": 1.78,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "at the city centre",
+          "corrected": "in the city centre",
+          "explanation": "Şehir merkezinden bahsederken 'in' edatı kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, right in the heart of things! That's a busy area. Would you like a coffee or maybe a croissant to start your morning?",
+      "round": 2
+    },
+    {
+      "id": "vu1",
+      "status": "ok",
+      "seconds": 1.83,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "make a good job",
+          "corrected": "do a good job",
+          "explanation": "İngilizcede 'iş yapmak' ifadesi 'do a job' şeklinde kullanılır."
+        }
+      ],
+      "npc_reply": "That's a good start. Could you tell me a bit more about any past jobs where you have worked with customers?",
+      "round": 2
+    },
+    {
+      "id": "vu2",
+      "status": "ok",
+      "seconds": 13.13,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "make my homework",
+          "corrected": "do my homework",
+          "explanation": "Ödev yapmak için 'do' fiili kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, I see. You need a quiet place to study. Do you want to see the flat upstairs now?",
+      "round": 2
+    },
+    {
+      "id": "vu3",
+      "status": "ok",
+      "seconds": 2.36,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "make me a favour",
+          "corrected": "do me a favour",
+          "explanation": "İngilizcede 'favour' kelimesiyle 'do' fiili kullanılır."
+        }
+      ],
+      "npc_reply": "Of course! I am worried because I lost my blue backpack yesterday. Can you help me find it?",
+      "round": 2
+    },
+    {
+      "id": "vu4",
+      "status": "ok",
+      "seconds": 3.87,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "funny",
+          "corrected": "fun",
+          "explanation": "Funny komik demektir, eğlenceli demek için 'fun' kullanılır."
+        }
+      ],
+      "npc_reply": "That sounds great! I'm so glad you're enjoying it. Would you like to try one of our fresh croissants with your coffee today?",
+      "round": 2
+    },
+    {
+      "id": "vu5",
+      "status": "ok",
+      "seconds": 2.9,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "The travel",
+          "corrected": "The trip",
+          "explanation": "Genel bir yolculuktan bahsederken 'trip' veya 'journey' kelimelerini kullanmak daha doğaldır."
+        }
+      ],
+      "npc_reply": "Oh, I'm sorry to hear that! Moving can be such a hassle, you know? I'm Alex, by the way. I live in 3B. How are you settling in so far?",
+      "round": 2
+    },
+    {
+      "id": "vu6",
+      "status": "ok",
+      "seconds": 3.51,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "That sounds like a challenging experience, though earning money is always a nice bonus. Could you tell me more about what your daily tasks were in that role?",
+      "round": 2
+    },
+    {
+      "id": "vu7",
+      "status": "ok",
+      "seconds": 1.93,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "borrow",
+          "corrected": "lend",
+          "explanation": "Birinden bir şey alırken 'borrow', birine bir şey verirken 'lend' kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, sure! Here you go. Do you want to see the flat upstairs now?",
+      "round": 2
+    },
+    {
+      "id": "ok1",
+      "status": "ok",
+      "seconds": 2.53,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, welcome to Linden House! I am Alex in 3B. Do you like your new flat?",
+      "round": 2
+    },
+    {
+      "id": "ok2",
+      "status": "ok",
+      "seconds": 1.44,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Coming right up! Do you want your cappuccino with regular milk or oat milk?",
+      "round": 2
+    },
+    {
+      "id": "ok3",
+      "status": "ok",
+      "seconds": 4.91,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "That sounds like great experience for this role. What were your main responsibilities while working at the hotel?",
+      "round": 2
+    },
+    {
+      "id": "ok4",
+      "status": "ok",
+      "seconds": 4.59,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "That sounds wonderful! Helping people create great memories is exactly what we do here. Could you tell me about a time you helped someone with their travel plans or a similar task?",
+      "round": 2
+    },
+    {
+      "id": "ok5",
+      "status": "ok",
+      "seconds": 10.66,
+      "communication_success": true,
+      "detected": [
+        "past_simple"
+      ],
+      "corrections": [
+        {
+          "category": "past_simple",
+          "original": "Mia left",
+          "corrected": "I left",
+          "explanation": "Kendi kendinden bahsederken 'I' zamirini kullanmalısın."
+        }
+      ],
+      "npc_reply": "Oh, that's right! I remember leaving it on that chair near the window. I'm so worried about my notebook inside. Did you happen to see anyone suspicious near that chair yesterday afternoon?",
+      "round": 2
+    },
+    {
+      "id": "ok6",
+      "status": "ok",
+      "seconds": 4.92,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, the rent is 650 a month. Sadly, the bills are extra, you know. But it's a lovely place! Do you need a lot of space for your things?",
+      "round": 2
+    },
+    {
+      "id": "ok7",
+      "status": "ok",
+      "seconds": 3.02,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that sounds hard! I just design posters all day. Do you like your classes?",
+      "round": 2
+    },
+    {
+      "id": "ok8",
+      "status": "ok",
+      "seconds": 4.95,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "I am so glad you like it! Would you like a croissant with your coffee today?",
+      "round": 2
+    },
+    {
+      "id": "un1",
+      "status": "ok",
+      "seconds": 2.57,
+      "communication_success": false,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "I'm not quite sure I follow. Could you tell me a little bit about your previous work experience instead?",
+      "round": 2
+    },
+    {
+      "id": "un2",
+      "status": "ok",
+      "seconds": 5.94,
+      "communication_success": false,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "Window the go tomorrow me",
+          "corrected": "I would like a coffee tomorrow.",
+          "explanation": "Cümlenizdeki kelimelerin sırası ve anlamı net değil."
+        }
+      ],
+      "npc_reply": "I am sorry, I do not understand. Would you like a coffee or some tea?",
+      "round": 2
+    },
+    {
+      "id": "un3",
+      "status": "ok",
+      "seconds": 4.12,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that's a funny thing to say! I'm not sure if the flat is right for a purple dog, you know? Are you looking for a quiet place to live?",
+      "round": 2
+    },
+    {
+      "id": "un4",
+      "status": "ok",
+      "seconds": 4.5,
+      "communication_success": false,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "Because maybe yes the train.",
+          "corrected": "I came by train.",
+          "explanation": "Bu cümle kurmak istediğiniz anlamı tam olarak karşılamıyor."
+        }
+      ],
+      "npc_reply": "Oh, I see. You came by train? That is a long trip! Are you tired from moving in?",
+      "round": 2
+    },
+    {
+      "id": "un5",
+      "status": "ok",
+      "seconds": 2.88,
+      "communication_success": false,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "Sandwich forty run bag",
+          "corrected": "Someone took the bag while buying a sandwich.",
+          "explanation": "Cümlenizdeki kelimeler birbiriyle bağlantılı değil, ne demek istediğinizi tam anlayamadım."
+        }
+      ],
+      "npc_reply": "Oh, I'm sorry, I don't quite understand. Are you saying someone took my blue bag while they were buying a sandwich? Could you tell me a bit more about what you saw?",
+      "round": 2
+    }
+  ]
+}

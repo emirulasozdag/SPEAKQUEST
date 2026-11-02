@@ -1,0 +1,474 @@
+{
+  "label": "holdout-after",
+  "model": "gemini-3.1-flash-lite",
+  "started": "2026-11-02T18:40:18+00:00",
+  "prompt": "96165aa96d2f",
+  "repeat": 2,
+  "metrics": {
+    "records": 24,
+    "answered": 24,
+    "unavailable": {
+      "count": 0,
+      "of": 24,
+      "rate": 0.0
+    },
+    "categories": {
+      "present_simple": {
+        "expected": 0,
+        "recall": null,
+        "precision": null,
+        "accuracy": 1.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 18
+      },
+      "past_simple": {
+        "expected": 0,
+        "recall": null,
+        "precision": null,
+        "accuracy": 1.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 18
+      },
+      "question_formation": {
+        "expected": 0,
+        "recall": null,
+        "precision": null,
+        "accuracy": 1.0,
+        "tp": 0,
+        "fp": 0,
+        "fn": 0,
+        "tn": 18
+      },
+      "prepositions": {
+        "expected": 6,
+        "recall": 1.0,
+        "precision": 1.0,
+        "accuracy": 1.0,
+        "tp": 6,
+        "fp": 0,
+        "fn": 0,
+        "tn": 12
+      },
+      "vocabulary_usage": {
+        "expected": 6,
+        "recall": 1.0,
+        "precision": 1.0,
+        "accuracy": 1.0,
+        "tp": 6,
+        "fp": 0,
+        "fn": 0,
+        "tn": 12
+      }
+    },
+    "exact_match": {
+      "count": 18,
+      "of": 18,
+      "rate": 1.0
+    },
+    "error_found": {
+      "count": 12,
+      "of": 12,
+      "rate": 1.0
+    },
+    "clean_false_positive": {
+      "count": 0,
+      "of": 6,
+      "rate": 0.0
+    },
+    "minor_error_false_failure": {
+      "count": 0,
+      "of": 12,
+      "rate": 0.0
+    },
+    "correct_false_failure": {
+      "count": 0,
+      "of": 6,
+      "rate": 0.0
+    },
+    "unclear_flagged": {
+      "count": 4,
+      "of": 6,
+      "rate": 0.667
+    },
+    "confusion": {
+      "present_simple": {},
+      "past_simple": {},
+      "question_formation": {},
+      "prepositions": {
+        "prepositions": 6
+      },
+      "vocabulary_usage": {
+        "vocabulary_usage": 6
+      }
+    },
+    "misses": [],
+    "communication_misses": [
+      {
+        "id": "h-un1",
+        "player": "My favourite colour is green.",
+        "expected": false,
+        "got": true
+      },
+      {
+        "id": "h-un1",
+        "player": "My favourite colour is green.",
+        "expected": false,
+        "got": true
+      }
+    ]
+  },
+  "records": [
+    {
+      "id": "h-pr1",
+      "status": "ok",
+      "seconds": 6.3,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "depends of",
+          "corrected": "depends on",
+          "explanation": "Depend fiilinden sonra 'on' edatı kullanılır."
+        }
+      ],
+      "npc_reply": "That makes sense! It looks a bit cloudy out there, doesn't it? Would you like to start your morning with a hot latte and a fresh croissant?",
+      "round": 1
+    },
+    {
+      "id": "h-pr2",
+      "status": "ok",
+      "seconds": 1.94,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "married with",
+          "corrected": "married to",
+          "explanation": "İngilizcede 'evli olmak' ifadesi 'married to' şeklinde kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, a doctor! That sounds busy. Do you two have a lot of plants in your new flat? I'm always moving mine around.",
+      "round": 1
+    },
+    {
+      "id": "h-pr3",
+      "status": "ok",
+      "seconds": 3.56,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "proud for",
+          "corrected": "proud of",
+          "explanation": "Proud sıfatından sonra genellikle 'of' edatı kullanılır."
+        }
+      ],
+      "npc_reply": "That sounds like a great team! Could you tell me a bit more about what you did while working at that hotel?",
+      "round": 1
+    },
+    {
+      "id": "h-vu1",
+      "status": "ok",
+      "seconds": 2.99,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "make a party",
+          "corrected": "have a party",
+          "explanation": "İngilizcede parti vermek için 'have a party' ifadesi kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, a birthday party! That sounds fun. I usually stay home and draw. Do you have many friends coming?",
+      "round": 1
+    },
+    {
+      "id": "h-vu2",
+      "status": "ok",
+      "seconds": 2.0,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "do fewer mistakes",
+          "corrected": "make fewer mistakes",
+          "explanation": "Hata yapmak için 'make' fiili kullanılır."
+        }
+      ],
+      "npc_reply": "That's a great skill to have, especially in a busy travel agency! Could you tell me a bit more about what your daily tasks were in that role?",
+      "round": 1
+    },
+    {
+      "id": "h-vu3",
+      "status": "ok",
+      "seconds": 2.02,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "sympathetic",
+          "corrected": "friendly",
+          "explanation": "İngilizcede 'sympathetic' genellikle birinin üzüntüsünü paylaşmak anlamında kullanılır, arkadaş canlısı demek için 'friendly' daha uygundur."
+        }
+      ],
+      "npc_reply": "Oh, that's so sweet of you to say! I try my best to make everyone feel at home here. By the way, have you seen my blue backpack? I think I left it behind the counter yesterday.",
+      "round": 1
+    },
+    {
+      "id": "h-ok1",
+      "status": "ok",
+      "seconds": 1.8,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that's right! Alex was sitting by the window yesterday afternoon. Did you see what he did with it after that?",
+      "round": 1
+    },
+    {
+      "id": "h-ok2",
+      "status": "ok",
+      "seconds": 2.13,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that is hard work! I am Alex, by the way. I live in flat 3B. What is your name?",
+      "round": 1
+    },
+    {
+      "id": "h-ok3",
+      "status": "ok",
+      "seconds": 3.81,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "That sounds like a busy place! Would you like a coffee or some toast to start your day?",
+      "round": 1
+    },
+    {
+      "id": "h-un1",
+      "status": "ok",
+      "seconds": 4.71,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, green is nice! I love my plants too. Do you need a big flat for your things?",
+      "round": 1
+    },
+    {
+      "id": "h-un2",
+      "status": "ok",
+      "seconds": 6.96,
+      "communication_success": false,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "That is an interesting fact! However, I am looking for someone to join our team at the front desk. Could you tell me a little bit about yourself and why you are interested in this role?",
+      "round": 1
+    },
+    {
+      "id": "h-un3",
+      "status": "ok",
+      "seconds": 8.77,
+      "communication_success": false,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that is interesting! But would you like some milk in your coffee today?",
+      "round": 1
+    },
+    {
+      "id": "h-pr1",
+      "status": "ok",
+      "seconds": 2.37,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "depends of",
+          "corrected": "depends on",
+          "explanation": "Depend fiilinden sonra 'on' edatı kullanılır."
+        }
+      ],
+      "npc_reply": "Fair enough! It's looking a bit cloudy, so maybe an umbrella is a good idea. Would you like to order a hot coffee or tea to warm up while you decide?",
+      "round": 2
+    },
+    {
+      "id": "h-pr2",
+      "status": "ok",
+      "seconds": 4.52,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "married with",
+          "corrected": "married to",
+          "explanation": "İngilizcede evli olmak için 'married to' ifadesi kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, that's nice! A doctor, that sounds like a busy job. Do you two have a lot of plants in your new place?",
+      "round": 2
+    },
+    {
+      "id": "h-pr3",
+      "status": "ok",
+      "seconds": 2.07,
+      "communication_success": true,
+      "detected": [
+        "prepositions"
+      ],
+      "corrections": [
+        {
+          "category": "prepositions",
+          "original": "proud for",
+          "corrected": "proud of",
+          "explanation": "Proud sıfatından sonra genellikle 'of' edatı kullanılır."
+        }
+      ],
+      "npc_reply": "That sounds wonderful. Working well with a team is so important here. Could you tell me more about your responsibilities at that hotel?",
+      "round": 2
+    },
+    {
+      "id": "h-vu1",
+      "status": "ok",
+      "seconds": 4.07,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "make a party",
+          "corrected": "have a party",
+          "explanation": "İngilizcede parti vermek için 'have a party' ifadesi kullanılır."
+        }
+      ],
+      "npc_reply": "Oh, a birthday party! That sounds fun. I usually just stay home and draw. Do you have many friends coming over?",
+      "round": 2
+    },
+    {
+      "id": "h-vu2",
+      "status": "ok",
+      "seconds": 3.76,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "do fewer mistakes",
+          "corrected": "make fewer mistakes",
+          "explanation": "Hata yapmak için 'make' fiili kullanılır."
+        }
+      ],
+      "npc_reply": "That sounds like a very useful skill to have, especially in a busy travel office. Could you tell me a bit more about what kind of tasks you were responsible for in that role?",
+      "round": 2
+    },
+    {
+      "id": "h-vu3",
+      "status": "ok",
+      "seconds": 23.62,
+      "communication_success": true,
+      "detected": [
+        "vocabulary_usage"
+      ],
+      "corrections": [
+        {
+          "category": "vocabulary_usage",
+          "original": "sympathetic",
+          "corrected": "friendly",
+          "explanation": "İngilizcede 'sympathetic' genellikle üzüntü paylaşmak anlamında kullanılır, 'friendly' ise arkadaş canlısı demektir."
+        }
+      ],
+      "npc_reply": "Oh, that's so kind of you to say! I try my best to keep everyone happy here. But listen, I'm a bit worried—have you seen my blue backpack anywhere since yesterday?",
+      "round": 2
+    },
+    {
+      "id": "h-ok1",
+      "status": "ok",
+      "seconds": 2.14,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that's interesting! So Alex had it after Olivia? I'm so worried about my notebook. Do you remember what time you saw Alex with my blue bag?",
+      "round": 2
+    },
+    {
+      "id": "h-ok2",
+      "status": "ok",
+      "seconds": 3.25,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that is hard work! I am Alex, I live in 3B. What do you do every day?",
+      "round": 2
+    },
+    {
+      "id": "h-ok3",
+      "status": "ok",
+      "seconds": 3.61,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, that is close! Do you want a coffee or a tea today?",
+      "round": 2
+    },
+    {
+      "id": "h-un1",
+      "status": "ok",
+      "seconds": 6.23,
+      "communication_success": true,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "Oh, green is nice! I love plants, so my flat is very green too. Do you need a big place to live?",
+      "round": 2
+    },
+    {
+      "id": "h-un2",
+      "status": "ok",
+      "seconds": 4.15,
+      "communication_success": false,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "That is an interesting fact, but I am not sure how it relates to our job opening. Could you please tell me a little bit about yourself and your background?",
+      "round": 2
+    },
+    {
+      "id": "h-un3",
+      "status": "ok",
+      "seconds": 53.65,
+      "communication_success": false,
+      "detected": [],
+      "corrections": [],
+      "npc_reply": "That is interesting! But would you like milk in your coffee today?",
+      "round": 2
+    }
+  ]
+}

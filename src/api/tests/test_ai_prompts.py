@@ -25,7 +25,7 @@ from tests.ai_fakes import job_interview_context
 
 def test_the_context_has_no_room_for_user_or_account_data():
     # If a field such as user_email or api_key is ever added here, this test forces a conscious decision
-    assert {f.name for f in dataclasses.fields(DialogueContext)} == {"npc", "quest", "level", "story_summary", "history", "objectives_met"}
+    assert {f.name for f in dataclasses.fields(DialogueContext)} == {"npc", "quest", "level", "story_summary", "history", "objectives_met", "practice_focus"}
     assert {f.name for f in dataclasses.fields(NpcProfile)} == {"name", "role", "personality", "speaking_style", "knows"}
     assert {f.name for f in dataclasses.fields(QuestBrief)} == {"title", "summary", "objectives", "allowed_story_actions"}
     assert {f.name for f in dataclasses.fields(HistoryLine)} == {"speaker", "text"}
