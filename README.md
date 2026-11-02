@@ -304,6 +304,22 @@ yedek cevap verir ve oyunda hiçbir şey değişmez. Model adı `AI_MODEL` ile d
 PostgreSQL bilgisayarınızda **5433** portundan erişilebilir (yerel bir PostgreSQL ile çakışmaması
 için). Gerekirse `.env` içindeki `POSTGRES_PORT` ile değiştirilebilir.
 
+**Gizli anahtar (`SECRET_KEY`):** giriş token'larını imzalar; bilen herkes herhangi bir oyuncu olarak
+giriş yapabilir. Kendi bilgisayarınız dışında kullanmadan önce rastgele bir anahtar üretip `.env`'e yazın:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+`ENVIRONMENT=development` (varsayılan) iken varsayılan ya da kısa bir anahtar yalnızca uyarı olarak
+loglanır. Başka bir ortamda (ör. `ENVIRONMENT=production`) anahtar varsayılan değer, `.env.example`
+içindeki örnek değer ya da 32 karakterden kısaysa uygulama başlamaz.
+
+**Değiştirilebilen ayarlar:** `.env.example` içindeki her ayar Docker'da `api` konteynerine aktarılır
+(`docker-compose.yml`): `ENVIRONMENT`, `SECRET_KEY`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `AI_*` ve deneme
+sınırları (`DIALOGUE_RATE_*`, `LOGIN_RATE_*`, `REGISTER_RATE_*`, `PASSWORD_CHECK_RATE_*`). `.env`'i değiştirdikten sonra
+`docker compose up -d` konteyneri yeni değerlerle yeniden oluşturur.
+
 ### Docker olmadan (yalnızca backend geliştirme)
 
 **Gereksinimler:** Python 3.12+ ve çalışan bir PostgreSQL (örneğin `docker compose up db`).
