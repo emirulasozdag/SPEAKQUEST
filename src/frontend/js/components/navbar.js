@@ -25,7 +25,7 @@ function gameNav() {
     <button class="navbar-toggler border-light" type="button" data-bs-toggle="collapse"
             data-bs-target="#sq-nav" aria-controls="sq-nav" aria-expanded="false"
             aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon" style="filter: invert(1)"></span>
+      <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="sq-nav">
       <ul class="navbar-nav me-auto">${GAME_LINKS.map(linkItem).join("")}</ul>

@@ -427,6 +427,15 @@ AI adımının süresi (`ai analysis ... ms`). Loga istek/cevap gövdesi, sorgu 
 başlığıyla reddedilir ve AI çağrılmaz. Bu, paylaşılan ücretsiz AI kotasını tek bir oyuncunun
 tüketmesini önler.
 
+## Güvenlik başlıkları
+
+Her cevapta `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY` ve
+`Referrer-Policy: strict-origin-when-cross-origin` bulunur. Sayfalar bir Content Security Policy ile
+sunulur: betikler yalnızca bu sunucudan ve sürümü sabit Bootstrap CDN'inden yüklenir, satır içi betik ve
+stil niteliği kullanılmaz, sayfa başka bir sitede çerçeve içinde açılamaz. Politika
+`src/api/app/core/security_headers.py` içindedir; yeni bir dış kaynak eklenirse orada da izin verilmelidir.
+`/api/docs` (Swagger) kendi satır içi betiğini kullandığı için CSP dışında tutulur.
+
 ## Test
 
 Backend testleri `pytest` ile yazılır. Her Pull Request'te GitHub Actions üzerinde otomatik çalışır.

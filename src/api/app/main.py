@@ -10,6 +10,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.core.config import check_secret_key, get_settings
 from app.core.errors import http_error_handler, validation_error_handler
 from app.core.logging import RequestContextMiddleware, configure_logging
+from app.core.security_headers import SecurityHeadersMiddleware
 from app.routers import auth, dialogue, health, learning, locations, player, quests, story
 
 settings = get_settings()
@@ -28,6 +29,8 @@ app.add_exception_handler(RequestValidationError, validation_error_handler)
 app.add_exception_handler(StarletteHTTPException, http_error_handler)
 # Request id, access log and the JSON answer for unexpected errors (core/logging.py)
 app.add_middleware(RequestContextMiddleware)
+# Added last, so it is the outermost layer and also covers error responses (core/security_headers.py)
+app.add_middleware(SecurityHeadersMiddleware)
 
 for router in (health, auth, player, locations, quests, dialogue, learning, story):
     app.include_router(router.router, prefix="/api")
