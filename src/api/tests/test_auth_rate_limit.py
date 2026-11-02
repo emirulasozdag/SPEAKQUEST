@@ -2,6 +2,7 @@ import pytest
 
 from app.core.config import get_settings
 from app.core.rate_limit import TOO_MANY_ATTEMPTS, RateLimiter
+from app.routers.auth import login_limiter
 
 REGISTER_URL = "/api/auth/register"
 LOGIN_URL = "/api/auth/login"
@@ -182,3 +183,68 @@ def test_the_password_limit_is_per_account(client, few_password_checks, session)
     token = client.post(LOGIN_URL, json={"email": "other@example.com", "password": "secret-pass"}).json()["access_token"]
 
     assert change(client, {"Authorization": f"Bearer {token}"}).status_code == 403
+
+
+# --- memory: only active keys are kept (#76) ----------------------------------------------------
+
+
+@pytest.fixture
+def clock(monkeypatch):
+    now = [1000.0]
+    monkeypatch.setattr("app.core.rate_limit.time.monotonic", lambda: now[0])
+    return now
+
+
+def test_asking_about_a_key_never_stores_it(clock):
+    limiter = RateLimiter()
+
+    for index in range(100):
+        assert limiter.retry_after(f"user{index}@example.com|1.2.3.4", limit=5, window=60) is None
+
+    assert len(limiter) == 0
+
+
+def test_a_key_whose_hits_left_the_window_is_removed_when_asked_again(clock):
+    limiter = RateLimiter()
+    limiter.hit("key", window=60)
+    clock[0] += 61
+
+    assert limiter.retry_after("key", limit=1, window=60) is None
+    assert len(limiter) == 0
+
+
+def test_a_periodic_sweep_drops_expired_keys_and_keeps_active_ones(clock):
+    limiter = RateLimiter()
+    for index in range(1000):
+        limiter.hit(f"old{index}", window=60)
+    clock[0] += 30
+    limiter.hit("recent", window=60)
+    assert len(limiter) == 1001
+
+    # Past the old keys' window and past the sweep interval: the next hit sweeps
+    clock[0] += 40
+    limiter.hit("new", window=60)
+
+    assert len(limiter) == 2
+    assert limiter.retry_after("recent", limit=1, window=60) is not None
+
+
+def test_keys_with_a_long_window_survive_a_sweep(clock):
+    limiter = RateLimiter()
+    limiter.hit("password-check", window=900)
+    clock[0] += RateLimiter.SWEEP_INTERVAL + 1
+    limiter.hit("other", window=60)
+
+    assert limiter.retry_after("password-check", limit=1, window=900) is not None
+
+
+def test_many_failed_logins_with_different_emails_do_not_pile_up(client, clock):
+    for index in range(50):
+        client.post(LOGIN_URL, json={"email": f"nobody{index}@example.com", "password": "wrong-pass"})
+    stored = len(login_limiter)
+    assert stored == 50
+
+    clock[0] += 120
+    client.post(LOGIN_URL, json={"email": "last@example.com", "password": "wrong-pass"})
+
+    assert len(login_limiter) == 1
