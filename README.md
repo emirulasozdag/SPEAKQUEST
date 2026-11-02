@@ -192,7 +192,7 @@ doğru kategori bulunur. Yöntem, önce/sonra karşılaştırması ve sınırlar
 | Frontend | HTML5, CSS3, JavaScript, Bootstrap |
 | Backend | Python, FastAPI, REST API |
 | Veritabanı | PostgreSQL, SQLAlchemy ORM |
-| Yapay Zekâ | Gemini API veya OpenAI API (karar verilecek) |
+| Yapay Zekâ | Google Gemini API ([karar belgesi](docs/decisions/0001-ai-provider.md)) |
 | Altyapı | Docker, Docker Compose, Alembic (migration), GitHub Actions (CI) |
 | Araçlar | Git, GitHub, VS Code, Postman, pytest |
 
@@ -206,7 +206,7 @@ flowchart LR
     U[Kullanıcı<br/>Tarayıcı] -->|REST / JSON| API[FastAPI Backend]
     API --> AUTH[Auth & Player]
     API --> DLG[Dialogue Service]
-    DLG -->|kontrollü bağlam| AI[(LLM API<br/>Gemini / OpenAI)]
+    DLG -->|kontrollü bağlam| AI[(LLM API<br/>Gemini)]
     AI -->|yapılandırılmış JSON| VAL[Cevap Doğrulama]
     VAL --> LE[Learning Engine]
     VAL --> SE[Story Engine]
@@ -233,7 +233,7 @@ Bir mesajın yolculuğu:
 ```
 SPEAKQUEST/
 ├── .github/
-│   ├── workflows/ci.yml            # her PR'da pytest çalıştıran GitHub Actions
+│   ├── workflows/ci.yml            # her PR'da testleri ve migration'ları kontrol eden GitHub Actions
 │   ├── ISSUE_TEMPLATE/             # görev ve hata şablonları
 │   └── pull_request_template.md
 ├── src/
@@ -246,19 +246,29 @@ SPEAKQUEST/
 │   │   │   ├── routers/            # REST endpointleri (/api/...)
 │   │   │   ├── services/ai/        # LLM istemcisi ve prompt'lar
 │   │   │   ├── engines/            # learning, story, quest motorları ve hata kategorileri
-│   │   │   └── content/            # hikâye içeriği: mekânlar, NPC'ler, görevler, sonlar (JSON)
+│   │   │   └── content/            # hikâye içeriği (JSON) ve seed komutu
 │   │   ├── alembic/                # veritabanı migration'ları
+│   │   ├── scripts/                # AI sağlayıcı karşılaştırması ve hata analizi değerlendirmesi
 │   │   ├── tests/                  # pytest testleri
 │   │   ├── Dockerfile
 │   │   ├── requirements.txt        # çalışma bağımlılıkları
 │   │   └── requirements-dev.txt    # test bağımlılıkları
 │   └── frontend/                   # HTML, CSS, JS, Bootstrap
-├── docs/                           # veri modeli ve story bible (hikâye, görevler, içerik formatı)
 │       ├── index.html              # landing sayfası
 │       ├── pages/                  # diğer sayfalar
 │       ├── css/main.css            # tasarım değişkenleri ve ortak bileşenler
-│       ├── js/                     # api istemcisi, durum yönetimi, ortak bileşenler
-│       └── assets/
+│       ├── js/                     # api istemcisi, durum yönetimi, ortak bileşenler, sayfa betikleri
+│       └── assets/                 # logo, portreler, avatarlar, sahneler
+├── docs/
+│   ├── data-model.md               # veritabanı tabloları ve modüller arası sınırlar
+│   ├── story-bible.md              # hikâye, görevler ve içerik formatı
+│   ├── learning-engine.md          # beceri puanı, tekrar eden hata ve hedef seçimi
+│   ├── quest-engine.md             # görev önerisi kuralları ve puanlama
+│   ├── design-system.md            # renkler, tipografi, bileşenler, erişilebilirlik
+│   ├── demo.md                     # sunum senaryosu ve gerçek AI ile oynanış
+│   ├── decisions/                  # mimari kararlar (ör. AI sağlayıcısı seçimi)
+│   ├── evaluation/                 # hata analizi değerlendirme seti ve sonuçları
+│   └── screenshots/                # demo ekran görüntüleri
 ├── docker-compose.yml              # PostgreSQL + API geliştirme ortamı
 ├── .env.example                    # örnek ortam değişkenleri (gerçek anahtar içermez)
 └── README.md
@@ -322,15 +332,25 @@ sınırları (`DIALOGUE_RATE_*`, `LOGIN_RATE_*`, `REGISTER_RATE_*`, `PASSWORD_CH
 
 ### Docker olmadan (yalnızca backend geliştirme)
 
-**Gereksinimler:** Python 3.12+ ve çalışan bir PostgreSQL (örneğin `docker compose up db`).
+**Gereksinimler:** Python 3.12+ ve çalışan bir PostgreSQL (örneğin `docker compose up db`, 5433 portunda).
 
 ```bash
+cp .env.example .env            # Windows: copy .env.example .env
 cd src/api
 python -m venv .venv
 .venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
 pip install -r requirements-dev.txt
+alembic upgrade head
+python -m app.content.seed
 uvicorn app.main:app --reload
 ```
+
+`alembic upgrade head` tabloları oluşturur, `python -m app.content.seed` mekânları, NPC'leri ve görevleri
+yükler (ikisi de tekrar çalıştırılabilir). Uygulama <http://localhost:8000> adresinde açılır.
+
+Ayarlar `src/api` içinden çalıştırılsa da proje kökündeki `.env`'den okunur (`app/core/config.py`).
+`src/api` içinde ayrı bir `.env` varsa onun değerleri önceliklidir. Veritabanı adresi `.env` içindeki
+`DATABASE_URL`'dir; AI için aynı dosyaya `AI_PROVIDER=gemini` ve `AI_API_KEY` yazılır.
 
 ### Veritabanı migration'ları
 
@@ -342,7 +362,9 @@ docker compose exec api alembic revision --autogenerate -m "create player_profil
 docker compose restart api
 ```
 
-Mevcut tablolar: `users` ve `player_profiles`. Şifreler yalnızca bcrypt hash'i olarak saklanır.
+Mevcut tablolar: `users`, `player_profiles`, `locations`, `npcs`, `quest_templates`, `quest_progress`,
+`dialogue_messages`, `language_errors`, `skill_observations`, `story_states`, `npc_relationships` ve
+`story_decisions`. Şifreler yalnızca bcrypt hash'i olarak saklanır.
 Tüm MVP tabloları, ilişkileri ve hangi iş paketine ait oldukları [docs/data-model.md](docs/data-model.md)
 içinde anlatılır. Yeni bir tablo ekleyen PR bu dokümanı da günceller.
 
@@ -496,13 +518,14 @@ Proje GitHub Flow ile geliştirilir:
 
 - [x] **Aşama 1 – Altyapı:** klasör yapısı, FastAPI projesi, PostgreSQL bağlantısı, ortam değişkenleri,
   Docker, CI ve tüm sayfaların UI taslağı
-- [ ] **Aşama 2 – Veritabanı ve kullanıcı sistemi:** SQLAlchemy modelleri, kayıt/giriş, karakter profili
-- [ ] **Aşama 3 – Frontend:** ortak tasarım sistemi, temel sayfalar, responsive tasarım, harita ve görev ekranları
-- [ ] **Aşama 4 – Temel oyun sistemi:** mekânlar, NPC'ler, görev kuralları, XP, hikâye durumu
-- [ ] **Aşama 5 – AI entegrasyonu:** AI servis katmanı, NPC diyalogları, hata analizi, JSON doğrulama
-- [ ] **Aşama 6 – Learning Engine:** hata kategorileri, beceri puanları, gelişim verileri
-- [ ] **Aşama 7 – Adaptive Story Engine:** kararlar, NPC ilişkileri, kişiye göre görev seçimi, farklı sonlar
+- [x] **Aşama 2 – Veritabanı ve kullanıcı sistemi:** SQLAlchemy modelleri, kayıt/giriş, karakter profili
+- [x] **Aşama 3 – Frontend:** ortak tasarım sistemi, temel sayfalar, responsive tasarım, harita ve görev ekranları
+- [x] **Aşama 4 – Temel oyun sistemi:** mekânlar, NPC'ler, görev kuralları, XP, hikâye durumu
+- [x] **Aşama 5 – AI entegrasyonu:** AI servis katmanı, NPC diyalogları, hata analizi, JSON doğrulama
+- [x] **Aşama 6 – Learning Engine:** hata kategorileri, beceri puanları, gelişim verileri
+- [x] **Aşama 7 – Adaptive Story Engine:** kararlar, NPC ilişkileri, kişiye göre görev seçimi, farklı sonlar
 - [ ] **Aşama 8 – Test ve tamamlama:** unit ve API testleri, demo senaryoları, dokümantasyon
+  (testler ve demo hazır; README'nin son kontrolü ve `v1.0.0` sürümü #23'te)
 
 **Sonraki sürümler için fikirler:** sesli konuşma modu, yeni şehirler ve karakterler, premium hikâye
 paketleri, gelişmiş öğrenme analizi, eğitim kurumlarına özel kullanım.

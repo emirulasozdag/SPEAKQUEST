@@ -9,6 +9,7 @@ import pytest
 from app.core.config import (
     DEFAULT_SECRET_KEY,
     EXAMPLE_SECRET_KEY,
+    ROOT_ENV_FILE,
     InsecureSecretKeyError,
     Settings,
     check_secret_key,
@@ -18,6 +19,27 @@ from app.core.config import (
 ROOT = Path(__file__).resolve().parents[3]
 GOOD_KEY = "k" * 48
 LOGGER = logging.getLogger("speakquest.test")
+
+
+def test_the_repository_env_file_is_read_even_from_src_api():
+    # Running uvicorn in src/api must still find the .env next to docker-compose.yml (#70)
+    assert ROOT_ENV_FILE == ROOT / ".env"
+    assert Settings.model_config["env_file"] == (ROOT_ENV_FILE, ".env")
+
+
+def test_a_env_file_in_the_working_directory_wins_over_the_repository_one(tmp_path, monkeypatch):
+    monkeypatch.delenv("AI_MODEL", raising=False)
+    monkeypatch.delenv("AI_PROVIDER", raising=False)
+    root_env = tmp_path / "root.env"
+    root_env.write_text("AI_PROVIDER=gemini\nAI_MODEL=from-root\n", encoding="utf-8")
+    (tmp_path / ".env").write_text("AI_MODEL=from-cwd\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    _, cwd_env = Settings.model_config["env_file"]
+    settings = Settings(_env_file=(root_env, cwd_env))
+
+    assert settings.ai_provider == "gemini"
+    assert settings.ai_model == "from-cwd"
 
 
 @pytest.mark.parametrize("key", [DEFAULT_SECRET_KEY, EXAMPLE_SECRET_KEY, "short-but-random"])
