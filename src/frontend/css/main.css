@@ -161,6 +161,11 @@ h3 { font-size: 1.25rem; }
   height: 2rem;
 }
 
+/* The menu icon is drawn dark by Bootstrap; the header is dark, so it is turned light */
+.sq-header .navbar-toggler-icon {
+  filter: invert(1);
+}
+
 .sq-header .nav-link {
   color: var(--sq-on-dark-soft);
 }
