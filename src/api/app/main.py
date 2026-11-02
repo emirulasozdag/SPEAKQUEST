@@ -1,17 +1,21 @@
 """FastAPI entry point: registers the API routers and serves the static frontend."""
 
+import logging
+
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.core.config import get_settings
+from app.core.config import check_secret_key, get_settings
 from app.core.errors import http_error_handler, validation_error_handler
 from app.core.logging import RequestContextMiddleware, configure_logging
 from app.routers import auth, dialogue, health, learning, locations, player, quests, story
 
 settings = get_settings()
 configure_logging()
+# Stops the app here, before it serves anything, when the key is unsafe outside development
+check_secret_key(settings, logging.getLogger("speakquest.startup"))
 
 app = FastAPI(
     title=settings.app_name,
