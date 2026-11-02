@@ -22,7 +22,7 @@ from app.models.content import Npc, QuestTemplate
 from app.models.dialogue import PLAYER_MESSAGE_MAX_LENGTH, DialogueMessage, MessageRole
 from app.models.learning import LanguageError
 from app.models.player import EnglishLevel
-from app.models.quest_progress import QuestProgress
+from app.models.quest_progress import QuestProgress, QuestProgressStatus
 from app.services.ai.analysis import analyze_message
 from app.services.ai.client import AiClient
 from app.services.ai.prompts import (
@@ -49,7 +49,9 @@ class MessageRefusedError(Exception):
     """The message cannot be sent. `reason` is stable, `message` is for the player."""
 
     def __init__(
-        self, reason: Literal["empty", "too_long", "no_active_quest", "no_character"], message: str
+        self,
+        reason: Literal["empty", "too_long", "no_active_quest", "no_character", "quest_changed"],
+        message: str,
     ) -> None:
         super().__init__(message)
         self.reason = reason
@@ -157,6 +159,11 @@ def send_message(db: Session, user_id: int, text: str, client: AiClient | None) 
     transaction, and only after the AI reply was validated: both messages are stored, the Learning
     Engine records the mistakes, and the Story Engine accepts or refuses the suggested action.
     If the AI fails, nothing is stored and nothing changes.
+
+    The AI call can take many seconds, so no transaction (and no database connection) is held
+    while it runs. Afterwards the quest's progress row is locked and read again: objectives met by
+    another message in the meantime are kept, and if the quest was completed, reset or deleted
+    meanwhile, nothing is written and MessageRefusedError("quest_changed") is raised.
     """
     text = text.strip()
     if not text:
@@ -170,13 +177,21 @@ def send_message(db: Session, user_id: int, text: str, client: AiClient | None) 
     if active is None:
         raise MessageRefusedError("no_active_quest", "Start a quest before talking to someone.")
 
-    quest, progress = active.quest, active.progress
-    context = _dialogue_context(db, user_id, quest, progress, EnglishLevel(profile.english_level))
+    quest, progress_id = active.quest, active.progress.id
+    context = _dialogue_context(db, user_id, quest, active.progress, EnglishLevel(profile.english_level))
+    # Read-only so far: end the transaction so the connection goes back to the pool during the call
+    db.rollback()
     result = analyze_message(client, context, text)
     if not result.ok:
         return DialogueTurn(status="ai_unavailable", quest_id=quest.id, npc_reply=result.npc_reply)
 
     analysis = result.analysis
+    progress = _lock_active_progress(db, progress_id)
+    if progress is None:
+        db.rollback()
+        raise MessageRefusedError(
+            "quest_changed", "This quest changed while your message was on its way. Nothing was saved."
+        )
     player_message = DialogueMessage(
         quest_progress_id=progress.id,
         role=MessageRole.PLAYER,
@@ -225,6 +240,20 @@ def send_message(db: Session, user_id: int, text: str, client: AiClient | None) 
         ),
         newly_met=outcome.newly_met,
     )
+
+
+def _lock_active_progress(db: Session, progress_id: int) -> QuestProgress | None:
+    """The quest's progress row, locked until commit and read fresh; None when it is no longer an
+    active quest (completed, reset or deleted while the AI was answering)."""
+    progress = db.execute(
+        select(QuestProgress)
+        .where(QuestProgress.id == progress_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    ).scalar_one_or_none()
+    if progress is None or progress.status != QuestProgressStatus.ACTIVE:
+        return None
+    return progress
 
 
 def _dialogue_context(

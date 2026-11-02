@@ -30,6 +30,7 @@ _REFUSAL_STATUS = {
     "too_long": status.HTTP_422_UNPROCESSABLE_ENTITY,
     "no_active_quest": status.HTTP_409_CONFLICT,
     "no_character": status.HTTP_409_CONFLICT,
+    "quest_changed": status.HTTP_409_CONFLICT,
 }
 
 
