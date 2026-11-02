@@ -8,10 +8,13 @@ from app.engines.progression import level_for_xp
 from app.models.content import QuestTemplate
 from app.models.player import PlayerProfile
 from app.models.quest_progress import QuestProgress
+from app.models.story import StoryDecision
 from app.models.user import User
 from app.services import quests as quest_service
+from app.services.story import open_decision_ids
 from tests.test_dialogue_history import add_messages
 from tests.test_player_profile import VALID_PROFILE, login_headers
+from tests.test_quests import complete_in_db
 
 EMAIL = "deniz@example.com"
 STARTER = "meet_your_neighbor"
@@ -49,10 +52,22 @@ def start(client, headers, quest: QuestTemplate) -> None:
     assert client.post(f"/api/quests/{quest.id}/start", headers=headers).status_code == 201
 
 
-def meet_objectives(db_session, email: str, quest: QuestTemplate, ids: list[str] | None = None) -> None:
-    """What the dialogue checks (#31) will write once the player reaches each objective."""
+def meet_objectives(
+    db_session, email: str, quest: QuestTemplate, ids: list[str] | None = None, decide_the_rest: bool = True
+) -> None:
+    """What the dialogue checks (#31) will write once the player reaches each objective.
+
+    A quest with an open decision cannot be completed (#68), so by default every decision the
+    player has not made yet is recorded with its last option, which in the content has no effects.
+    """
     progress = progress_of(db_session, email, quest)
     progress.objectives_met = [o["id"] for o in quest.objectives] if ids is None else ids
+    if decide_the_rest:
+        for point in open_decision_ids(db_session, progress.user_id, quest):
+            last = next(p for p in quest.decision_points if p["id"] == point)["options"][-1]["id"]
+            db_session.add(
+                StoryDecision(user_id=progress.user_id, quest_template_id=quest.id, decision_key=point, choice=last)
+            )
     db_session.commit()
 
 
@@ -249,3 +264,58 @@ def test_xp_adds_up_across_quests(client, headers, db_session):
     assert body["xp_gained"] == second.rewards["xp"]
     assert body["xp"] == total
     assert body["level"] == level_for_xp(total)
+
+
+# --- open decisions (#68) ---------------------------------------------------------------------
+
+
+def test_a_quest_with_an_open_decision_cannot_be_completed_and_nothing_changes(client, headers, db_session):
+    quest = quest_by_slug(db_session, "meet_your_neighbor")
+    start(client, headers, quest)
+    meet_objectives(db_session, EMAIL, quest, decide_the_rest=False)
+
+    response = complete(client, headers, quest)
+
+    assert response.status_code == 409
+    assert response.json()["detail"] == "Make your choice before finishing this quest."
+    assert progress_of(db_session, EMAIL, quest).status == "active"
+    assert profile_of(db_session, EMAIL).xp == 0
+    story = client.get("/api/story/state", headers=headers).json()
+    assert all(npc["trust"] == 0 for npc in story["npcs"])
+
+
+def test_after_the_decision_the_quest_can_be_completed(client, headers, db_session):
+    quest = quest_by_slug(db_session, "meet_your_neighbor")
+    start(client, headers, quest)
+    meet_objectives(db_session, EMAIL, quest, decide_the_rest=False)
+    payload = {"quest_id": quest.id, "decision_id": "help_alex_move", "option_id": "not_now"}
+    assert client.post("/api/story/decision", json=payload, headers=headers).status_code == 201
+
+    assert complete(client, headers, quest).status_code == 200
+
+
+def test_a_quest_without_decision_points_needs_no_decision(client, headers, db_session):
+    complete_in_db(db_session, EMAIL, "meet_your_neighbor")
+    interview = quest_by_slug(db_session, "the_job_interview")
+    assert interview.decision_points == []
+    start(client, headers, interview)
+    meet_objectives(db_session, EMAIL, interview, decide_the_rest=False)
+
+    assert complete(client, headers, interview).status_code == 200
+
+
+def test_the_story_cannot_end_while_a_decision_is_still_open(client, headers, db_session):
+    """The #68 scenario: no to Alex, the interview done, the café about to be finished silently."""
+    for slug in ("meet_your_neighbor", "the_job_interview"):
+        complete_in_db(db_session, EMAIL, slug)
+    cafe = quest_by_slug(db_session, "morning_at_the_cafe")
+    start(client, headers, cafe)
+    meet_objectives(db_session, EMAIL, cafe, decide_the_rest=False)
+
+    assert complete(client, headers, cafe).status_code == 409
+    assert client.get("/api/story/ending", headers=headers).status_code == 404
+    payload = {"quest_id": cafe.id, "decision_id": "watch_mia_bag", "option_id": "watch"}
+    assert client.post("/api/story/decision", json=payload, headers=headers).status_code == 201
+    body = complete(client, headers, cafe).json()
+    assert [quest["slug"] for quest in body["unlocked_quests"]] == ["the_missing_backpack"]
+    assert body["ending"] is None

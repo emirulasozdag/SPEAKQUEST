@@ -53,6 +53,8 @@ class QuestProgress(Base):
     status: Mapped[str] = mapped_column(String(12))
     # Objective ids the backend has verified; never written from what the client or the AI claims
     objectives_met: Mapped[list] = mapped_column(JSON, default=list)
+    # Trust that story actions in this quest's conversation added; capped by the Story Engine
+    story_trust_gained: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     # XP given on completion; a non-zero value stops the same quest paying twice
     xp_awarded: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

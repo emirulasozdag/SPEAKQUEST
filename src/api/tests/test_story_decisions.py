@@ -6,9 +6,11 @@ from sqlalchemy import func, select
 from app.content.schema import Effects, Ending, load_content
 from app.content.seed import seed_content
 from app.engines.story import StoryProgress, apply_decision, choose_ending
+from app.models.content import QuestTemplate
 from app.models.story import StoryDecision
 from app.services import story as story_service
 from tests.test_player_profile import VALID_PROFILE, login_headers
+from tests.test_quest_complete import meet_objectives
 from tests.test_story_state import EMAIL, play, quest_by_slug, user_id_of
 
 DECISION_URL = "/api/story/decision"
@@ -104,41 +106,50 @@ def test_decisions_require_a_token(client):
     assert client.get("/api/story/decisions/1").status_code == 401
 
 
+def finish(client, headers, db_session, quest_id: int):
+    """Meet the quest's objectives and complete it; the decision must already be made."""
+    quest = db_session.get(QuestTemplate, quest_id)
+    meet_objectives(db_session, EMAIL, quest, decide_the_rest=False)
+    return client.post(f"/api/quests/{quest_id}/complete", headers=headers)
+
+
 def test_helping_alex_sets_the_flag_raises_trust_and_unlocks_the_flat_viewing(client, headers, db_session):
-    play(client, headers, db_session, "meet_your_neighbor")
-    assert statuses(client, headers)["the_flat_viewing"] == "locked"
+    quest_id = start(client, headers, db_session, "meet_your_neighbor")
     alex_before = trust_of(client, headers, "alex")
 
-    response = decide(client, headers, quest_by_slug(db_session, "meet_your_neighbor").id, "help_alex_move", "help")
+    response = decide(client, headers, quest_id, "help_alex_move", "help")
 
     assert response.status_code == 201
     body = response.json()
     assert "helped_alex" in body["flags"]
     assert body["npcs"] == [{"slug": "alex", "name": "Alex", "trust": alex_before + 15}]
-    assert [quest["slug"] for quest in body["unlocked_quests"]] == ["the_flat_viewing"]
-    assert statuses(client, headers)["the_flat_viewing"] == "available"
     assert trust_of(client, headers, "alex") == alex_before + 15
+    # The flag counts once the quest itself is finished
+    completed = finish(client, headers, db_session, quest_id).json()
+    assert "the_flat_viewing" in [quest["slug"] for quest in completed["unlocked_quests"]]
+    assert statuses(client, headers)["the_flat_viewing"] == "available"
 
 
 def test_saying_no_keeps_the_flat_viewing_locked(client, headers, db_session):
-    play(client, headers, db_session, "meet_your_neighbor")
+    quest_id = start(client, headers, db_session, "meet_your_neighbor")
 
-    response = decide(client, headers, quest_by_slug(db_session, "meet_your_neighbor").id, "help_alex_move", "not_now")
+    response = decide(client, headers, quest_id, "help_alex_move", "not_now")
 
     assert response.status_code == 201
     assert response.json()["flags"] == []
-    assert response.json()["unlocked_quests"] == []
+    completed = finish(client, headers, db_session, quest_id).json()
+    assert "the_flat_viewing" not in [quest["slug"] for quest in completed["unlocked_quests"]]
     assert statuses(client, headers)["the_flat_viewing"] == "locked"
 
 
 def test_watching_mias_bag_unlocks_a_different_quest(client, headers, db_session):
     play(client, headers, db_session, "meet_your_neighbor")
-    play(client, headers, db_session, "morning_at_the_cafe")
-    assert statuses(client, headers)["the_missing_backpack"] == "locked"
+    cafe = start(client, headers, db_session, "morning_at_the_cafe")
 
-    response = decide(client, headers, quest_by_slug(db_session, "morning_at_the_cafe").id, "watch_mia_bag", "watch")
+    decide(client, headers, cafe, "watch_mia_bag", "watch")
+    completed = finish(client, headers, db_session, cafe).json()
 
-    assert [quest["slug"] for quest in response.json()["unlocked_quests"]] == ["the_missing_backpack"]
+    assert [quest["slug"] for quest in completed["unlocked_quests"]] == ["the_missing_backpack"]
     # The other branch stays closed: each quest depends on its own decision
     assert statuses(client, headers)["the_flat_viewing"] == "locked"
 

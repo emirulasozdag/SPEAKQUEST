@@ -18,11 +18,9 @@ from app.schemas.story import (
     NpcRelationshipOut,
     StoryLocationOut,
     StoryStateOut,
-    UnlockedQuestOut,
 )
 from app.services import learning as learning_service
 from app.services import players as player_service
-from app.services import quests as quest_service
 from app.services import story as story_service
 
 router = APIRouter(prefix="/story", tags=["story"])
@@ -123,9 +121,8 @@ def story_decision(
     db: Session = Depends(get_db),
 ) -> DecisionResultOut:
     """Make one of a started quest's decisions. 400 unknown decision or option, 409 when it was
-    already made or the quest is not started. The Story Engine applies its flags and trust."""
-    quests = quest_service.list_player_quests(db, current_user.id)
-    locked_before = {item.quest.id for item in quests if item.status == quest_service.QuestStatus.LOCKED}
+    already made or the quest is not started. The Story Engine applies its flags and trust; the
+    quests a decision opens are reported when the quest is completed."""
     try:
         result = story_service.make_decision(
             db, current_user.id, payload.quest_id, payload.decision_id, payload.option_id
@@ -133,16 +130,10 @@ def story_decision(
     except story_service.DecisionRefusedError as refused:
         raise HTTPException(status_code=_REFUSAL_STATUS[refused.reason], detail=refused.message) from None
 
-    unlocked = [
-        item.quest
-        for item in quest_service.list_player_quests(db, current_user.id)
-        if item.quest.id in locked_before and item.status != quest_service.QuestStatus.LOCKED
-    ]
     names = dict(db.execute(select(Npc.slug, Npc.name).where(Npc.slug.in_(result.trust))).tuples().all())
     return DecisionResultOut(
         decision_id=payload.decision_id,
         option_id=payload.option_id,
         flags=sorted(result.flags),
         npcs=[NpcRelationshipOut(slug=slug, name=names[slug], trust=trust) for slug, trust in result.trust.items()],
-        unlocked_quests=[UnlockedQuestOut(id=quest.id, slug=quest.slug, title=quest.title) for quest in unlocked],
     )

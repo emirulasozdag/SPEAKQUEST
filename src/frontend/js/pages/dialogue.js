@@ -30,7 +30,16 @@ const completeBox = document.querySelector("#complete-box");
 const completeButton = document.querySelector("#complete-button");
 const resultBox = document.querySelector("#result-box");
 
-const state = { quest: null, npc: null, place: null, sending: false, finished: false };
+const state = {
+  quest: null,
+  npc: null,
+  place: null,
+  sending: false,
+  finished: false,
+  objectives: [],
+  // Story decisions of this quest not made yet; "Complete quest" waits for them
+  openDecisions: 0,
+};
 
 function categoryLabel(category) {
   const text = category.replaceAll("_", " ");
@@ -197,7 +206,11 @@ function showObjectives(objectives) {
   bar.setAttribute("aria-valuemax", String(objectives.length));
   bar.firstElementChild.style.width = `${objectives.length ? (done / objectives.length) * 100 : 0}%`;
   document.querySelector("#objective-text").textContent = `${done} of ${objectives.length} goals done`;
-  completeBox.hidden = state.finished || !objectives.length || done < objectives.length;
+  state.objectives = objectives;
+  const allDone = !state.finished && objectives.length > 0 && done === objectives.length;
+  // A quest cannot be completed with a decision left open, so point to the choice instead
+  completeBox.hidden = !allDone || state.openDecisions > 0;
+  document.querySelector("#decision-note").hidden = !allDone || state.openDecisions === 0;
 }
 
 // Goals are verified by the backend, so they are fetched again after each message.
@@ -343,6 +356,12 @@ async function finishQuest() {
       link.href = ENDING_PAGE;
       link.textContent = "See how your story ended";
     }
+    if (done.unlocked_quests?.length) {
+      const unlocked = document.createElement("p");
+      unlocked.className = "small mb-2";
+      unlocked.textContent = `New quest unlocked: ${done.unlocked_quests.map((quest) => quest.title).join(", ")}.`;
+      resultBox.append(unlocked);
+    }
     resultBox.append(link);
     resultBox.hidden = false;
     await showSummary();
@@ -395,7 +414,12 @@ async function loadDialogue() {
       [state.npc?.role, state.place?.name].filter(Boolean).join(" · ");
 
     showHistory(history.messages);
-    showDecisions(document.querySelector("#decision-panel"), summary.id);
+    const decisionPanel = document.querySelector("#decision-panel");
+    state.openDecisions = await showDecisions(decisionPanel, summary.id);
+    decisionPanel.addEventListener("decision-made", () => {
+      state.openDecisions = Math.max(0, state.openDecisions - 1);
+      showObjectives(state.objectives);
+    });
     if (isActive) {
       showObjectives(active.objectives);
     } else {

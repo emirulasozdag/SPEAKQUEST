@@ -29,7 +29,7 @@ from app.models.player import EnglishLevel, LearningGoal
 from app.models.story import StoryDecision
 from app.services.learning import get_skill_scores
 from app.services.players import get_profile
-from app.services.story import add_trust, ending_for, get_story_state, load_story_progress
+from app.services.story import add_trust, ending_for, get_story_state, load_story_progress, open_decision_ids
 
 
 class QuestStatus(StrEnum):
@@ -61,7 +61,7 @@ class QuestCompleteRefusedError(Exception):
 
     def __init__(
         self,
-        reason: Literal["not_started", "already_completed", "objectives_not_met", "no_character"],
+        reason: Literal["not_started", "already_completed", "objectives_not_met", "decision_open", "no_character"],
         message: str,
     ) -> None:
         super().__init__(message)
@@ -213,6 +213,8 @@ class CompletedQuest:
     gain: XpGain
     # Set when this was the last quest the player could play: the story has ended
     ending: Ending | None = None
+    # Quests that finishing this one (with the decisions made in it) has just unlocked
+    unlocked: tuple[QuestTemplate, ...] = ()
 
 
 def complete_quest(db: Session, user_id: int, quest_id: int) -> CompletedQuest:
@@ -235,10 +237,14 @@ def complete_quest(db: Session, user_id: int, quest_id: int) -> CompletedQuest:
         raise QuestCompleteRefusedError(
             "objectives_not_met", "You have not reached every objective of this quest yet."
         )
+    if open_decision_ids(db, user_id, quest):
+        # The story only branches through decisions, so a quest cannot end with one left open
+        raise QuestCompleteRefusedError("decision_open", "Make your choice before finishing this quest.")
     profile = get_profile(db, user_id)
     if profile is None:
         raise QuestCompleteRefusedError("no_character", "Create your character before completing a quest.")
 
+    locked_before = {item.quest.id for item in list_player_quests(db, user_id) if item.status == QuestStatus.LOCKED}
     reward = quest.rewards["xp"]
     # Only the request that flips the row from active to completed pays; a second request for the
     # same quest waits on this row lock and then finds nothing left to update
@@ -258,9 +264,14 @@ def complete_quest(db: Session, user_id: int, quest_id: int) -> CompletedQuest:
     add_trust(db, user_id, quest.rewards.get("trust", {}))
     _update_chapter(db, user_id)
     ending = _close_story_if_finished(db, user_id)
+    unlocked = tuple(
+        item.quest
+        for item in list_player_quests(db, user_id)
+        if item.quest.id in locked_before and item.status != QuestStatus.LOCKED
+    )
     db.commit()
     db.refresh(progress)
-    return CompletedQuest(PlayerQuest(quest, QuestStatus.COMPLETED, progress), gain, ending)
+    return CompletedQuest(PlayerQuest(quest, QuestStatus.COMPLETED, progress), gain, ending, unlocked)
 
 
 def recommend_quest(db: Session, user_id: int) -> QuestRecommendation | None:

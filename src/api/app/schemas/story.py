@@ -47,20 +47,12 @@ class DecisionRequest(BaseModel):
     option_id: str = Field(min_length=1, max_length=60)
 
 
-class UnlockedQuestOut(BaseModel):
-    id: int
-    slug: str
-    title: str
-
-
 class DecisionResultOut(BaseModel):
     decision_id: str
     option_id: str
     flags: list[str]
     # Only the NPCs whose trust this decision changed
     npcs: list[NpcRelationshipOut]
-    # Quests that this decision unlocked just now
-    unlocked_quests: list[UnlockedQuestOut]
 
 
 class KeyDecisionOut(BaseModel):

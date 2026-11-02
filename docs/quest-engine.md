@@ -59,7 +59,9 @@ Bu kural `tests/test_quest_engine.py` içinde hem motor düzeyinde hem API üzer
 ## Sonlar
 
 Oyuncunun başlatabileceği görev kalmadığında (açık ya da aktif görev yoksa) son görevin
-tamamlanmasıyla hikâye kapanır. Story Engine'in `choose_ending()` fonksiyonu
+tamamlanmasıyla hikâye kapanır. Açık karar noktası olan bir görev tamamlanamadığı için hikâye
+bir karar atlanarak bitemez ([story-bible.md](story-bible.md), "Kararlar ve dallanma"). Sonu
+yalnızca kararlar ve görev ödülleri belirler; sohbetten gelen güven görev başına +6 ile sınırlıdır. Story Engine'in `choose_ending()` fonksiyonu
 [endings.json](../src/api/app/content/endings.json) sırasıyla ilk uyan sonu seçer ve sonuç
 `story_states.ending` alanına yazılır.
 

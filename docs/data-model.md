@@ -151,6 +151,7 @@ aynı zamanda o görevin diyalog oturumudur.
 | quest_template_id | int FK → quest_templates | |
 | status | varchar(12) | `active`, `completed` |
 | objectives_met | JSON | backend'in doğruladığı hedef id'leri; her diyalog turunda `engines/objectives.py` ekler (#31) |
+| story_trust_gained | int | bu görevin sohbetinde story action'larla eklenen güven; görev başına en fazla 6 (#68) |
 | xp_awarded | int | tamamlanınca verilen XP, tekrar ödül vermeyi engeller |
 | started_at, completed_at | timestamptz | |
 

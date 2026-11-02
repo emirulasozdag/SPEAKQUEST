@@ -211,7 +211,7 @@ def send_message(db: Session, user_id: int, text: str, client: AiClient | None) 
         correctly_used=[SkillCategory(c) for c in analysis.correctly_used],
     )
     # Only a suggestion: the Story Engine checks it against the quest's allowed actions
-    story = apply_suggested_action(db, user_id, quest, analysis.suggested_story_action)
+    story = apply_suggested_action(db, user_id, quest, analysis.suggested_story_action, progress)
     outcome = apply_objectives(
         [objective["id"] for objective in quest.objectives],
         progress.objectives_met,

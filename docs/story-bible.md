@@ -133,6 +133,12 @@ zaman ve nerede gördüğünü sor; çantayı geri almak için ne yapabileceğin
 Yardım etmeyen oyuncu o görevi hiç görmez ve "New in Town" sonuna gider. Böylece kararların
 sonucu oyuncunun hangi görevleri oynadığında ve hangi sonu gördüğünde hissedilir.
 
+Karar, görev sürerken verilir. **Açık (verilmemiş) karar noktası olan görev tamamlanamaz**
+(`POST /api/quests/{id}/complete` → `409`, "Make your choice before finishing this quest."). Diyalog
+ekranı hedefler bitse de karar açıkken "Complete quest" yerine karar paneline yönlendirir. Böylece
+oyuncu bir dalı yalnızca seçerek kaybeder, kararı atlayarak değil. Kararın açtığı görev, görev
+tamamlanınca cevaptaki `unlocked_quests` alanında bildirilir.
+
 Adaptive Quest Engine için iki karar da "yardım et" seçildiğinde bölüm 2 ve 3'te hem Past
 Simple (The Job Interview, The Missing Backpack) hem Question Formation (The Flat Viewing, The
 Missing Backpack) çalıştıran görevler açık olur. README'deki demo kuralı (iki farklı oyuncuya
@@ -197,8 +203,10 @@ aksiyonların geçerli olduğunu söyler; etkilerini Story Engine (`engines/stor
 
 - Görevin `allowed_story_actions` listesinde olmayan aksiyon reddedilir, hiçbir şey değişmez.
 - `npc_pleased`, `order_taken`, `viewing_positive`, `interview_positive`, `clue_found`: görevin
-  NPC'sinin güvenine en fazla +2 eklenir (100'ü geçmez). Hikâyeyi asıl ilerleten kararlar (+15)
-  ve görev ödülleridir; bu yalnızca küçük bir bonustur.
+  NPC'sinin güvenine en fazla +2 eklenir (100'ü geçmez). Bir görevin sohbetinden gelen toplam güven
+  en fazla **+6**'dır (`ACTION_TRUST_CAP_PER_QUEST`); oyuncu ne kadar yazarsa yazsın bu aşılmaz.
+  Sayaç `quest_progress.story_trust_gained` alanında tutulur. Hikâyeyi asıl ilerleten kararlar (+15)
+  ve görev ödülleridir; bu tavandan etkilenmezler ve sohbet yalnızca küçük bir bonustur.
 - `continue`, `npc_confused`, `interview_concern`: kabul edilir ama durumu değiştirmez. Dil
   öğrenen oyuncu anlaşılmadığı için hikâyede cezalandırılmaz.
 

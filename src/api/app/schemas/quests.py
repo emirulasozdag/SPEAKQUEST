@@ -81,6 +81,12 @@ class EndingOut(BaseModel):
     summary: str
 
 
+class UnlockedQuestOut(BaseModel):
+    id: int
+    slug: str
+    title: str
+
+
 class QuestCompletedOut(BaseModel):
     """The finished quest and what it paid. XP and level are the player's new totals."""
 
@@ -91,6 +97,8 @@ class QuestCompletedOut(BaseModel):
     leveled_up: bool
     # Set when this was the last quest the player could play and the story has ended
     ending: EndingOut | None = None
+    # Quests that finishing this one has just unlocked (prerequisites and decisions now met)
+    unlocked_quests: list["UnlockedQuestOut"] = []
 
     @classmethod
     def from_completed(cls, completed: CompletedQuest) -> "QuestCompletedOut":
@@ -106,4 +114,5 @@ class QuestCompletedOut(BaseModel):
                 if completed.ending
                 else None
             ),
+            unlocked_quests=[UnlockedQuestOut(id=q.id, slug=q.slug, title=q.title) for q in completed.unlocked],
         )
