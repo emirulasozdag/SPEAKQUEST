@@ -23,6 +23,9 @@ TRUST_RAISING_ACTIONS = frozenset({"npc_pleased", "order_taken", "viewing_positi
 # The most trust one AI-suggested action can add. Decisions (+15) and quest rewards (+5/+10) are
 # what move the story; a pleased NPC is only a small bonus on top.
 ACTION_TRUST_STEP = 2
+# The most trust story actions can add during one quest, however long the player keeps talking.
+# Decisions and quest rewards are not limited by this; they are what the story is built on.
+ACTION_TRUST_CAP_PER_QUEST = 6
 
 
 @dataclass(frozen=True)
@@ -75,19 +78,23 @@ def unmet_conditions(conditions: Conditions, progress: StoryProgress) -> Conditi
     )
 
 
-def apply_story_action(progress: StoryProgress, quest: QuestRules, action: str) -> StoryActionOutcome:
+def apply_story_action(
+    progress: StoryProgress, quest: QuestRules, action: str, gained_in_quest: int = 0
+) -> StoryActionOutcome:
     """Apply an AI-suggested story action if the quest allows it.
 
     An action that is not in the quest's allowed_story_actions is refused and changes nothing,
     whatever the AI claims. An allowed action changes at most the quest NPC's trust, by at most
-    ACTION_TRUST_STEP, and never beyond TRUST_MAX.
+    ACTION_TRUST_STEP, never beyond TRUST_MAX, and never beyond ACTION_TRUST_CAP_PER_QUEST in total
+    for the quest (gained_in_quest is what earlier actions in the same quest already added).
     """
     if action not in quest.allowed_story_actions:
         return StoryActionOutcome(action=action, accepted=False, progress=progress)
-    if action not in TRUST_RAISING_ACTIONS:
+    step = min(ACTION_TRUST_STEP, ACTION_TRUST_CAP_PER_QUEST - gained_in_quest)
+    if action not in TRUST_RAISING_ACTIONS or step <= 0:
         return StoryActionOutcome(action=action, accepted=True, progress=progress)
 
-    updated = apply_trust_changes(progress, {quest.npc: ACTION_TRUST_STEP})
+    updated = apply_trust_changes(progress, {quest.npc: step})
     change = updated.trust.get(quest.npc, 0) - progress.trust.get(quest.npc, 0)
     return StoryActionOutcome(action=action, accepted=True, progress=updated, trust_change=change)
 

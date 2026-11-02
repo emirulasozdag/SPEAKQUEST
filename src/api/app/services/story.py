@@ -76,16 +76,35 @@ def add_trust(db: Session, user_id: int, changes: Mapping[str, int]) -> dict[str
     return {npc: after[npc] for npc in changes}
 
 
-def apply_suggested_action(db: Session, user_id: int, quest: QuestTemplate, action: str) -> StoryActionOutcome:
+def apply_suggested_action(
+    db: Session, user_id: int, quest: QuestTemplate, action: str, progress: QuestProgress
+) -> StoryActionOutcome:
     """Let the Story Engine accept or refuse the AI's suggested action and store what it changed.
 
-    For the dialogue flow (#12). Does not commit.
+    progress is the quest's own row: it counts the trust the conversation has added so far, so the
+    per-quest cap holds however many messages the player sends. For the dialogue flow (#12).
+    Does not commit.
     """
     rules = QuestRules(npc=quest.npc.slug, allowed_story_actions=frozenset(quest.allowed_story_actions))
-    outcome = apply_story_action(StoryProgress(trust=load_trust(db, user_id)), rules, action)
+    outcome = apply_story_action(
+        StoryProgress(trust=load_trust(db, user_id)), rules, action, gained_in_quest=progress.story_trust_gained
+    )
     if outcome.trust_change:
         _store_trust(db, user_id, {rules.npc: outcome.progress.trust[rules.npc]})
+        progress.story_trust_gained += outcome.trust_change
     return outcome
+
+
+def open_decision_ids(db: Session, user_id: int, quest: QuestTemplate) -> list[str]:
+    """The quest's decision points the player has not made yet, in template order."""
+    made = set(
+        db.scalars(
+            select(StoryDecision.decision_key).where(
+                StoryDecision.user_id == user_id, StoryDecision.quest_template_id == quest.id
+            )
+        )
+    )
+    return [point["id"] for point in quest.decision_points if point["id"] not in made]
 
 
 def list_relationships(db: Session, user_id: int) -> list[tuple[Npc, int]]:

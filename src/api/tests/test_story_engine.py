@@ -4,6 +4,7 @@ import pytest
 
 from app.content.schema import load_content
 from app.engines.story import (
+    ACTION_TRUST_CAP_PER_QUEST,
     ACTION_TRUST_STEP,
     TRUST_MAX,
     TRUST_MIN,
@@ -143,3 +144,31 @@ def test_the_chapter_is_the_earliest_one_with_something_left_to_play():
 
 def test_with_nothing_left_to_play_the_player_stays_in_the_last_finished_chapter():
     assert current_chapter(open_quest_chapters=[], completed_quest_chapters=[1, 2, 2]) == 2
+
+
+# --- trust from conversation is capped per quest (#68) ---------------------------------------
+
+
+def test_actions_stop_adding_trust_at_the_per_quest_cap():
+    outcome = apply_story_action(StoryProgress(), ALEX_QUEST, "npc_pleased", gained_in_quest=ACTION_TRUST_CAP_PER_QUEST)
+
+    assert outcome.accepted is True
+    assert outcome.trust_change == 0
+    assert outcome.progress.trust == {}
+
+
+def test_the_last_step_before_the_cap_is_cut_short():
+    gained = ACTION_TRUST_CAP_PER_QUEST - 1
+
+    outcome = apply_story_action(StoryProgress(), ALEX_QUEST, "npc_pleased", gained_in_quest=gained)
+
+    assert outcome.trust_change == 1
+
+
+def test_many_pleased_messages_in_one_quest_add_at_most_the_cap():
+    progress, gained = StoryProgress(), 0
+    for _ in range(20):
+        outcome = apply_story_action(progress, ALEX_QUEST, "npc_pleased", gained_in_quest=gained)
+        progress, gained = outcome.progress, gained + outcome.trust_change
+
+    assert progress.trust["alex"] == ACTION_TRUST_CAP_PER_QUEST

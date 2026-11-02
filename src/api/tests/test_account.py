@@ -11,7 +11,8 @@ from app.models.quest_progress import QuestProgress
 from app.models.user import User
 from app.services.players import PROGRESS_MODELS
 from tests.test_player_profile import VALID_PROFILE, login_headers
-from tests.test_story_state import EMAIL, play, quest_by_slug
+from tests.test_quest_complete import meet_objectives
+from tests.test_story_state import EMAIL, quest_by_slug
 
 CHANGE_URL = "/api/auth/change-password"
 RESET_URL = "/api/player/reset"
@@ -50,11 +51,13 @@ def progress_rows(db_session, uid: int) -> int:
 
 
 def play_a_little(client, headers, db_session) -> None:
-    """Complete the first quest, make its decision and start the next one."""
-    play(client, headers, db_session, "meet_your_neighbor")
-    quest_id = quest_by_slug(db_session, "meet_your_neighbor").id
-    payload = {"quest_id": quest_id, "decision_id": "help_alex_move", "option_id": "help"}
+    """Play the first quest with its decision, then start the next one."""
+    starter = quest_by_slug(db_session, "meet_your_neighbor")
+    assert client.post(f"/api/quests/{starter.id}/start", headers=headers).status_code == 201
+    payload = {"quest_id": starter.id, "decision_id": "help_alex_move", "option_id": "help"}
     assert client.post("/api/story/decision", json=payload, headers=headers).status_code == 201
+    meet_objectives(db_session, EMAIL, starter)
+    assert client.post(f"/api/quests/{starter.id}/complete", headers=headers).status_code == 200
     cafe = quest_by_slug(db_session, "morning_at_the_cafe")
     assert client.post(f"/api/quests/{cafe.id}/start", headers=headers).status_code == 201
 
@@ -155,9 +158,9 @@ def test_after_a_reset_the_game_can_be_played_again(client, db_session):
     play_a_little(client, headers, db_session)
     client.post(RESET_URL, headers=headers)
 
-    play(client, headers, db_session, "meet_your_neighbor")
-    quest_id = quest_by_slug(db_session, "meet_your_neighbor").id
-    payload = {"quest_id": quest_id, "decision_id": "help_alex_move", "option_id": "not_now"}
+    starter = quest_by_slug(db_session, "meet_your_neighbor")
+    assert client.post(f"/api/quests/{starter.id}/start", headers=headers).status_code == 201
+    payload = {"quest_id": starter.id, "decision_id": "help_alex_move", "option_id": "not_now"}
 
     assert client.post("/api/story/decision", json=payload, headers=headers).status_code == 201
 
