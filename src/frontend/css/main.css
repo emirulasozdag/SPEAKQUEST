@@ -768,6 +768,21 @@ circle.sq-chart-series { fill: var(--sq-surface); stroke-width: 2.5; }
   background: var(--sq-series);
 }
 
+/* ---------- Privacy ---------- */
+
+/* Always visible next to where the player types, but quiet */
+.sq-privacy-note {
+  color: var(--sq-ink-soft);
+}
+
+.sq-privacy-warning {
+  padding: var(--sq-space-3) var(--sq-space-4);
+  border-left: 4px solid var(--sq-cafe);
+  border-radius: var(--sq-radius-sm);
+  background: var(--sq-cafe-tint);
+  color: var(--sq-cafe-ink);
+}
+
 /* ---------- Placeholder notice ---------- */
 
 .sq-draft-note {
