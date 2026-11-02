@@ -32,3 +32,6 @@ Thumbs.db
 # Logs and local databases
 *.log
 *.sqlite3
+
+# Playwright output (screenshots of failed browser tests)
+test-results/
