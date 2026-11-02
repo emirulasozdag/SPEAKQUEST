@@ -10,7 +10,7 @@ from app.models.story import NpcRelationship, StoryState
 from app.models.user import User
 from app.services import story as story_service
 from tests.test_player_profile import VALID_PROFILE, login_headers
-from tests.test_quest_complete import meet_objectives, quest_by_slug
+from tests.test_quest_complete import meet_objectives, progress_of, quest_by_slug
 
 STATE_URL = "/api/story/state"
 EMAIL = "deniz@example.com"
@@ -212,9 +212,10 @@ def starter_template(db_session) -> QuestTemplate:
 
 
 def test_an_allowed_pleasing_action_stores_a_small_trust_gain(client, headers, db_session):
-    outcome = story_service.apply_suggested_action(
-        db_session, user_id_of(db_session), starter_template(db_session), "npc_pleased"
-    )
+    starter = starter_template(db_session)
+    assert client.post(f"/api/quests/{starter.id}/start", headers=headers).status_code == 201
+    progress = progress_of(db_session, EMAIL, starter)
+    outcome = story_service.apply_suggested_action(db_session, user_id_of(db_session), starter, "npc_pleased", progress)
     db_session.commit()
 
     assert outcome.accepted is True
@@ -222,9 +223,10 @@ def test_an_allowed_pleasing_action_stores_a_small_trust_gain(client, headers, d
 
 
 def test_an_action_the_quest_does_not_allow_stores_nothing(client, headers, db_session):
-    outcome = story_service.apply_suggested_action(
-        db_session, user_id_of(db_session), starter_template(db_session), "clue_found"
-    )
+    starter = starter_template(db_session)
+    assert client.post(f"/api/quests/{starter.id}/start", headers=headers).status_code == 201
+    progress = progress_of(db_session, EMAIL, starter)
+    outcome = story_service.apply_suggested_action(db_session, user_id_of(db_session), starter, "clue_found", progress)
     db_session.commit()
 
     assert outcome.accepted is False

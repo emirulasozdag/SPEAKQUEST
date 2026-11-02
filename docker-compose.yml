@@ -23,11 +23,23 @@ services:
     build: ./src/api
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-speakquest}:${POSTGRES_PASSWORD:-speakquest}@db:5432/${POSTGRES_DB:-speakquest}
+      # development: an unsafe SECRET_KEY is only a warning; any other value refuses to start with it
+      ENVIRONMENT: ${ENVIRONMENT:-development}
       SECRET_KEY: ${SECRET_KEY:-dev-only-change-me}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
       AI_PROVIDER: ${AI_PROVIDER:-}
       AI_API_KEY: ${AI_API_KEY:-}
       AI_MODEL: ${AI_MODEL:-}
       AI_TIMEOUT_SECONDS: ${AI_TIMEOUT_SECONDS:-20}
+      # Request limits (defaults as in src/api/app/core/config.py)
+      DIALOGUE_RATE_LIMIT: ${DIALOGUE_RATE_LIMIT:-10}
+      DIALOGUE_RATE_WINDOW_SECONDS: ${DIALOGUE_RATE_WINDOW_SECONDS:-60}
+      LOGIN_RATE_LIMIT: ${LOGIN_RATE_LIMIT:-5}
+      LOGIN_RATE_WINDOW_SECONDS: ${LOGIN_RATE_WINDOW_SECONDS:-60}
+      REGISTER_RATE_LIMIT: ${REGISTER_RATE_LIMIT:-5}
+      REGISTER_RATE_WINDOW_SECONDS: ${REGISTER_RATE_WINDOW_SECONDS:-60}
+      PASSWORD_CHECK_RATE_LIMIT: ${PASSWORD_CHECK_RATE_LIMIT:-5}
+      PASSWORD_CHECK_RATE_WINDOW_SECONDS: ${PASSWORD_CHECK_RATE_WINDOW_SECONDS:-900}
     ports:
       - "8000:8000"
     depends_on:

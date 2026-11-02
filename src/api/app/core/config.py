@@ -1,5 +1,6 @@
 """Application settings, loaded from environment variables (and an optional .env file)."""
 
+import logging
 from functools import lru_cache
 from pathlib import Path
 
@@ -7,6 +8,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # src/frontend when running locally, /frontend inside the Docker container
 DEFAULT_FRONTEND_DIR = Path(__file__).resolve().parents[3] / "frontend"
+
+# Secret keys that are public (the default here and the example in .env.example) and the
+# shortest key accepted outside development. Anyone who knows the key can forge a login token.
+DEFAULT_SECRET_KEY = "dev-only-change-me"
+EXAMPLE_SECRET_KEY = "change-me-to-a-long-random-value"
+MIN_SECRET_KEY_LENGTH = 32
 
 
 class Settings(BaseSettings):
@@ -16,7 +23,7 @@ class Settings(BaseSettings):
     environment: str = "development"
 
     database_url: str = "postgresql+psycopg://speakquest:speakquest@localhost:5433/speakquest"
-    secret_key: str = "dev-only-change-me"
+    secret_key: str = DEFAULT_SECRET_KEY
     access_token_expire_minutes: int = 60 * 24
 
     # Which AI provider answers the player (gemini; see docs/decisions/0001-ai-provider.md).
@@ -39,6 +46,10 @@ class Settings(BaseSettings):
     # Registration attempts allowed per IP inside the window
     register_rate_limit: int = 5
     register_rate_window_seconds: int = 60
+    # Wrong current passwords allowed per account inside the window, for changing the password and
+    # deleting the account; someone holding a stolen session cannot guess the password endlessly
+    password_check_rate_limit: int = 5
+    password_check_rate_window_seconds: int = 900
 
     frontend_dir: Path = DEFAULT_FRONTEND_DIR
 
@@ -46,3 +57,27 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+class InsecureSecretKeyError(RuntimeError):
+    pass
+
+
+def secret_key_problem(settings: Settings) -> str | None:
+    """Why the secret key is unsafe, or None. The message never contains the key itself."""
+    if settings.secret_key in (DEFAULT_SECRET_KEY, EXAMPLE_SECRET_KEY):
+        return "SECRET_KEY is still the public default value"
+    if len(settings.secret_key) < MIN_SECRET_KEY_LENGTH:
+        return f"SECRET_KEY is shorter than {MIN_SECRET_KEY_LENGTH} characters"
+    return None
+
+
+def check_secret_key(settings: Settings, logger: logging.Logger) -> None:
+    """Refuse to start with an unsafe secret key outside development; only warn in development."""
+    problem = secret_key_problem(settings)
+    if problem is None:
+        return
+    advice = 'Set a new one in .env, e.g. from: python -c "import secrets; print(secrets.token_urlsafe(48))"'
+    if settings.environment != "development":
+        raise InsecureSecretKeyError(f"{problem} (ENVIRONMENT={settings.environment}). {advice}")
+    logger.warning("%s. Fine for local development only. %s", problem, advice)

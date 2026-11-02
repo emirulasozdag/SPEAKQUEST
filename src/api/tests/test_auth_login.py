@@ -100,3 +100,28 @@ def test_me_rejects_token_of_deleted_user(client):
     response = client.get(ME_URL, headers=auth_header(create_access_token(999)))
 
     assert response.status_code == 401
+
+
+
+def signed(claims: dict) -> str:
+    return jwt.encode(claims, get_settings().secret_key, algorithm=TOKEN_ALGORITHM)
+
+
+@pytest.mark.parametrize(
+    "missing",
+    ["exp", "sub", "iat"],
+)
+def test_a_token_without_a_required_claim_is_rejected(client, registered_user, missing):
+    """#71: a token without an expiry must never work forever."""
+    now = datetime.now(timezone.utc)
+    claims = {"sub": str(registered_user["id"]), "ver": 0, "iat": now, "exp": now + timedelta(minutes=5)}
+    del claims[missing]
+
+    assert client.get(ME_URL, headers=auth_header(signed(claims))).status_code == 401
+
+
+def test_a_token_with_an_old_version_is_rejected(client, registered_user):
+    now = datetime.now(timezone.utc)
+    claims = {"sub": str(registered_user["id"]), "ver": 1, "iat": now, "exp": now + timedelta(minutes=5)}
+
+    assert client.get(ME_URL, headers=auth_header(signed(claims))).status_code == 401

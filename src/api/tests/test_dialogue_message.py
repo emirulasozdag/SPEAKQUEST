@@ -4,7 +4,8 @@ import pytest
 from sqlalchemy import func, select
 
 from app.content.seed import seed_content
-from app.engines.story import ACTION_TRUST_STEP
+from app.engines.story import ACTION_TRUST_CAP_PER_QUEST, ACTION_TRUST_STEP
+from app.models.content import Npc
 from app.main import app
 from app.models.dialogue import DialogueMessage
 from app.models.learning import LanguageError, SkillObservation
@@ -325,3 +326,23 @@ def test_messages_go_to_the_senders_own_quest_only(client, headers, interview, d
     assert [m["role"] for m in ece_history] == ["npc"]
     ece_id = db_session.scalar(select(User.id).where(User.email == "ece@example.com"))
     assert db_session.scalar(select(func.count()).select_from(LanguageError).where(LanguageError.user_id == ece_id)) == 0
+
+
+def test_a_long_friendly_conversation_adds_only_limited_trust(client, headers, db_session):
+    """#68: chatting can never replace the decisions the story is built on."""
+    starter = quest_by_slug(db_session, "meet_your_neighbor")
+    assert client.post(f"/api/quests/{starter.id}/start", headers=headers).status_code == 201
+    use_ai(*[reply_json(suggested_story_action="npc_pleased", detected_errors=[])] * 6)
+
+    for index in range(6):
+        assert send(client, headers, f"Nice to meet you, number {index}!").status_code == 200
+
+    alex = db_session.scalar(select(NpcRelationship).join(NpcRelationship.npc).where(Npc.slug == "alex"))
+    assert alex.trust == ACTION_TRUST_CAP_PER_QUEST
+    progress = db_session.scalar(select(QuestProgress).where(QuestProgress.quest_template_id == starter.id))
+    assert progress.story_trust_gained == ACTION_TRUST_CAP_PER_QUEST
+    # A decision still counts in full
+    payload = {"quest_id": starter.id, "decision_id": "help_alex_move", "option_id": "help"}
+    assert client.post("/api/story/decision", json=payload, headers=headers).json()["npcs"][0]["trust"] == (
+        ACTION_TRUST_CAP_PER_QUEST + 15
+    )

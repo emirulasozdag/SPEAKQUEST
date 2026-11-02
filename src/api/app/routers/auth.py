@@ -28,6 +28,22 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # Failed logins are counted per email + IP, so one attacker cannot lock other people out
 login_limiter = RateLimiter()
 register_limiter = RateLimiter()
+# Wrong current passwords on a logged-in account, counted per user
+password_check_limiter = RateLimiter()
+
+
+def _check_password_attempts(user: User) -> str:
+    """Answer 429 when this account has used up its password attempts; returns its limiter key."""
+    settings = get_settings()
+    key = f"user:{user.id}"
+    raise_if_limited(
+        password_check_limiter, key, settings.password_check_rate_limit, settings.password_check_rate_window_seconds
+    )
+    return key
+
+
+def _count_wrong_password(key: str) -> None:
+    password_check_limiter.hit(key, get_settings().password_check_rate_window_seconds)
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -71,7 +87,7 @@ def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)
         )
     login_limiter.reset(attempt_key)
     return TokenResponse(
-        access_token=create_access_token(user.id),
+        access_token=create_access_token(user.id, user.token_version),
         expires_in=settings.access_token_expire_minutes * 60,
     )
 
@@ -89,20 +105,31 @@ def delete_me(
     db: Session = Depends(get_db),
 ) -> Response:
     """Permanently delete the account and all of the player's data. Needs the current password."""
+    attempts = _check_password_attempts(current_user)
     if not delete_account(db, current_user, payload.password):
+        _count_wrong_password(attempts)
         # 403, not 401: the session is still valid, only the confirmation failed
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Incorrect password.")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.post("/change-password", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/change-password", response_model=TokenResponse)
 def change_my_password(
     payload: ChangePasswordRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
-) -> Response:
-    """Replace the password after checking the current one. The new one follows the sign-up rules."""
+) -> TokenResponse:
+    """Replace the password after checking the current one. The new one follows the sign-up rules.
+
+    Every session opened before ends; this one continues with the new token in the response.
+    """
+    attempts = _check_password_attempts(current_user)
     if not change_password(db, current_user, payload.current_password, payload.new_password):
+        _count_wrong_password(attempts)
         # 403, not 401: the session is still valid, only the check failed
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Your current password is incorrect.")
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    password_check_limiter.reset(attempts)
+    return TokenResponse(
+        access_token=create_access_token(current_user.id, current_user.token_version),
+        expires_in=get_settings().access_token_expire_minutes * 60,
+    )

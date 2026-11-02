@@ -13,11 +13,7 @@ function chosenNote(decision) {
 }
 
 function resultNote(result) {
-  const parts = result.npcs.map((npc) => `${npc.name} trusts you more (${npc.trust}/100).`);
-  if (result.unlocked_quests.length) {
-    parts.push(`New quest unlocked: ${result.unlocked_quests.map((quest) => quest.title).join(", ")}.`);
-  }
-  return parts.join(" ");
+  return result.npcs.map((npc) => `${npc.name} trusts you more (${npc.trust}/100).`).join(" ");
 }
 
 function decisionItem(decision, questId, panel) {
@@ -45,6 +41,8 @@ function decisionItem(decision, questId, panel) {
       try {
         const result = await makeDecision(questId, decision.id, option.id);
         buttons.replaceWith(chosenNote({ ...decision, chosen: option.id }));
+        // The dialogue page shows "Complete quest" once no decision is left open
+        panel.dispatchEvent(new CustomEvent("decision-made"));
         const message = resultNote(result);
         if (message) showAlert(panel.querySelector("[data-decision-alert]"), message, "success");
       } catch (error) {
@@ -63,15 +61,18 @@ function decisionItem(decision, questId, panel) {
 }
 
 // Fills the panel with the quest's decisions; leaves it hidden when the quest has none.
+// Resolves to the number of decisions still open (a quest cannot be completed while one is).
 export async function showDecisions(panel, questId) {
   try {
     const decisions = await getDecisions(questId);
-    if (!decisions.length) return;
+    if (!decisions.length) return 0;
     const body = panel.querySelector("[data-decision-list]");
     body.replaceChildren(...decisions.map((decision) => decisionItem(decision, questId, panel)));
     panel.hidden = false;
+    return decisions.filter((decision) => !decision.chosen).length;
   } catch (error) {
-    // The conversation still works without this panel
+    // The conversation still works without this panel; the server still refuses to complete
     if (!(error instanceof ApiError && error.status === 409)) handleApiError(error);
+    return 0;
   }
 }

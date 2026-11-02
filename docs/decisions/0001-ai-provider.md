@@ -111,8 +111,9 @@ Kaynak: <https://ai.google.dev/gemini-api/docs/pricing>, bakılan tarih **2026-1
   hatası alınmadı.
 - **Gizlilik sonucu:** ücretsiz katmanda oyuncuların yazdığı mesajlar Google tarafından ürün geliştirmede
   kullanılabilir. Geliştirme ve ders demosu için kabul edilebilir, ancak gerçek kullanıcı verisi için değil.
-  Oyuncuya gösterilecek bir gizlilik notu ve "gerçek kişisel bilgi yazma" uyarısı (#10 veya #14) eklenmeli;
-  canlıya çıkılırsa ücretli katmana geçilmelidir.
+  Oyuncuya gösterilecek bir gizlilik notu ve "gerçek kişisel bilgi yazma" uyarısı **eklendi (#69)**:
+  `pages/privacy.html`, kayıt formundaki not ve diyalog ekranında mesaj kutusunun altındaki sürekli uyarı.
+  Canlıya çıkılırsa ücretli katmana geçilmelidir.
 
 ## Geri dönüş yolu
 

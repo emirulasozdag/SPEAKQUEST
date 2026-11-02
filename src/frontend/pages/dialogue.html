@@ -48,13 +48,14 @@
             <h2 class="sq-panel-title mb-2">Your goals</h2>
             <ul id="objective-list" class="list-unstyled mb-3"></ul>
             <div id="objective-bar" class="progress sq-xp mb-1" role="progressbar" aria-label="Quest progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="1">
-              <div class="progress-bar" style="width: 0%"></div>
+              <div class="progress-bar"></div>
             </div>
             <p id="objective-text" class="small text-secondary mb-3"></p>
             <div id="complete-box" hidden>
               <p class="small mb-2">All goals are done. Finish the quest to collect your XP.</p>
               <button id="complete-button" type="button" class="btn btn-primary w-100">Complete quest</button>
             </div>
+            <p id="decision-note" class="sq-decision-note small mb-0" role="status" hidden>All goals are done. Make your choice in "Your choice" to finish this quest.</p>
             <div id="result-box" class="sq-result" role="status" hidden></div>
           </section>
 
@@ -81,8 +82,11 @@
 
           <form id="message-form" class="sq-panel p-3" novalidate>
             <label for="player-message" class="form-label">Your reply</label>
-            <textarea class="form-control mb-1" id="player-message" name="message" rows="2" maxlength="500" placeholder="Write your answer in English. Enter sends, Shift+Enter adds a new line."></textarea>
-            <p id="message-count" class="small text-secondary text-end mb-2">0 / 500</p>
+            <textarea class="form-control mb-1" id="player-message" name="message" rows="2" maxlength="500" aria-describedby="message-privacy" placeholder="Write your answer in English. Enter sends, Shift+Enter adds a new line."></textarea>
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+              <p id="message-privacy" class="sq-privacy-note small mb-0">Sent to an AI service. Don't type real personal information. <a href="/pages/privacy.html">Privacy</a></p>
+              <p id="message-count" class="small text-secondary text-end text-nowrap mb-0">0 / 500</p>
+            </div>
             <div class="d-flex justify-content-between gap-2">
               <a class="btn btn-outline-secondary" href="/pages/map.html">Back to map</a>
               <button id="send-button" type="submit" class="btn btn-primary">Send</button>
