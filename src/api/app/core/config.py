@@ -9,6 +9,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # src/frontend when running locally, /frontend inside the Docker container
 DEFAULT_FRONTEND_DIR = Path(__file__).resolve().parents[3] / "frontend"
 
+# The repository's .env (next to docker-compose.yml), so the API started from src/api reads the same
+# file as Docker. A .env in the working directory is read after it and wins. Inside the container this
+# path does not exist and Docker passes the values as environment variables instead.
+ROOT_ENV_FILE = Path(__file__).resolve().parents[2].parent.parent / ".env"
+
 # Secret keys that are public (the default here and the example in .env.example) and the
 # shortest key accepted outside development. Anyone who knows the key can forge a login token.
 DEFAULT_SECRET_KEY = "dev-only-change-me"
@@ -17,7 +22,7 @@ MIN_SECRET_KEY_LENGTH = 32
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=(ROOT_ENV_FILE, ".env"), extra="ignore")
 
     app_name: str = "SpeakQuest API"
     environment: str = "development"

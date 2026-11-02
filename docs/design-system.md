@@ -56,7 +56,7 @@ token'larla aynı değerleri kullanır. Bir token değişirse bu dosyalar da gü
   - Kilitli: `is-locked`. Bina gri ve soluk, etiket çerçevesi kesikli, durum metni "Locked".
   - Aktif görev: `is-active`. Etiket mekân rengiyle dolu ve çerçevesi kalın.
 
-  Bu sınıfları gerçek veriye göre koymak #10'un işidir.
+  Sınıfları ve durum metnini `js/pages/map.js` (`drawMap()`) API'den gelen görev durumlarına göre koyar.
 - **Diyalog sahnesi:** `.sq-scene` (mekân arka planı) ve `.sq-scene-npc` (portre, ad, rol). İsim kartı düz
   beyaz zemin üzerindedir, böylece metnin kontrastı illüstrasyona bağlı kalmaz.
 - **Konuşma balonları:** `.sq-bubble-npc` (soldaki küçük portre `.sq-bubble-row` ile) ve

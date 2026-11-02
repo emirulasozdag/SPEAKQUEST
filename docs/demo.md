@@ -170,13 +170,16 @@ gerek kalmadı.
   hesapları bir gün önceden açıp ilk görevi oynayın.
 - Bir hesabı baştan oynatmak için **Profile → Reset game progress** kullanın. Hesap ve karakter kalır.
 - AI cevabı bazen birkaç saniye sürer. Bu sırada _"Sending…"_ görünür.
-- Bilinen hatalar aşağıdadır. [#64](https://github.com/emirulasozdag/SPEAKQUEST/issues/64) düzelmeden sunum yapılırsa Mia, Café görevinde çantadan bahsedebilir.
+- Oynanış sırasında bulunan hatalar aşağıdadır. İkisi de çözüldü, sunumda ayrıca dikkat gerekmez.
 
 ## Oynanış sırasında bulunan hatalar
 
-- [#64](https://github.com/emirulasozdag/SPEAKQUEST/issues/64): Mia, çanta henüz kaybolmamışken Morning at the Café görevinde kaybolduğundan bahsediyor. Dört
-  oynanışın dördünde de görüldü; çantaya göz kulak olmayı reddeden oyuncuya da oluyor.
-  ![Burak'ın Café diyaloğunda Mia çantadan bahsediyor](screenshots/demo/bug-mia-mentions-backpack-in-cafe.png)
-- [#65](https://github.com/emirulasozdag/SPEAKQUEST/issues/65): Kilitli görevlerin özetleri, oyuncunun vermediği kararı varsayıyor. Örneğin çantaya göz kulak
+- [#64](https://github.com/emirulasozdag/SPEAKQUEST/issues/64) · **çözüldü (PR [#67](https://github.com/emirulasozdag/SPEAKQUEST/pull/67))**:
+  Mia, çanta henüz kaybolmamışken Morning at the Café görevinde kaybolduğundan bahsediyordu. Dört
+  oynanışın dördünde de görüldü; çantaya göz kulak olmayı reddeden oyuncuya da oluyordu. Kaybolan çanta
+  artık yalnızca The Missing Backpack görevinin `npc_knows` alanında; Café görevinde prompt'a girmiyor.
+  ![Düzeltmeden önce: Burak'ın Café diyaloğunda Mia çantadan bahsediyor](screenshots/demo/bug-mia-mentions-backpack-in-cafe.png)
+- [#65](https://github.com/emirulasozdag/SPEAKQUEST/issues/65) · **çözüldü (PR [#67](https://github.com/emirulasozdag/SPEAKQUEST/pull/67))**:
+  Kilitli görevlerin özetleri, oyuncunun vermediği kararı varsayıyordu. Örneğin çantaya göz kulak
   olmayan Burak'ın Quest Journal'ında The Missing Backpack için _"You watched it for her for a
-  while."_ yazıyor.
+  while."_ yazıyordu. Artık kilitli görev kararı varsaymayan ayrı bir özet (`locked_summary`) gösteriyor.

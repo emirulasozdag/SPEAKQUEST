@@ -4,8 +4,8 @@ Bu doküman SpeakQuest MVP'sinin veritabanı sözleşmesidir. Bir tabloyu ekleye
 bu dosyayı da günceller. Tablolar SQLAlchemy modelleri olarak `src/api/app/models/` altında yazılır
 ve her değişiklik tek bir Alembic migration zincirine eklenir.
 
-**Durum:** `users`, `player_profiles`, `locations`, `npcs`, `quest_templates` ve `quest_progress` uygulandı. Diğer tablolar önerilen tasarımdır; sahibi olan
-iş paketi uygularken alanları netleştirir ve bu dosyayı günceller.
+**Durum:** aşağıdaki tabloların hepsi uygulandı ve migration zincirinde (`src/api/alembic/versions/`)
+yer alıyor. Her başlığın yanındaki numara tabloyu ekleyen issue'dur.
 
 ## Genel kurallar
 
@@ -133,9 +133,10 @@ başlangıcında `alembic upgrade head`'den sonra çalışır.
 ve görevleri (`id, slug, title, chapter, summary, npc_slug, status`) döner. `personality`,
 `speaking_style`, `knows`, `npc_opening`, `rewards` ve `prerequisites` oyuncuya hiç gönderilmez
 (hikâye bilgisi içerebilirler, yalnızca sunucuda ve AI prompt'unda kullanılırlar). Görev `status`
-değeri `services/quests.py` içindeki `quest_statuses()` ile hesaplanır; ön koşulsuz görev `available`,
-diğerleri `locked` döner. Oyuncu ilerlemesi (`active`, `completed`) #7 ile, bayrak ve güven
-koşulları #13 ile bu fonksiyona eklenir; endpoint değişmez.
+değeri `services/quests.py` içindeki `quest_statuses()` ile hesaplanır: başlatılmış görev oyuncunun
+ilerlemesinden (`active`, `completed`, #7) gelir; diğerleri Story Engine'in bayrak ve güven koşullarına
+(`is_unlocked()`, #13) göre `available` ya da `locked` döner. Kilitli görevde `summary` yerine
+`locked_summary` gösterilir (#65).
 
 Hikâye sonları (`endings.json`) tabloya yazılmaz; Story Engine onları doğrudan içerik
 dosyasından okur. Oyuncunun ulaştığı son `story_states.ending` alanında slug olarak tutulur.
@@ -173,7 +174,7 @@ NPC'nin ilk cümlesi (`npc_opening`) bu cevaplarda yoktur; görev başlatılırk
 hataları tamamlamayı engellemez. Bilinmeyen görev `404`; başlatılmamış, zaten tamamlanmış, hedefleri
 eksik ya da karakteri olmayan oyuncu için `409`. Cevap görevi, kazanılan XP'yi, yeni XP/seviyeyi ve
 seviye atlanıp atlanmadığını döner. Aynı görev için gelen ikinci istek, `status = 'active'` koşullu
-güncellemede satır bulamadığı için XP almaz. Şablondaki güven ödülü (`rewards.trust`) #13 ile uygulanır.
+güncellemede satır bulamadığı için XP almaz. Şablondaki güven ödülü (`rewards.trust`) aynı transaction'da Story Engine ile eklenir (#13).
 
 **XP ve seviye:** `engines/progression.py`. Seviye eşikleri `LEVEL_THRESHOLDS = (0, 50, 120, 220, 350,
 500)`; MVP'nin 5 görevi toplam 410 XP verir ve oyuncuyu 5. seviyeye çıkarır. Görev tamamlanırken
@@ -352,4 +353,4 @@ Bu adımlar tek transaction içinde yapılır. AI hata verirse hiçbir tablo de�
 ## Kullanıcı verisini silme
 
 Tüm oyuncu tabloları `users`'a `ON DELETE CASCADE` ile bağlıdır. Bir hesabı silmek, ona ait tüm
-oyun ve öğrenme verisini siler. Hesabı koruyup yalnızca ilerlemeyi sıfırlama #29'dadır.
+oyun ve öğrenme verisini siler. Hesabı koruyup yalnızca ilerlemeyi sıfırlamak için `POST /api/player/reset` kullanılır (#29).
