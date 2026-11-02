@@ -1,3 +1,7 @@
 -r requirements.txt
 pytest==8.3.4
 httpx==0.28.1
+# Browser smoke tests (tests/browser, `pytest -m browser`); the browser itself is installed with
+# `python -m playwright install chromium`
+pytest-playwright==0.7.2
+playwright==1.63.0
