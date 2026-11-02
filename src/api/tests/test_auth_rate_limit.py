@@ -114,3 +114,71 @@ def test_default_limits_come_from_settings():
     assert settings.login_rate_window_seconds > 0
     assert settings.register_rate_limit > 0
     assert settings.register_rate_window_seconds > 0
+
+
+# --- password checks on a logged-in account (#71) -----------------------------------------------
+
+CHANGE_URL = "/api/auth/change-password"
+
+
+@pytest.fixture
+def few_password_checks(monkeypatch):
+    settings = get_settings()
+    monkeypatch.setattr(settings, "password_check_rate_limit", 3)
+    monkeypatch.setattr(settings, "password_check_rate_window_seconds", 900)
+
+
+@pytest.fixture
+def session(client, registered_user) -> dict[str, str]:
+    token = client.post(LOGIN_URL, json={"email": "alex@example.com", "password": "secret-pass"}).json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
+def change(client, headers, current="wrong-pass"):
+    return client.post(CHANGE_URL, json={"current_password": current, "new_password": "new-secret"}, headers=headers)
+
+
+def delete(client, headers, password="wrong-pass"):
+    return client.request("DELETE", "/api/auth/me", json={"password": password}, headers=headers)
+
+
+def test_wrong_passwords_on_change_password_are_limited(client, few_password_checks, session):
+    for _ in range(3):
+        assert change(client, session).status_code == 403
+
+    response = change(client, session)
+
+    assert response.status_code == 429
+    assert response.json()["detail"] == TOO_MANY_ATTEMPTS
+    assert 1 <= int(response.headers["Retry-After"]) <= 900
+    # Even the right password waits now: guessing has to stop
+    assert change(client, session, current="secret-pass").status_code == 429
+
+
+def test_delete_account_shares_the_same_password_limit(client, few_password_checks, session):
+    change(client, session)
+    change(client, session)
+    assert delete(client, session).status_code == 403
+
+    assert delete(client, session, password="secret-pass").status_code == 429
+    assert client.get("/api/auth/me", headers=session).status_code == 200
+
+
+def test_a_successful_change_clears_the_count(client, few_password_checks, session):
+    change(client, session)
+    change(client, session)
+    new_token = change(client, session, current="secret-pass").json()["access_token"]
+    headers = {"Authorization": f"Bearer {new_token}"}
+
+    for _ in range(3):
+        assert change(client, headers).status_code == 403
+    assert change(client, headers).status_code == 429
+
+
+def test_the_password_limit_is_per_account(client, few_password_checks, session):
+    for _ in range(3):
+        change(client, session)
+    client.post(REGISTER_URL, json={"email": "other@example.com", "password": "secret-pass"})
+    token = client.post(LOGIN_URL, json={"email": "other@example.com", "password": "secret-pass"}).json()["access_token"]
+
+    assert change(client, {"Authorization": f"Bearer {token}"}).status_code == 403

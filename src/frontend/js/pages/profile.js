@@ -13,7 +13,7 @@ import {
 import { fillCharacterForm, saveCharacterForm } from "../components/character-form.js";
 import { clearErrorsOnEdit, setFieldError, showAlert } from "../components/form.js";
 import { CHARACTER_PAGE } from "../session.js";
-import { clearSession } from "../state.js";
+import { clearSession, setSession } from "../state.js";
 
 const form = document.querySelector("#character-form");
 const fieldset = document.querySelector("#character-fields");
@@ -74,7 +74,7 @@ deleteForm.addEventListener("submit", async (event) => {
     window.location.assign("/");
     return;
   } catch (error) {
-    if (error instanceof ApiError && error.status === 403) {
+    if (error instanceof ApiError && (error.status === 403 || error.status === 429)) {
       setFieldError(deletePassword, error.message);
     } else if (error instanceof ApiError && error.status !== 401) {
       showAlert(deleteAlert, "Your account could not be deleted. Please try again.");
@@ -109,12 +109,16 @@ passwordForm.addEventListener("submit", async (event) => {
 
   passwordButton.disabled = true;
   try {
-    await changePassword(currentPassword.value, newPassword.value);
+    // Every older session ends with the change; this one goes on with the token it returns
+    const changed = await changePassword(currentPassword.value, newPassword.value);
+    const { access_token: token, expires_in: expiresIn } = changed;
+    setSession({ token, tokenExpiresAt: Date.now() + expiresIn * 1000 });
     passwordForm.reset();
     closeDialog(passwordForm);
-    showAlert(alertBox, "Your password was changed.", "success");
+    showAlert(alertBox, "Your password was changed. You were logged out on every other device.", "success");
   } catch (error) {
-    if (error instanceof ApiError && error.status === 403) {
+    // 403: wrong password; 429: too many wrong passwords, the message says to wait
+    if (error instanceof ApiError && (error.status === 403 || error.status === 429)) {
       setFieldError(currentPassword, error.message);
     } else if (error instanceof ApiError && error.status === 422) {
       setFieldError(newPassword, error.message);

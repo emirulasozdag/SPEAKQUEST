@@ -81,7 +81,7 @@ def test_changing_the_password_replaces_the_old_one(client, db_session):
 
     response = client.post(CHANGE_URL, json={"current_password": PASSWORD, "new_password": "new-secret"}, headers=headers)
 
-    assert response.status_code == 204
+    assert response.status_code == 200
     new_hash = db_session.scalar(select(User.password_hash).where(User.email == EMAIL))
     assert new_hash != old_hash and new_hash.startswith("$2")
     assert "new-secret" not in new_hash
@@ -204,3 +204,59 @@ def test_every_table_with_player_progress_is_reset():
 
     assert referencing("users") - {"player_profiles"} == {model.__tablename__ for model in PROGRESS_MODELS}
     assert referencing("quest_progress") == {"dialogue_messages"}
+
+
+# --- sessions end when the password changes (#71) ----------------------------------------------
+
+
+def change(client, headers, current=PASSWORD, new="new-secret"):
+    return client.post(CHANGE_URL, json={"current_password": current, "new_password": new}, headers=headers)
+
+
+def test_changing_the_password_ends_every_older_session(client):
+    this_device = login_headers(client, EMAIL)
+    other_token = client.post("/api/auth/login", json={"email": EMAIL, "password": PASSWORD}).json()["access_token"]
+    other_device = {"Authorization": f"Bearer {other_token}"}
+
+    assert change(client, this_device).status_code == 200
+
+    assert client.get("/api/auth/me", headers=this_device).status_code == 401
+    assert client.get("/api/auth/me", headers=other_device).status_code == 401
+
+
+def test_the_client_that_changed_the_password_continues_with_the_new_token(client):
+    headers = login_headers(client, EMAIL)
+
+    body = change(client, headers).json()
+
+    assert body["token_type"] == "bearer" and body["expires_in"] > 0
+    new_headers = {"Authorization": f"Bearer {body['access_token']}"}
+    assert client.get("/api/auth/me", headers=new_headers).status_code == 200
+
+
+def test_a_new_login_after_the_change_works_and_the_change_can_happen_again(client):
+    headers = login_headers(client, EMAIL)
+    change(client, headers)
+    token = client.post("/api/auth/login", json={"email": EMAIL, "password": "new-secret"}).json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    assert client.get("/api/auth/me", headers=headers).status_code == 200
+    assert change(client, headers, current="new-secret", new="third-secret").status_code == 200
+    assert client.get("/api/auth/me", headers=headers).status_code == 401
+
+
+def test_a_wrong_current_password_keeps_the_sessions(client):
+    headers = login_headers(client, EMAIL)
+
+    assert change(client, headers, current="wrong-pass").status_code == 403
+
+    assert client.get("/api/auth/me", headers=headers).status_code == 200
+
+
+def test_one_players_password_change_keeps_other_players_logged_in(client):
+    headers = login_headers(client, EMAIL)
+    other = login_headers(client, OTHER_EMAIL)
+
+    change(client, headers)
+
+    assert client.get("/api/auth/me", headers=other).status_code == 200

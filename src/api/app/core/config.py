@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     # Registration attempts allowed per IP inside the window
     register_rate_limit: int = 5
     register_rate_window_seconds: int = 60
+    # Wrong current passwords allowed per account inside the window, for changing the password and
+    # deleting the account; someone holding a stolen session cannot guess the password endlessly
+    password_check_rate_limit: int = 5
+    password_check_rate_window_seconds: int = 900
 
     frontend_dir: Path = DEFAULT_FRONTEND_DIR
 
