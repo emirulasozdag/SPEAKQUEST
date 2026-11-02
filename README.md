@@ -355,6 +355,11 @@ işaretleyin. Hesabınız, karakteriniz ve size ait tüm oyun ve öğrenme veris
 diyaloglar, dil hataları, beceri puanları, hikâye durumu ve kararlar) kalıcı olarak silinir; oturumunuz
 kapanır ve landing page'e yönlendirilirsiniz. Bu işlem geri alınamaz.
 
+**Şifre değiştirme:** `POST /api/auth/change-password` mevcut şifreyi doğrular ve yeni bir token döner;
+şifre değişince o ana kadar açılmış tüm oturumlar kapanır (eski token'lar `401` alır). Şifre isteyen
+işlemlerde (şifre değiştirme, hesap silme) hesap başına deneme sınırı vardır; sınır aşılınca `429`
+döner (`PASSWORD_CHECK_RATE_LIMIT`, `.env.example`).
+
 Hesabı silmeden yalnızca oyunu baştan başlatmak için Profile sayfasındaki _Reset game progress_
 (`POST /api/player/reset`) kullanılır: görevler, diyaloglar, hatalar, beceri puanları, hikâye durumu ve
 kararlar silinir, XP ve seviye sıfırlanır; hesap ve karakter kalır.

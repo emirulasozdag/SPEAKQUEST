@@ -48,6 +48,7 @@ locations 1──* npcs 1──* quest_templates
 | id | int PK | |
 | email | varchar(255) | unique, index, küçük harfe çevrilmiş |
 | password_hash | varchar(255) | bcrypt |
+| token_version | int | şifre her değiştiğinde artar; token bu değeri taşır, eski token'lar `401` alır (#71) |
 | created_at | timestamptz | |
 
 ### `player_profiles` · uygulandı (#3)

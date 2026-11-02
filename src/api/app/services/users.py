@@ -66,9 +66,14 @@ def delete_account(db: Session, user: User, password: str) -> bool:
 
 
 def change_password(db: Session, user: User, current_password: str, new_password: str) -> bool:
-    """Store a new bcrypt hash. Returns False and changes nothing when the current password is wrong."""
+    """Store a new bcrypt hash and end every existing session.
+
+    Returns False and changes nothing when the current password is wrong.
+    """
     if not verify_password(current_password, user.password_hash):
         return False
     user.password_hash = hash_password(new_password)
+    # Every session opened with the old password ends here (see core/dependencies.py)
+    user.token_version += 1
     db.commit()
     return True
