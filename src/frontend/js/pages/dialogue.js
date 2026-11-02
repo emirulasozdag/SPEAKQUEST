@@ -13,6 +13,7 @@ import {
   sendDialogueMessage,
 } from "../api.js";
 import { showDecisions } from "../components/decisions.js";
+import { createDictation, createSpeaker } from "../components/voice.js";
 import { showAlert } from "../components/form.js";
 import { ENDING_PAGE, portraitUrl } from "../components/quests.js";
 
@@ -40,6 +41,9 @@ const state = {
   // Story decisions of this quest not made yet; "Complete quest" waits for them
   openDecisions: 0,
 };
+
+// Read-aloud for NPC lines; off by default, settings kept in this browser only
+const voice = createSpeaker();
 
 function categoryLabel(category) {
   const text = category.replaceAll("_", " ");
@@ -72,6 +76,16 @@ function npcBubble(text) {
   line.className = "mb-0";
   line.textContent = text;
   bubble.append(speaker, line);
+  if (voice.supported) {
+    // Each line can be heard again, whether or not "Read replies aloud" is on
+    const listen = document.createElement("button");
+    listen.type = "button";
+    listen.className = "btn btn-link btn-sm p-0 sq-listen";
+    listen.textContent = "Listen";
+    listen.setAttribute("aria-label", `Listen to ${speaker.textContent}'s line`);
+    listen.addEventListener("click", () => voice.speak(text));
+    bubble.append(listen);
+  }
   row.append(portrait, bubble);
   return row;
 }
@@ -165,6 +179,7 @@ function addTurn(turn) {
   conversation.append(feedbackBlock(turn.communication_success, turn.corrections));
   conversation.append(npcBubble(turn.npc_reply));
   scrollToLatest();
+  if (voice.settings.autoRead) voice.speak(turn.npc_reply);
 }
 
 function showHistory(messages) {
@@ -227,6 +242,7 @@ function lockConversation(note) {
   state.finished = true;
   input.disabled = true;
   sendButton.disabled = true;
+  document.querySelector("#voice-button").disabled = true;
   input.placeholder = note;
   completeBox.hidden = true;
 }
@@ -237,6 +253,7 @@ function setSending(sending) {
   sendButton.textContent = sending ? "Sending…" : "Send";
   sendButton.setAttribute("aria-busy", String(sending));
   input.readOnly = sending;
+  document.querySelector("#voice-button").disabled = sending || state.finished;
   document.querySelector("#retry-button").disabled = sending;
 }
 
@@ -441,6 +458,66 @@ async function loadDialogue() {
     loading.hidden = true;
   }
 }
+
+// ---------- Voice (#28) ----------
+
+function setupVoicePanel() {
+  const panel = document.querySelector("#voice-panel");
+  if (!voice.supported) return;
+  const auto = document.querySelector("#voice-auto");
+  const select = document.querySelector("#voice-select");
+  const rate = document.querySelector("#voice-rate");
+  const rateValue = document.querySelector("#voice-rate-value");
+
+  function fillVoices() {
+    const voices = voice.voices();
+    select.replaceChildren(
+      ...voices.map((item) => {
+        const option = document.createElement("option");
+        option.value = item.voiceURI;
+        option.textContent = `${item.name} (${item.lang})`;
+        option.selected = item.voiceURI === voice.settings.voiceURI;
+        return option;
+      }),
+    );
+    select.disabled = voices.length === 0;
+    if (!voices.length) select.append(new Option("Your browser's default voice", ""));
+  }
+
+  auto.checked = voice.settings.autoRead;
+  rate.value = String(voice.settings.rate);
+  rateValue.textContent = `${voice.settings.rate.toFixed(1)}×`;
+  fillVoices();
+  // Browsers load their voice list a little later
+  window.speechSynthesis.addEventListener?.("voiceschanged", fillVoices);
+
+  auto.addEventListener("change", () => {
+    voice.update({ autoRead: auto.checked });
+    if (!auto.checked) voice.stop();
+  });
+  select.addEventListener("change", () => voice.update({ voiceURI: select.value || null }));
+  rate.addEventListener("input", () => {
+    const { rate: value } = voice.update({ rate: Number(rate.value) });
+    rateValue.textContent = `${value.toFixed(1)}×`;
+  });
+  document.querySelector("#voice-test").addEventListener("click", () => {
+    voice.speak("Hello! This is how the characters will sound.");
+  });
+  panel.hidden = false;
+}
+
+const dictation = createDictation({
+  button: document.querySelector("#voice-button"),
+  input,
+  status: document.querySelector("#voice-status"),
+  onChange: updateCounter,
+});
+setupVoicePanel();
+// Reading or listening never continues on another page
+window.addEventListener("pagehide", () => {
+  voice.stop();
+  dictation.stop();
+});
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();

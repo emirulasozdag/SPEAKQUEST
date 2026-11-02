@@ -30,6 +30,8 @@ SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
     "Referrer-Policy": "strict-origin-when-cross-origin",
+    # Only this site may ask for the microphone (voice input, #28); camera and location never
+    "Permissions-Policy": "microphone=(self), camera=(), geolocation=()",
 }
 
 # FastAPI's interactive API docs are built with an inline script and a CDN of their own, so they

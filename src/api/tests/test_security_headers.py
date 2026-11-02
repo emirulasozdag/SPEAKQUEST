@@ -36,6 +36,13 @@ def test_the_api_docs_keep_working_without_the_csp(client):
     assert response.headers["X-Content-Type-Options"] == "nosniff"
 
 
+def test_only_this_site_may_use_the_microphone(client):
+    policy = client.get("/pages/dialogue.html").headers["Permissions-Policy"]
+
+    assert "microphone=(self)" in policy
+    assert "camera=()" in policy
+
+
 def test_the_policy_allows_no_inline_scripts_and_no_framing():
     directives = dict(part.split(" ", 1) for part in CONTENT_SECURITY_POLICY.split("; "))
 
