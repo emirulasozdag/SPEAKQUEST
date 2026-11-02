@@ -768,6 +768,23 @@ circle.sq-chart-series { fill: var(--sq-surface); stroke-width: 2.5; }
   background: var(--sq-series);
 }
 
+/* ---------- Voice (#28) ---------- */
+
+.sq-voice-button.is-listening {
+  color: var(--sq-on-dark);
+  background: var(--sq-error);
+  border-color: var(--sq-error);
+}
+
+.sq-voice-status {
+  color: var(--sq-ink-soft);
+}
+
+.sq-listen {
+  margin-top: var(--sq-space-1);
+  font-size: var(--sq-text-sm);
+}
+
 /* ---------- Privacy ---------- */
 
 /* Always visible next to where the player types, but quiet */

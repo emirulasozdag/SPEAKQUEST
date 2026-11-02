@@ -27,6 +27,7 @@ kullanmayı gerektiren yeni bir görev açılır.
 - [Klasör Yapısı](#klasör-yapısı)
 - [Kurulum ve Çalıştırma](#kurulum-ve-çalıştırma)
 - [Kullanım](#kullanım)
+- [Sesli giriş ve NPC seslendirmesi](#sesli-giriş-ve-npc-seslendirmesi)
 - [Verilerimi nasıl silerim?](#verilerimi-nasıl-silerim)
 - [API Özeti](#api-özeti)
 - [Test](#test)
@@ -364,6 +365,18 @@ içinde anlatılır. Yeni bir tablo ekleyen PR bu dokümanı da günceller.
 8. Oynanabilecek görev kalmadığında hikâye biter. **Ending** ekranı (`/pages/ending.html`) ulaştığınız
    sonu, sizi oraya götüren kararları, kazandığınız XP'yi ve en çok gelişen becerinizi gösterir.
 
+## Sesli giriş ve NPC seslendirmesi
+
+Diyalog ekranında oyuncu **Speak** düğmesiyle cevabını konuşarak girebilir. Tarayıcının Web Speech API'si
+konuşmayı mesaj kutusuna yazar; mesaj otomatik gönderilmez, oyuncu düzenleyip kendisi gönderir. Tarayıcı
+konuşma tanımayı desteklemiyorsa düğme görünmez; mikrofon izni reddedilirse ne yapılacağını söyleyen bir
+mesaj çıkar. Ses kaydı SpeakQuest sunucusuna hiç gönderilmez ve saklanmaz (bazı tarayıcılar, ör. Chrome,
+konuşmayı kendi çevrimiçi servisinde metne çevirir; gizlilik sayfasında yazar).
+
+NPC cevapları `speechSynthesis` ile sesli okunabilir: her satırda **Listen** düğmesi vardır; yan paneldeki
+**Voice** bölümünden "Read replies aloud" (varsayılan kapalı), İngilizce ses ve hız seçilir. Bu ayarlar
+yalnızca tarayıcıda (`localStorage`) tutulur. Kod `src/frontend/js/components/voice.js` içindedir.
+
 ## Verilerimi nasıl silerim?
 
 Oyunun hangi verileri sakladığı, mesajların hangi AI servisine gönderildiği ve silme yolları oyun içindeki
@@ -444,6 +457,9 @@ stil niteliği kullanılmaz, sayfa başka bir sitede çerçeve içinde açılama
 ## Test
 
 Backend testleri `pytest` ile yazılır. Her Pull Request'te GitHub Actions üzerinde otomatik çalışır.
+Tarayıcı olmadan çalışabilen ön yüz modüllerinin (ör. ses bileşeni) birim testleri Node'un kendi test
+aracıyla yazılır ve CI'da `frontend-tests` işinde çalışır; yerelde Node 20+ ile:
+`node --test "src/frontend/tests/*.test.mjs"`.
 Yerelde çalıştırmak için:
 
 ```bash
