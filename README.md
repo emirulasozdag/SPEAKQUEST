@@ -460,11 +460,29 @@ yalnızca testlere ayrılmış boş bir veritabanı verin (her testte tablolar s
 TEST_DATABASE_URL=postgresql+psycopg://speakquest:speakquest@localhost:5433/speakquest_test pytest
 ```
 
-CI'da iki iş vardır: `api-tests` testleri SQLite'ta çalıştırır. `postgres` işi ise gerçek bir
+CI'da üç iş vardır: `api-tests` testleri SQLite'ta çalıştırır. `postgres` işi ise gerçek bir
 PostgreSQL'de tek bir migration head olduğunu kontrol eder, boş veritabanında `alembic upgrade head`,
-`alembic check` ve `alembic downgrade base` çalıştırır ve testleri PostgreSQL'de koşar.
+`alembic check` ve `alembic downgrade base` çalıştırır ve testleri PostgreSQL'de koşar. Üçüncü iş
+`browser-tests` tarayıcı duman testlerini koşar (aşağıda).
 `tests/test_access_control.py` her korumalı endpoint'in token istediğini ve bir oyuncunun başka bir
 oyuncunun verisini okuyup değiştiremediğini doğrular.
+
+**Tarayıcı duman testleri:** `tests/browser/` ana oyun akışını gerçek bir tarayıcıda (Playwright,
+Chromium) dener: kayıt → giriş → karakter → dashboard, harita → görev başlatma → diyalog (mesaj,
+düzeltme rozeti, karar, görevi tamamlama ve özet), Quest Journal sekmeleri ve Learning Progress.
+Testler sunucuyu kendisi başlatır; her test boş bir test veritabanı ve sahte AI istemcisi kullanır,
+gerçek AI çağrılmaz. Her test sayfada JavaScript ya da konsol hatası olmadığını da kontrol eder.
+Normal `pytest` bu testleri atlar, tarayıcı gerekmez. Çalıştırmak için `src/api` klasöründe:
+
+```bash
+pip install -r requirements-dev.txt
+python -m playwright install chromium
+pytest -m browser
+```
+
+Tarayıcıyı görerek izlemek için `pytest -m browser --headed --slowmo 300`. CI'daki `browser-tests`
+işi bu testleri ayrı koşar; bir test kırılırsa ekran görüntüsü `browser-test-screenshots` artifact'i
+olarak yüklenir (yerelde `--screenshot only-on-failure --output test-results`).
 
 Testlerde öncelik verilen alanlar:
 
