@@ -1,0 +1,44 @@
+{
+  "slug": "a_walk_to_the_market",
+  "title": "A Walk to the Market",
+  "chapter": 3,
+  "location": "market",
+  "npc": "rosa",
+  "target_skills": ["prepositions", "question_formation"],
+  "min_level": "A2",
+  "max_level": "B1",
+  "summary": "You need a few things for your new flat, so you walk down to the Riverside Market. Rosa, the flower seller, knows every stall and every street. Ask her the way and find what you need.",
+  "locked_summary": "There is a busy market by the river, a short walk from Linden Street.",
+  "npc_knows": [
+    "The hardware stall is behind the fruit stalls, next to the old book stall. It sells light bulbs, hooks and small tools.",
+    "The bus stop for the city centre is at the end of the market, in front of the old stone bridge.",
+    "The River Festival is this Saturday. Rosa is organising it and she still needs one more volunteer for the flower stall."
+  ],
+  "npc_opening": "Hello there! You look a bit lost. First time at the Riverside Market? I'm Rosa. Tell me what you're looking for and I'll tell you where it is.",
+  "objectives": [
+    { "id": "ask_the_way", "description": "Ask Rosa where to find something you need." },
+    { "id": "describe_location", "description": "Say where a place or a stall is, using words like next to, behind or opposite." },
+    { "id": "buy_something", "description": "Buy something at the market and say why you need it." }
+  ],
+  "prerequisites": { "quests_completed": ["meet_your_neighbor"] },
+  "rewards": { "xp": 70, "trust": { "rosa": 5 } },
+  "allowed_story_actions": ["continue", "npc_pleased", "npc_confused", "directions_understood"],
+  "decision_points": [
+    {
+      "id": "festival_volunteer",
+      "prompt": "Rosa tells you about the River Festival on Saturday. She needs one more person to help at the flower stall. Do you volunteer?",
+      "options": [
+        {
+          "id": "volunteer",
+          "label": "Say yes and promise to help at the flower stall on Saturday.",
+          "effects": { "flags": ["joined_festival_team"], "trust": { "rosa": 15 } }
+        },
+        {
+          "id": "busy_weekend",
+          "label": "Say sorry, you already have plans this weekend.",
+          "effects": {}
+        }
+      ]
+    }
+  ]
+}

@@ -87,7 +87,7 @@ Mekânın kilitli olup olmadığı saklanmaz. Story Engine bunu oyuncunun durumu
 | Alan | Tip | Not |
 |---|---|---|
 | id | int PK | |
-| slug | varchar(40) | unique (`mia`, `alex`, `olivia`) |
+| slug | varchar(40) | unique (`mia`, `alex`, `olivia`, `rosa`) |
 | location_id | int FK → locations | |
 | name | varchar(60) | |
 | role | varchar(80) | |
@@ -177,7 +177,8 @@ seviye atlanıp atlanmadığını döner. Aynı görev için gelen ikinci istek,
 güncellemede satır bulamadığı için XP almaz. Şablondaki güven ödülü (`rewards.trust`) aynı transaction'da Story Engine ile eklenir (#13).
 
 **XP ve seviye:** `engines/progression.py`. Seviye eşikleri `LEVEL_THRESHOLDS = (0, 50, 120, 220, 350,
-500)`; MVP'nin 5 görevi toplam 410 XP verir ve oyuncuyu 5. seviyeye çıkarır. Görev tamamlanırken
+500)`; MVP'nin 5 görevi toplam 410 XP verir ve oyuncuyu 5. seviyeye çıkarır. Riverside Market
+görevleriyle sekiz görevin toplamı 860 XP'dir; 500 XP'de son seviye olan 6'ya ulaşılır. Görev tamamlanırken
 `add_xp()` sonucu `player_profiles.xp/level` ve `quest_progress.xp_awarded` alanlarına yazılır.
 
 ### `dialogue_messages` · uygulandı (#11)

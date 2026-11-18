@@ -32,5 +32,17 @@
       "The job is a customer assistant at the front desk: answering questions, booking trips and helping visitors.",
       "She is looking for someone friendly who has worked with people before, in any job."
     ]
+  },
+  {
+    "slug": "rosa",
+    "location": "market",
+    "name": "Rosa",
+    "role": "Flower seller and organiser of the Riverside Market",
+    "personality": "Energetic, warm and very direct. Rosa has sold flowers by the river for twenty years, knows every street in the neighbourhood and is always planning the next market event.",
+    "speaking_style": "Fast and friendly. Explains where things are with landmarks and place words (next to, opposite, behind, between, at the end of) and checks that the listener understood.",
+    "knows": [
+      "The Riverside Market is open every day from eight until two, and on Saturdays until six.",
+      "The market is between the river and the bus station. The old stone bridge is at the end of the market, and the pharmacy is opposite the bridge."
+    ]
   }
 ]

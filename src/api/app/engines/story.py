@@ -19,7 +19,19 @@ from app.engines.trust import TRUST_MAX, TRUST_MIN, clamp_trust
 # Story actions that make the quest's NPC like the player a little more. Every other allowed action
 # (continue, npc_confused, interview_concern) only colours the conversation and changes nothing:
 # a language learner is never punished in the story for being misunderstood.
-TRUST_RAISING_ACTIONS = frozenset({"npc_pleased", "order_taken", "viewing_positive", "interview_positive", "clue_found"})
+TRUST_RAISING_ACTIONS = frozenset(
+    {
+        "npc_pleased",
+        "order_taken",
+        "viewing_positive",
+        "interview_positive",
+        "clue_found",
+        "directions_understood",
+        "customer_helped",
+        "stall_ready",
+        "visitor_helped",
+    }
+)
 # The most trust one AI-suggested action can add. Decisions (+15) and quest rewards (+5/+10) are
 # what move the story; a pleased NPC is only a small bonus on top.
 ACTION_TRUST_STEP = 2

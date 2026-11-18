@@ -1,0 +1,44 @@
+{
+  "slug": "first_day_at_work",
+  "title": "First Day at Work",
+  "chapter": 3,
+  "location": "office",
+  "npc": "olivia",
+  "target_skills": ["present_simple", "vocabulary_usage"],
+  "min_level": "A2",
+  "max_level": "B1",
+  "summary": "You got the job! It is your first day at the front desk of Bright Path Travel. Olivia shows you around, explains your daily tasks and watches you help your first customers.",
+  "locked_summary": "Bright Path Travel has news about the customer assistant job.",
+  "npc_knows": [
+    "The player got the customer assistant job after the interview. Today is their first day.",
+    "The front desk opens at nine and closes at six. Every morning the assistant checks emails, prints the day's tickets and answers the phone.",
+    "The most popular trips this month are a weekend in Lisbon (two nights, 320 per person) and a train tour of the mountains (five days, 590 per person)."
+  ],
+  "npc_opening": "Good morning, and welcome to the team! I'm so glad you said yes. Let me show you the front desk. First, tell me: what do you usually do in the morning before work?",
+  "objectives": [
+    { "id": "describe_routine", "description": "Tell Olivia about your usual morning or your daily routine." },
+    { "id": "explain_tasks", "description": "Explain what a customer assistant does every day." },
+    { "id": "help_customer", "description": "Answer a customer's question about a trip, its price or its dates." }
+  ],
+  "prerequisites": { "quests_completed": ["the_job_interview"] },
+  "rewards": { "xp": 100, "trust": { "olivia": 10 } },
+  "allowed_story_actions": ["continue", "npc_pleased", "npc_confused", "customer_helped"],
+  "decision_points": [
+    {
+      "id": "late_customer",
+      "prompt": "It is five to six and Olivia is closing the office. A tired traveller runs in: their train was cancelled and they need a new ticket for tonight.",
+      "options": [
+        {
+          "id": "stay_and_help",
+          "label": "Stay a little longer and help the traveller book a new ticket.",
+          "effects": { "flags": ["helped_late_customer"], "trust": { "olivia": 15 } }
+        },
+        {
+          "id": "come_back_tomorrow",
+          "label": "Politely ask the traveller to come back tomorrow morning.",
+          "effects": {}
+        }
+      ]
+    }
+  ]
+}

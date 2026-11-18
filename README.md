@@ -167,6 +167,8 @@ doğru kategori bulunur. Yöntem, önce/sonra karşılaştırması ve sınırlar
 - Ana dashboard (profil, seviye, XP, aktif görev, gelişim)
 - 2D şehir haritası ve 3 mekân: **Café, Apartment, Office**
 - 3 NPC ve 5 temel görev (hikâye, görevler ve sonlar: [docs/story-bible.md](docs/story-bible.md))
+- MVP'den sonra eklenen: 4. mekân **Riverside Market**, yeni NPC **Rosa**, 3 yeni görev ve
+  toplam 4 farklı son
 - Yapay zekâ destekli yazılı diyalog ve İngilizce hata analizi
 - Learning Engine ve Story Engine
 - Kullanıcıya göre görev seçimi

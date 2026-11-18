@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Rosa, flower seller at the Riverside Market">
+  <title>Rosa, flower seller at the Riverside Market</title>
+  <clipPath id="frame"><circle cx="60" cy="60" r="60"/></clipPath>
+  <g clip-path="url(#frame)">
+  <circle cx="60" cy="60" r="60" fill="#f7dbe6"/>
+  <path d="M30 58c-4-26 10-40 30-40s34 14 30 40c4 10 2 22-4 30H34c-6-8-8-20-4-30z" fill="#8a8a8a"/>
+  <path d="M18 120c2-24 20-36 42-36s40 12 42 36z" fill="#2f8a5f"/>
+  <path d="M40 92h40l-4 28H44z" fill="#fff6e9"/>
+  <rect x="52" y="70" width="16" height="16" rx="6" fill="#d9a27a"/>
+  <ellipse cx="60" cy="54" rx="21" ry="24" fill="#d9a27a"/>
+  <path d="M38 50c2-14 12-22 22-22s20 8 22 22c-8-8-14-10-22-10-8 0-14 2-22 10z" fill="#8a8a8a"/>
+  <circle cx="82" cy="38" r="7" fill="#b8396b"/><circle cx="82" cy="38" r="2.6" fill="#f2b632"/>
+  <circle cx="52" cy="56" r="2.6" fill="#1e2a47"/>
+  <circle cx="68" cy="56" r="2.6" fill="#1e2a47"/>
+  <path d="M51 65q9 8 18 0" fill="none" stroke="#1e2a47" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M46 49l10-1M64 48l10 1" stroke="#5f5f5f" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>

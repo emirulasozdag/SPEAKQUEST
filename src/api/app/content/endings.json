@@ -1,5 +1,15 @@
 [
   {
+    "slug": "heart_of_the_neighbourhood",
+    "title": "Heart of the Neighbourhood",
+    "summary": "At the end of the River Festival, Alex, Mia, Rosa and Olivia sit with you on the old stone bridge and watch the lights on the water. You helped your neighbours, your new team and the whole market. People in the street now say your name the way they say Mia's.",
+    "conditions": {
+      "quests_completed": ["the_flat_viewing", "the_missing_backpack", "first_day_at_work", "the_river_festival"],
+      "flags": ["helped_alex", "watched_mia_bag", "helped_late_customer", "joined_festival_team", "invited_neighbours"],
+      "min_trust": { "alex": 30, "mia": 30, "olivia": 30, "rosa": 30 }
+    }
+  },
+  {
     "slug": "home_at_last",
     "title": "Home at Last",
     "summary": "Alex and Mia throw you a small welcome party in the Linden House courtyard. You helped your neighbours when they needed it, and now the city feels like home.",
@@ -7,6 +17,16 @@
       "quests_completed": ["the_flat_viewing", "the_missing_backpack"],
       "flags": ["helped_alex", "watched_mia_bag"],
       "min_trust": { "alex": 30, "mia": 30 }
+    }
+  },
+  {
+    "slug": "a_place_in_the_city",
+    "title": "A Place in the City",
+    "summary": "A month later, Olivia gives you your own desk by the window at Bright Path Travel. Customers ask for you by name. You still don't know all your neighbours, but your work has given you a place in the city.",
+    "conditions": {
+      "quests_completed": ["first_day_at_work"],
+      "flags": ["helped_late_customer"],
+      "min_trust": { "olivia": 30 }
     }
   },
   {

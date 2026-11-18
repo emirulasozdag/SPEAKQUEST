@@ -8,6 +8,12 @@ hikâye sonuna götürür.
 Senaryo gerçek AI (Gemini) ile iki kez baştan sona oynandı. İki oynanışta da öneri sırası ve sonlar
 birebir aynı çıktı (bkz. [Gerçek AI ile oynanış](#gerçek-ai-ile-oynanış)).
 
+> **Not:** Bu senaryo ve aşağıdaki ekran görüntüleri, Riverside Market eklenmeden önceki beş
+> görevlik sürümle kaydedildi. Bugün iki oyuncunun önüne ayrıca **A Walk to the Market** ve
+> **First Day at Work** de çıkar; hikâye bunlar da oynandıktan sonra biter. Ayşe bu görevlerde
+> "hayır" derse yine **Home at Last**'a, Burak yalnızca işte yardım ederse **A Place in the
+> City**'ye ulaşır. Sonların kuralları: [story-bible.md](story-bible.md#sonlar).
+
 ## Hazırlık
 
 1. `.env` içinde `AI_PROVIDER=gemini` ve `AI_API_KEY` dolu olmalı (README, "Kurulum ve Çalıştırma").

@@ -27,12 +27,14 @@ def test_the_map_lists_every_place_in_order_with_its_characters(client, headers,
 
     assert response.status_code == 200
     places = response.json()
-    assert [place["slug"] for place in places] == ["apartment", "cafe", "office"]
+    assert [place["slug"] for place in places] == ["apartment", "cafe", "office", "market"]
     assert [place["sort_order"] for place in places] == sorted(place["sort_order"] for place in places)
     by_slug = {place["slug"]: place for place in places}
     assert [npc["slug"] for npc in by_slug["office"]["npcs"]] == ["olivia"]
     assert by_slug["office"]["npcs"][0]["name"] == "Olivia"
     assert by_slug["office"]["npcs"][0]["role"]
+    assert [npc["slug"] for npc in by_slug["market"]["npcs"]] == ["rosa"]
+    assert by_slug["market"]["name"] == "Riverside Market"
 
 
 def test_each_quest_carries_its_story_data_and_the_players_status(client, headers, seeded):
