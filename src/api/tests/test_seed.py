@@ -1,7 +1,6 @@
 """The seed command: content files -> database, repeatable and update-in-place."""
 
 import copy
-import json
 
 from sqlalchemy import func, select
 
@@ -12,6 +11,11 @@ from app.models.content import Location, Npc, QuestTemplate
 
 def counts(db) -> tuple[int, int, int]:
     return tuple(db.scalar(select(func.count()).select_from(model)) for model in (Location, Npc, QuestTemplate))
+
+
+CONTENT = load_content()
+# (locations, NPCs, quests) in the real content files
+WORLD = (len(CONTENT.locations), len(CONTENT.npcs), len(CONTENT.quests))
 
 
 def changed_content(mutate) -> Content:
@@ -26,7 +30,7 @@ def test_first_run_creates_everything_from_the_content_files(db_session):
     report = seed_content(db_session)
 
     assert counts(db_session) == (len(content.locations), len(content.npcs), len(content.quests))
-    assert report.created == {"location": 3, "npc": 3, "quest": 5}
+    assert report.created == {"location": 4, "npc": 4, "quest": 8}
     assert report.updated == {} and report.unchanged == {}
 
 
@@ -36,9 +40,9 @@ def test_running_it_twice_creates_no_duplicates_and_changes_nothing(db_session):
 
     report = seed_content(db_session)
 
-    assert counts(db_session) == (3, 3, 5)
+    assert counts(db_session) == WORLD
     assert report.created == {} and report.updated == {}
-    assert report.unchanged == {"location": 3, "npc": 3, "quest": 5}
+    assert report.unchanged == {"location": 4, "npc": 4, "quest": 8}
     assert {row.slug: row.id for row in db_session.scalars(select(QuestTemplate))} == ids
 
 
@@ -84,41 +88,36 @@ def test_a_changed_file_updates_the_row_in_place(db_session):
     assert row.id == before  # progress that points at this row stays valid
     assert db_session.scalar(select(Npc).where(Npc.slug == "olivia")).role == "Head of hiring"
     assert report.updated == {"quest": 1, "npc": 1}
-    assert counts(db_session) == (3, 3, 5)
+    assert counts(db_session) == WORLD
 
 
 def test_a_new_quest_in_the_files_is_added(db_session):
     seed_content(db_session)
 
-    def add_quest(raw):
-        extra = copy.deepcopy(raw["quests"][0])
-        extra.update(
-            slug="extra_quest",
-            title="Extra",
-            prerequisites={"quests_completed": ["meet_your_neighbor"]},
-            locked_summary="Something new is waiting.",
-        )
-        raw["quests"].append(extra)
-
-    report = seed_content(db_session, changed_content(add_quest))
+    report = seed_content(db_session, changed_content(add_extra_quest))
 
     assert report.created == {"quest": 1}
-    assert counts(db_session) == (3, 3, 6)
+    assert counts(db_session) == (WORLD[0], WORLD[1], WORLD[2] + 1)
+
+
+def add_extra_quest(raw):
+    extra = copy.deepcopy(raw["quests"][0])
+    extra.update(
+        slug="extra_quest",
+        title="Extra",
+        prerequisites={"quests_completed": ["meet_your_neighbor"]},
+        locked_summary="Something new is waiting.",
+    )
+    raw["quests"].append(extra)
 
 
 def test_removing_a_quest_from_the_files_does_not_delete_the_row(db_session):
-    # Players may already have progress on it; removing content is a deliberate migration
+    # Players may already have progress on it; removing content is a deliberate migration.
+    # Every quest in the real files is needed by an ending or another quest, so the test adds an
+    # extra quest first and then seeds the real files, which no longer have it.
+    seed_content(db_session, changed_content(add_extra_quest))
+
     seed_content(db_session)
 
-    def remove_a_quest_nobody_refers_to(raw):
-        # The content validator rightly refuses to drop a quest that an ending or another quest needs
-        for quest in raw["quests"]:
-            others = json.dumps([q for q in raw["quests"] if q is not quest] + [raw["endings"]])
-            if quest["slug"] not in others:
-                raw["quests"].remove(quest)
-                return
-        raise AssertionError("every quest is referenced; pick another way to remove one")
-
-    seed_content(db_session, changed_content(remove_a_quest_nobody_refers_to))
-
-    assert counts(db_session) == (3, 3, 5)
+    assert counts(db_session) == (WORLD[0], WORLD[1], WORLD[2] + 1)
+    assert db_session.scalar(select(QuestTemplate).where(QuestTemplate.slug == "extra_quest")) is not None

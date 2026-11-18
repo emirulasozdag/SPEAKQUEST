@@ -16,5 +16,11 @@
     "name": "Bright Path Travel",
     "description": "A friendly travel agency in the city centre, with maps on the walls and a busy front desk. They are looking for a new customer assistant.",
     "sort_order": 3
+  },
+  {
+    "slug": "market",
+    "name": "Riverside Market",
+    "description": "An open-air market along the river, a short walk from Linden Street. Fruit, flowers, old books and street food, and on Saturdays the whole neighbourhood seems to be here.",
+    "sort_order": 4
   }
 ]

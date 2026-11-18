@@ -10,7 +10,7 @@ ham renk ve ölçü yerine bu token'ları kullanır. Yeni bir renk veya ölçü 
 |---|---|---|
 | Metin ve yüzey | `--sq-ink`, `--sq-ink-soft`, `--sq-muted`, `--sq-paper`, `--sq-surface`, `--sq-line` | Ana metin `--sq-ink`, ikincil metin `--sq-ink-soft` |
 | Koyu zemin | `--sq-on-dark`, `--sq-on-dark-soft` | Header ve hero üzerindeki metin |
-| Mekân renkleri | `--sq-cafe`, `--sq-apartment`, `--sq-office` ve her biri için `-tint` | Renk çizgi, nokta, buton içindir; `-tint` arka plandır |
+| Mekân renkleri | `--sq-cafe`, `--sq-apartment`, `--sq-office`, `--sq-market` ve her biri için `-tint` | Renk çizgi, nokta, buton içindir; `-tint` arka plandır |
 | Geri bildirim | `--sq-error`, `--sq-fix`, `--sq-ok` ve koyu zemin sürümleri (`-on-dark`) | Yanlış kelime üstü çizili kırmızı, doğrusu kalın yeşil |
 | Yalnızca şekil | `--sq-locked`, `--sq-park` | Kontrastı metin için yeterli değildir, metinde kullanılmaz |
 | Tipografi | `--sq-font-display` (Bricolage Grotesque), `--sq-font-body` (Atkinson Hyperlegible), `--sq-text-sm/base/lg` | Gövde fontu okunabilirlik için seçildi |
@@ -24,7 +24,7 @@ bileşenleri de aynı paleti kullanır.
 
 ## Mekân temaları
 
-Bir öğeye `sq-cafe`, `sq-apartment` veya `sq-office` sınıfı verilince `--sq-line-color` ve `--sq-tint`
+Bir öğeye `sq-cafe`, `sq-apartment`, `sq-office` veya `sq-market` sınıfı verilince `--sq-line-color` ve `--sq-tint`
 o mekâna göre ayarlanır. Paneldeki istasyon noktası, portre çerçevesi, sahne arka planı ve haritadaki etiket
 çerçevesi bu iki değişkeni okur.
 
@@ -33,16 +33,19 @@ o mekâna göre ayarlanır. Paneldeki istasyon noktası, portre çerçevesi, sah
 | `apartment` | Linden House | yeşil | Alex |
 | `cafe` | Corner Café | amber | Mia |
 | `office` | Bright Path Travel | mavi | Olivia |
+| `market` | Riverside Market | gül (`#b8396b`, beyaz üzerinde 5.5:1) | Rosa |
 
 ## İllüstrasyonlar
 
 Tüm görseller `src/frontend/assets/` altındaki elle yazılmış SVG'lerdir; telifli oyun görseli kullanılmaz.
 
 - `logo.svg`: konuşma balonu içinde yıldız.
-- `portraits/{mia,alex,olivia}.svg` ve `avatars/avatar-{1,2,3}.svg`: aynı çizim dili. Daire içinde düz
+- `portraits/{mia,alex,olivia,rosa}.svg` ve `avatars/avatar-{1,2,3}.svg`: aynı çizim dili. Daire içinde düz
   şekiller, kontur yok, mekân `-tint` rengiyle arka plan.
-- `scenes/{cafe,apartment,office}.svg`: diyalog ekranı ve landing kartları için 800×240 sahne arka planları.
+- `scenes/{cafe,apartment,office,market}.svg`: diyalog ekranı ve landing kartları için 800×240 sahne arka planları.
 - Şehir haritası `pages/map.html` içinde satır içi SVG'dir, böylece CSS ve JS mekânlara erişebilir.
+  Harita 800×600'dür: üstte Linden Street ve şehir merkezi, altta nehir kenarındaki pazar ve eski
+  taş köprü (`--sq-stone`).
 
 `<img>` ile yüklenen SVG'ler CSS değişkenlerini okuyamaz. Bu yüzden renkleri dosyaya yazılıdır ve
 token'larla aynı değerleri kullanır. Bir token değişirse bu dosyalar da güncellenir.

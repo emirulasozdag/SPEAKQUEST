@@ -10,7 +10,8 @@ PR ikisini birlikte günceller. Dosyaların doğruluğunu `tests/test_content_fi
 ## Dünya
 
 Oyuncu, adı geçmeyen modern bir şehre yeni taşınmıştır. Hikâye tek bir mahallede, **Linden
-Street**'te geçer: eski bir apartman, köşedeki kafe ve şehir merkezindeki bir seyahat acentesi.
+Street**'te geçer: eski bir apartman, köşedeki kafe, şehir merkezindeki bir seyahat acentesi ve
+nehir kenarındaki açık pazar.
 Ton sıcak ve günlüktür; büyük maceralar değil, yeni bir şehirde yer edinmenin küçük anları
 anlatılır. Oyuncunun İngilizcesi hikâyeyi ilerletir: anlaşılır konuşmak yeterlidir, kusursuz
 dil bilgisi gerekmez.
@@ -22,6 +23,7 @@ dil bilgisi gerekmez.
 | `apartment` | Linden House | Oyuncunun yeni evi. Eski, gıcırdayan merdivenli, herkesin birbirini tanıdığı bir apartman. |
 | `cafe` | Corner Café | Apartmanın köşesindeki küçük kafe. Müdavimler Mia'yı ismiyle tanır. |
 | `office` | Bright Path Travel | Şehir merkezinde bir seyahat acentesi. Yeni bir müşteri asistanı arıyorlar. |
+| `market` | Riverside Market | Linden Street'e birkaç dakika yürüme mesafesinde, nehir kenarında açık pazar. Meyve, çiçek, eski kitap ve sokak yemeği; cumartesileri bütün mahalle buradadır. |
 
 ## Karakterler (NPC)
 
@@ -63,6 +65,27 @@ yazılır. Yoksa NPC olayı daha olmadan, önceki görevlerde anlatır (#64).
 - **Bildikleri:** İş, ön büroda müşteri asistanlığı: soruları cevaplamak, seyahat
   rezervasyonu yapmak, ziyaretçilere yardım etmek. Daha önce herhangi bir işte insanlarla
   çalışmış, güler yüzlü birini arıyor.
+- **Yalnızca First Day at Work'te bildikleri:** Oyuncu mülakattan sonra işi aldı ve bugün ilk günü.
+  Ön büro dokuzda açılır, altıda kapanır; asistan her sabah e-postaları kontrol eder, günün
+  biletlerini basar ve telefona bakar. Bu ayın en popüler turları: Lizbon'da hafta sonu (iki gece,
+  kişi başı 320) ve dağlarda tren turu (beş gün, kişi başı 590).
+
+### Rosa · çiçekçi ve pazar sorumlusu (`market`)
+
+- **Kişilik:** Enerjik, sıcak ve çok doğrudan. Yirmi yıldır nehir kenarında çiçek satıyor,
+  mahallenin her sokağını biliyor ve hep bir sonraki pazar etkinliğini planlıyor.
+- **Konuşma tarzı:** Hızlı ve samimi. Bir yerin nerede olduğunu simgelerle ve yer edatlarıyla
+  anlatır (next to, opposite, behind, between, at the end of) ve karşısındakinin anlayıp
+  anlamadığını kontrol eder. Bu yüzden edatları (prepositions) çalıştıran görevlerin NPC'sidir.
+- **Bildikleri:** Pazar her gün sekizden ikiye, cumartesileri altıya kadar açık. Pazar nehir ile
+  otogar arasında; eski taş köprü pazarın sonunda, eczane köprünün karşısında.
+- **Yalnızca A Walk to the Market'te bildikleri:** Hırdavat tezgâhı meyve tezgâhlarının arkasında,
+  eski kitapçının yanında. Şehir merkezi otobüsü pazarın sonunda, taş köprünün önünden kalkar.
+  Bu cumartesi River Festival var; Rosa düzenliyor ve çiçek tezgâhı için bir gönüllü daha arıyor.
+- **Yalnızca The River Festival'da bildikleri:** Festival on birde açılır. Canlı müzik taş
+  köprüde, yemek alanı otogarın yanında, çocuk köşesi kitapçının arkasında. Çiçek tezgâhının üç
+  masası var: büyük ayçiçeği kovaları önde, küçük saksılar sol masada, fiyat tahtası tezgâhın
+  üstünde. Pazarın sonunda boş bir masa var; Rosa onu mahalleden birilerine vermek istiyor.
 
 ## Bölümler ve görevler
 
@@ -72,9 +95,13 @@ yazılır. Yoksa NPC olayı daha olmadan, önceki görevlerde anlatır (#64).
 | 2 · Settling In | Morning at the Café | Café · Mia | vocabulary_usage, prepositions | Meet Your Neighbor |
 | 2 · Settling In | The Flat Viewing | Apartment · Alex | question_formation | Meet Your Neighbor + `helped_alex` |
 | 2 · Settling In | The Job Interview | Office · Olivia | past_simple | Meet Your Neighbor |
-| 3 · The Missing Backpack | The Missing Backpack | Café · Mia | past_simple, question_formation | Morning at the Café + `watched_mia_bag` |
+| 3 · Finding My Feet | The Missing Backpack | Café · Mia | past_simple, question_formation | Morning at the Café + `watched_mia_bag` |
+| 3 · Finding My Feet | First Day at Work | Office · Olivia | present_simple, vocabulary_usage | The Job Interview |
+| 3 · Finding My Feet | A Walk to the Market | Market · Rosa | prepositions, question_formation | Meet Your Neighbor |
+| 4 · The River Festival | The River Festival | Market · Rosa | prepositions, vocabulary_usage | A Walk to the Market + `joined_festival_team` |
 
-Beş hata kategorisinin hepsi en az bir görevde hedeflenir. Spec'teki görev adlarıyla
+Beş hata kategorisinin hepsi en az bir görevde hedeflenir; en az çalışılan iki kategori olan
+Prepositions ve Vocabulary Usage, pazar görevleriyle ikişer görev daha kazanır. Spec'teki görev adlarıyla
 karşılıkları: _A New Beginning_ → Meet Your Neighbor, _Coffee and Conversations_ → Morning at
 the Café, _Finding a Place to Stay_ → The Flat Viewing.
 
@@ -121,16 +148,67 @@ gördüklerini anlatır ve doğru sorularla ne olduğunu bulmaya yardım eder (p
 kurma). **Hedefler:** dün kafede ne yaptığını ve gördüğünü anlat; Mia'ya çantayı en son ne
 zaman ve nerede gördüğünü sor; çantayı geri almak için ne yapabileceğini öner.
 
+### 6. First Day at Work
+
+Mülakattan sonra açılır: oyuncu işi almıştır. Olivia ön büroyu gösterir ve oyuncunun ilk
+müşterilerine yardım etmesini izler (present simple, kelime bilgisi). **Hedefler:** sabah
+rutinini ya da günlük düzenini anlat; müşteri asistanının her gün ne yaptığını açıkla; bir
+müşterinin tur, fiyat ya da tarih sorusunu cevapla.
+
+Mülakat ödülü Olivia'ya her zaman +10 güven verdiği için bu görevde ayrıca güven eşiği yoktur.
+Eşik koyulsaydı Quest Journal'daki kilit gerekçesi güven puanını gösterirdi; güven oyuncuya
+sayı olarak gösterilmez.
+
+**Karar · `late_customer`:** Kapanışa beş dakika kala treni iptal olmuş yorgun bir yolcu gelir.
+- _Stay a little longer and help the traveller book a new ticket._ → `helped_late_customer`,
+  Olivia güveni +15.
+- _Politely ask the traveller to come back tomorrow morning._ → etkisi yok.
+
+### 7. A Walk to the Market
+
+Yeni daire için birkaç şey lazımdır; oyuncu nehir kenarındaki pazara iner. Rosa her tezgâhı
+bilir. Oyuncu yol sorar ve bir yerin nerede olduğunu anlatır (edatlar, soru kurma).
+**Hedefler:** Rosa'ya bir şeyin nerede olduğunu sor; bir yerin ya da tezgâhın nerede olduğunu
+next to, behind, opposite gibi kelimelerle söyle; pazardan bir şey al ve neden lazım olduğunu söyle.
+
+Bölüm 3'tedir, çünkü yalnızca başlangıç görevini ister ve bölüm 2 görevleriyle aynı anda açılır.
+Bölüm sıralamada eşitliği bozar: hedefi "everyday" olan yeni oyuncuya ilk önce yine Morning at
+the Café önerilir.
+
+**Karar · `festival_volunteer`:** Rosa cumartesi günkü River Festival'dan bahseder ve çiçek
+tezgâhı için bir kişiye daha ihtiyacı vardır.
+- _Say yes and promise to help at the flower stall on Saturday._ → `joined_festival_team`,
+  Rosa güveni +15.
+- _Say sorry, you already have plans this weekend._ → etkisi yok.
+
+### 8. The River Festival
+
+Yalnızca gönüllü olan oyuncuya açılır. Cumartesi sabahı, festival iki saat sonra açılacaktır.
+Oyuncu Rosa'yla tezgâhı kurar ve ilk ziyaretçilere festivalde ne bulabileceklerini anlatır
+(edatlar, kelime bilgisi). **Hedefler:** masaların, çiçeklerin ya da fiyat tahtasının nereye
+konacağını söyle; bir ziyaretçiye tezgâhtaki çiçekleri anlat; bir ziyaretçiye müziğin, yemeğin ya
+da çocuk köşesinin nerede olduğunu söyle.
+
+**Karar · `invite_neighbours`:** Rosa pazarın sonundaki boş masayı gösterir: "Bunu isteyecek
+birini tanıyor musun?" Oyuncunun aklına Alex'in bitkileri ve Mia'nın tarçınlı çörekleri gelir.
+- _Call Alex and Mia and invite them to share the empty table._ → `invited_neighbours`,
+  Rosa +10, Alex +5, Mia +5.
+- _Say you are happy to focus on the flower stall today._ → etkisi yok.
+
 ## Kararlar ve dallanma
 
-İki karar, iki farklı görevin kilidini açar:
+Beş karar var. Üçü bir görevin kilidini açar, ikisi yalnızca hangi sona gidileceğini değiştirir:
 
 | Karar | Seçim | Açtığı içerik |
 |---|---|---|
 | `help_alex_move` | help | The Flat Viewing |
 | `watch_mia_bag` | watch | The Missing Backpack |
+| `festival_volunteer` | volunteer | The River Festival |
+| `late_customer` | stay_and_help | A Place in the City ve Heart of the Neighbourhood sonları |
+| `invite_neighbours` | invite | Heart of the Neighbourhood sonu |
 
-Yardım etmeyen oyuncu o görevi hiç görmez ve "New in Town" sonuna gider. Böylece kararların
+Yardım etmeyen oyuncu o görevi hiç görmez ve kararlarına göre "A Place in the City" ya da
+"New in Town" sonuna gider. Böylece kararların
 sonucu oyuncunun hangi görevleri oynadığında ve hangi sonu gördüğünde hissedilir.
 
 Karar, görev sürerken verilir. **Açık (verilmemiş) karar noktası olan görev tamamlanamaz**
@@ -151,14 +229,33 @@ sonudur. Son, oyuncunun açabileceği bütün görevler tamamlandığında değe
 
 | Son | Koşullar |
 |---|---|
+| **Heart of the Neighbourhood** | Sekiz görevin hepsi tamamlandı (The Flat Viewing, The Missing Backpack, First Day at Work ve The River Festival ile birlikte); beş "evet" bayrağının hepsi (`helped_alex`, `watched_mia_bag`, `helped_late_customer`, `joined_festival_team`, `invited_neighbours`); Alex, Mia, Olivia ve Rosa güveni ≥ 30 |
 | **Home at Last** | The Flat Viewing ve The Missing Backpack tamamlandı; `helped_alex` ve `watched_mia_bag`; Alex güveni ≥ 30, Mia güveni ≥ 30 |
+| **A Place in the City** | First Day at Work tamamlandı; `helped_late_customer`; Olivia güveni ≥ 30 |
 | **New in Town** | Koşul yok: diğer bütün oyuncular bu sona ulaşır |
 
-Güven eşikleri ulaşılabilirdir: Alex için 5 (Meet Your Neighbor) + 15 (yardım) + 10 (Flat
-Viewing) = 30; Mia için 5 + 15 + 15 = 35.
+Sıra önemlidir: en zor son en başta durur. Heart of the Neighbourhood, Home at Last ve A Place in
+the City'nin istediği her şeyi ister (`test_the_best_ending_needs_everything_the_others_need`);
+böylece hem komşularına hem işe yardım eden ama festivalde komşularını çağırmayan oyuncu Home at
+Last'a, yalnızca işte yardım eden oyuncu A Place in the City'ye gider.
 
+Güven eşikleri ulaşılabilirdir:
+
+| NPC | Kazanılabilecek güven (sohbet bonusu hariç) |
+|---|---|
+| Alex | 5 (Meet Your Neighbor) + 15 (yardım) + 10 (Flat Viewing) + 5 (festival daveti) = 35 |
+| Mia | 5 (Morning at the Café) + 15 (çanta) + 15 (Missing Backpack) + 5 (festival daveti) = 40 |
+| Olivia | 10 (Job Interview) + 15 (geç gelen yolcu) + 10 (First Day at Work) = 35 |
+| Rosa | 5 (A Walk to the Market) + 15 (gönüllü) + 10 (festival daveti) + 10 (River Festival) = 40 |
+
+- **Heart of the Neighbourhood:** Festivalin sonunda Alex, Mia, Rosa ve Olivia oyuncuyla eski taş
+  köprüde oturup sudaki ışıkları izler. Oyuncu komşularına, yeni ekibine ve bütün pazara yardım
+  etmiştir; sokakta artık adı Mia'nınki gibi anılır.
 - **Home at Last:** Alex ve Mia, Linden House'un avlusunda küçük bir hoş geldin partisi verir.
   Oyuncu komşularına ihtiyaç duyduklarında yardım etmiştir ve şehir artık ev gibidir.
+- **A Place in the City:** Bir ay sonra Olivia oyuncuya pencere kenarında kendi masasını verir;
+  müşteriler onu ismiyle sorar. Oyuncu bütün komşularını tanımaz ama işi ona şehirde bir yer
+  açmıştır.
 - **New in Town:** Oyuncu şehirde yolunu bulmuştur ama burası hâlâ biraz yabancı gelir. Kapanış,
   bir dahaki sefere yardım isteyen bir komşuya "evet" demeyi önerir; oyunu tekrar oynamaya
   davet eder.
@@ -197,12 +294,14 @@ aksiyonlar:
 - `npc_confused`: NPC oyuncuyu anlamadı; oyuncudan tekrar denemesi beklenir.
 
 Göreve özel aksiyonlar (`order_taken`, `viewing_positive`, `interview_positive`,
-`interview_concern`, `clue_found`) o görevin anlatımı içindir. İçerik dosyası yalnızca hangi
+`interview_concern`, `clue_found`, `directions_understood`, `customer_helped`, `stall_ready`,
+`visitor_helped`) o görevin anlatımı içindir. İçerik dosyası yalnızca hangi
 aksiyonların geçerli olduğunu söyler; etkilerini Story Engine (`engines/story.py`,
 `apply_story_action`) belirler:
 
 - Görevin `allowed_story_actions` listesinde olmayan aksiyon reddedilir, hiçbir şey değişmez.
-- `npc_pleased`, `order_taken`, `viewing_positive`, `interview_positive`, `clue_found`: görevin
+- `npc_pleased`, `order_taken`, `viewing_positive`, `interview_positive`, `clue_found`,
+  `directions_understood`, `customer_helped`, `stall_ready`, `visitor_helped`: görevin
   NPC'sinin güvenine en fazla +2 eklenir (100'ü geçmez). Bir görevin sohbetinden gelen toplam güven
   en fazla **+6**'dır (`ACTION_TRUST_CAP_PER_QUEST`); oyuncu ne kadar yazarsa yazsın bu aşılmaz.
   Sayaç `quest_progress.story_trust_gained` alanında tutulur. Hikâyeyi asıl ilerleten kararlar (+15)
@@ -251,11 +350,17 @@ aksiyonların geçerli olduğunu söyler; etkilerini Story Engine (`engines/stor
 - Her güven eşiği, oyunda kazanılabilecek güvenle ulaşılabilirdir.
 - Son ending koşulsuzdur, böylece her oyuncu bir sona ulaşır.
 - Ön koşulu olan her görevin bir `locked_summary` metni vardır.
-- Mia'nın çantası ve Alex'in boş dairesi yalnızca kendi görevlerinin `npc_knows` alanındadır.
+- Mia'nın çantası, Alex'in boş dairesi, Rosa'nın festivali ve Olivia'nın oyuncuyu işe alması
+  yalnızca kendi görevlerinin `npc_knows` alanındadır.
+- Her mekânın en az bir NPC'si ve bir görevi vardır; en iyi son, oyundaki her görevi gerektirir.
+- Her mekânın haritada bir girişi, renk teması ve diyalog sahnesi, her NPC'nin bir portresi vardır
+  (`tests/test_frontend_assets.py`).
 
 ### Yeni görev eklemek
 
 1. `quests/` altına `<slug>.json` dosyası ekle; gerekiyorsa `npcs.json` ve `locations.json`'u
-   güncelle.
+   güncelle. Yeni mekân için `pages/map.html`'e bir giriş, `css/main.css`'e `--sq-<slug>` ve
+   `--sq-<slug>-tint` renkleri ile `.sq-<slug>` teması, `assets/scenes/<slug>.svg` sahnesi; yeni
+   NPC için `assets/portraits/<slug>.svg` portresi ekle.
 2. Bu dokümandaki tabloları ve görev anlatımını güncelle.
-3. `pytest tests/test_content_files.py` çalıştır.
+3. `pytest tests/test_content_files.py tests/test_frontend_assets.py` çalıştır.

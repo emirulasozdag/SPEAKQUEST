@@ -70,10 +70,10 @@ def test_a_new_player_can_only_play_the_starting_quest():
     assert unlocked_quests(progress()) == {"meet_your_neighbor"}
 
 
-def test_finishing_the_starting_quest_opens_the_café_and_the_interview():
+def test_finishing_the_starting_quest_opens_the_café_the_interview_and_the_market():
     opened = unlocked_quests(progress(completed=["meet_your_neighbor"]))
 
-    assert opened == {"meet_your_neighbor", "morning_at_the_cafe", "the_job_interview"}
+    assert opened == {"meet_your_neighbor", "morning_at_the_cafe", "the_job_interview", "a_walk_to_the_market"}
 
 
 def test_quests_that_need_a_decision_stay_locked_until_the_flag_exists():

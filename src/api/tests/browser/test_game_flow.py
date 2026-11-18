@@ -146,9 +146,10 @@ def test_quest_journal_tabs_and_the_recommended_quest(page: Page, console, game_
     active_tab = page.get_by_role("tab", name=re.compile(r"^Active"))
     done_tab = page.get_by_role("tab", name=re.compile(r"^Completed"))
     locked_tab = page.get_by_role("tab", name=re.compile(r"^Locked"))
-    expect(active_tab).to_have_text("Active 3")
+    # Café, Flat Viewing, Job Interview and the market walk are open
+    expect(active_tab).to_have_text("Active 4")
     expect(done_tab).to_have_text("Completed 1")
-    expect(locked_tab).to_have_text("Locked 1")
+    expect(locked_tab).to_have_text("Locked 3")
 
     # The recommended quest comes first, with the reason the Adaptive Quest Engine gives
     expect(active_tab).to_have_attribute("aria-selected", "true")
@@ -157,7 +158,7 @@ def test_quest_journal_tabs_and_the_recommended_quest(page: Page, console, game_
     expect(first.get_by_role("heading", name=recommended["title"])).to_be_visible()
     expect(first.get_by_text("Why this quest was suggested for you")).to_be_visible()
     expect(first.get_by_text(recommended["recommendation_reason"])).to_be_visible()
-    expect(active.get_by_role("article")).to_have_count(3)
+    expect(active.get_by_role("article")).to_have_count(4)
 
     done_tab.click()
     expect(done_tab).to_have_attribute("aria-selected", "true")
@@ -169,7 +170,7 @@ def test_quest_journal_tabs_and_the_recommended_quest(page: Page, console, game_
     expect(locked_tab).to_have_attribute("aria-selected", "true")
     locked = page.get_by_role("tabpanel", name=re.compile(r"^Locked"))
     expect(locked.get_by_role("heading", name="The Missing Backpack")).to_be_visible()
-    expect(locked.get_by_text("What opens it:")).to_be_visible()
+    expect(locked.get_by_text("What opens it:")).to_have_count(3)
     expect(active).to_be_hidden()
     assert console.errors == []
 
@@ -195,4 +196,29 @@ def test_learning_progress_shows_what_the_player_practised(page: Page, console, 
     expect(page.get_by_role("region", name="What to practise next")).to_be_visible()
     expect(page.get_by_role("heading", name="Your skills over time")).to_be_visible()
     expect(page.get_by_text("Nothing to show yet")).to_be_hidden()
+    assert console.errors == []
+
+
+def test_the_riverside_market_opens_after_the_first_quest(page: Page, console, game_api, use_ai):
+    finish_first_quest(game_api, use_ai)
+    log_in(page, EMAIL)
+    expect(page).to_have_url(re.compile(r"/pages/dashboard\.html$"))
+    page.goto("/pages/map.html")
+
+    page.get_by_role("button", name=re.compile(r"^Riverside Market")).click()
+    place = page.locator("#place-detail")
+    expect(place.get_by_role("heading", name="Riverside Market")).to_be_visible()
+    expect(place.get_by_text("Rosa", exact=True)).to_be_visible()
+    expect(place.get_by_role("heading", name="A Walk to the Market")).to_be_visible()
+    # The festival needs a choice the player has not made yet
+    expect(place.get_by_role("heading", name="The River Festival")).to_be_visible()
+    place.get_by_role("button", name="Start quest").click()
+
+    expect(page).to_have_url(re.compile(r"/pages/dialogue\.html\?quest=\d+$"))
+    expect(page.get_by_role("heading", name="A Walk to the Market")).to_be_visible()
+    expect(page.get_by_role("log").get_by_text("First time at the Riverside Market?")).to_be_visible()
+    # The market's own scene and Rosa's portrait load instead of a broken image
+    scene = page.locator("#scene-bg")
+    expect(scene).to_have_attribute("src", "/assets/scenes/market.svg")
+    page.wait_for_function("document.querySelector('#scene-bg').naturalWidth > 0")
     assert console.errors == []

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <rect width="800" height="240" fill="#f7dbe6"/>
+  <path d="M480 150c110-14 210 8 320 0v50H480z" fill="#d9e3f8"/>
+  <path d="M540 150q90-70 180 0" fill="none" stroke="#c9c2b6" stroke-width="18" stroke-linecap="round"/>
+  <path d="M60 70h170l-12 34H72zM260 70h170l-12 34H272z" fill="#b8396b"/>
+  <path d="M100 70l-4 34M145 70v34M190 70l4 34M300 70l-4 34M345 70v34M390 70l4 34" stroke="#fff6e9" stroke-width="10"/>
+  <path d="M80 104v86M210 104v86M280 104v86M410 104v86" stroke="#7a3b1d" stroke-width="6"/>
+  <rect x="70" y="150" width="150" height="22" rx="4" fill="#fff6e9"/>
+  <rect x="270" y="150" width="150" height="22" rx="4" fill="#fff6e9"/>
+  <g fill="#b8396b"><circle cx="100" cy="140" r="11"/><circle cx="128" cy="134" r="11"/><circle cx="156" cy="140" r="11"/></g>
+  <g fill="#f2b632"><circle cx="186" cy="138" r="11"/><circle cx="114" cy="124" r="7"/><circle cx="170" cy="124" r="7"/></g>
+  <g fill="#c2412d"><circle cx="300" cy="140" r="9"/><circle cx="322" cy="140" r="9"/><circle cx="344" cy="140" r="9"/><circle cx="311" cy="126" r="9"/><circle cx="333" cy="126" r="9"/></g>
+  <g fill="#2f8a5f"><circle cx="378" cy="138" r="10"/><circle cx="398" cy="138" r="10"/></g>
+  <rect y="200" width="800" height="40" fill="#c9c2b6"/>
+</svg>

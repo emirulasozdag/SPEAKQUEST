@@ -1,0 +1,47 @@
+{
+  "slug": "the_river_festival",
+  "title": "The River Festival",
+  "chapter": 4,
+  "location": "market",
+  "npc": "rosa",
+  "target_skills": ["prepositions", "vocabulary_usage"],
+  "min_level": "A2",
+  "max_level": "B1",
+  "summary": "It is Saturday morning and you kept your promise to Rosa. The River Festival opens in two hours. Help her set up the flower stall and tell the first visitors what they can find at the festival.",
+  "locked_summary": "Something special is happening at the Riverside Market this weekend.",
+  "npc_knows": [
+    "The festival opens at eleven. There is live music on the stone bridge, a food area next to the bus station and a children's corner behind the book stall.",
+    "The flower stall has three tables. Rosa wants the big buckets of sunflowers in front, the small pots on the left table and the price board above the stall.",
+    "There is one empty table at the end of the market. Rosa would love to give it to people from the neighbourhood."
+  ],
+  "npc_opening": "You came! Wonderful. We have two hours and a lot of flowers. First, can you help me with the tables? Tell me where you think everything should go.",
+  "objectives": [
+    { "id": "arrange_stall", "description": "Tell Rosa where to put the tables, the flowers or the price board." },
+    { "id": "describe_flowers", "description": "Describe some of the flowers or plants on the stall to a visitor." },
+    { "id": "give_festival_tips", "description": "Tell a visitor where they can find the music, the food or the children's corner." }
+  ],
+  "prerequisites": {
+    "quests_completed": ["a_walk_to_the_market"],
+    "flags": ["joined_festival_team"]
+  },
+  "rewards": { "xp": 140, "trust": { "rosa": 10 } },
+  "allowed_story_actions": ["continue", "npc_pleased", "npc_confused", "stall_ready", "visitor_helped"],
+  "decision_points": [
+    {
+      "id": "invite_neighbours",
+      "prompt": "Rosa points at the empty table at the end of the market. \"Do you know anyone who would like it?\" You think of Alex's plants and Mia's cinnamon rolls.",
+      "options": [
+        {
+          "id": "invite",
+          "label": "Call Alex and Mia and invite them to share the empty table.",
+          "effects": { "flags": ["invited_neighbours"], "trust": { "rosa": 10, "alex": 5, "mia": 5 } }
+        },
+        {
+          "id": "keep_it_simple",
+          "label": "Say you are happy to focus on the flower stall today.",
+          "effects": {}
+        }
+      ]
+    }
+  ]
+}

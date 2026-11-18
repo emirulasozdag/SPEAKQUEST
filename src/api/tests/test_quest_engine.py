@@ -1,5 +1,5 @@
 """Adaptive Quest Engine: the next quest follows the player's weak skill, goal, story and NPCs,
-and the story ends with one of the two endings once nothing is left to play."""
+and the story ends with one of the endings once nothing is left to play."""
 
 import pytest
 from sqlalchemy import select
@@ -78,7 +78,7 @@ STRUGGLES_WITH_QUESTIONS = scores(*[(PS, True)] * 3, *[(QF, False)] * 4)
 def test_only_unlocked_quests_not_started_yet_are_candidates():
     slugs = {quest.slug for quest in candidates_for(player(), QUESTS)}
 
-    assert slugs == {"the_flat_viewing", "the_job_interview", "the_missing_backpack"}
+    assert slugs == {"the_flat_viewing", "the_job_interview", "the_missing_backpack", "a_walk_to_the_market"}
 
 
 def test_a_quest_behind_a_decision_the_player_did_not_make_is_never_chosen():
@@ -308,10 +308,24 @@ def test_no_recommendation_while_a_quest_is_active(client, db_session, seeded):
 
 EMAIL = "story@example.com"
 
+# Every decision in the story: the quest it belongs to, its id, and the "yes" and "no" options
+DECISIONS = {
+    "meet_your_neighbor": ("help_alex_move", "help", "not_now"),
+    "morning_at_the_cafe": ("watch_mia_bag", "watch", "in_a_hurry"),
+    "first_day_at_work": ("late_customer", "stay_and_help", "come_back_tomorrow"),
+    "a_walk_to_the_market": ("festival_volunteer", "volunteer", "busy_weekend"),
+    "the_river_festival": ("invite_neighbours", "invite", "keep_it_simple"),
+}
+SAY_YES_TO_EVERYTHING = frozenset(DECISIONS)
+NEIGHBOUR_DECISIONS = frozenset({"meet_your_neighbor", "morning_at_the_cafe"})
+TOTAL_XP = 50 + 60 + 80 + 100 + 120 + 100 + 70 + 140
 
-def play_through(client, db_session, headers, *, help_neighbours: bool) -> dict:
-    """Play every quest the story allows, making both decisions; returns the last completion."""
-    decisions = {"meet_your_neighbor": ("help_alex_move", "help", "not_now"), "morning_at_the_cafe": ("watch_mia_bag", "watch", "in_a_hurry")}
+
+def play_through(client, db_session, headers, *, say_yes_in=frozenset()) -> dict:
+    """Play every quest the story allows, making every decision; returns the last completion.
+
+    say_yes_in names the quests whose decision is answered "yes"; every other decision is "no".
+    """
     last = None
     while True:
         available = [q for q in client.get("/api/quests", headers=headers).json() if q["status"] == "available"]
@@ -319,14 +333,19 @@ def play_through(client, db_session, headers, *, help_neighbours: bool) -> dict:
             return last
         quest = quest_by_slug(db_session, available[0]["slug"])
         assert client.post(f"/api/quests/{quest.id}/start", headers=headers).status_code == 201
-        if quest.slug in decisions:
-            decision, yes, no = decisions[quest.slug]
-            payload = {"quest_id": quest.id, "decision_id": decision, "option_id": yes if help_neighbours else no}
+        if quest.slug in DECISIONS:
+            decision, yes, no = DECISIONS[quest.slug]
+            option = yes if quest.slug in say_yes_in else no
+            payload = {"quest_id": quest.id, "decision_id": decision, "option_id": option}
             assert client.post("/api/story/decision", json=payload, headers=headers).status_code == 201
         meet_objectives(db_session, EMAIL, quest)
         response = client.post(f"/api/quests/{quest.id}/complete", headers=headers)
         assert response.status_code == 200
         last = response.json()
+
+
+def quest_statuses(client, headers) -> dict[str, str]:
+    return {q["slug"]: q["status"] for q in client.get("/api/quests", headers=headers).json()}
 
 
 @pytest.fixture
@@ -336,27 +355,76 @@ def story_player(client, db_session, seeded):
     return headers
 
 
-def test_helping_everyone_plays_all_five_quests_and_reaches_home_at_last(client, db_session, story_player):
+def test_saying_yes_to_everyone_plays_all_eight_quests_and_reaches_the_best_ending(
+    client, db_session, story_player
+):
     assert client.get("/api/story/ending", headers=story_player).status_code == 404
 
-    last = play_through(client, db_session, story_player, help_neighbours=True)
+    last = play_through(client, db_session, story_player, say_yes_in=SAY_YES_TO_EVERYTHING)
 
-    statuses = {q["slug"]: q["status"] for q in client.get("/api/quests", headers=story_player).json()}
-    assert set(statuses.values()) == {"completed"} and len(statuses) == 5
-    assert last["ending"]["slug"] == "home_at_last"
-    assert client.get("/api/story/state", headers=story_player).json()["ending"] == "home_at_last"
+    statuses = quest_statuses(client, story_player)
+    assert set(statuses.values()) == {"completed"} and len(statuses) == 8
+    assert last["ending"]["slug"] == "heart_of_the_neighbourhood"
+    assert client.get("/api/story/state", headers=story_player).json()["ending"] == "heart_of_the_neighbourhood"
     ending = client.get("/api/story/ending", headers=story_player).json()
-    assert ending["title"] == "Home at Last" and ending["summary"]
+    assert ending["title"] == "Heart of the Neighbourhood" and ending["summary"]
+    assert ending["quests_completed"] == 8
+    assert ending["xp"] == TOTAL_XP
+    choices = {d["quest_title"]: d["choice"] for d in ending["decisions"]}
+    assert choices == {
+        "Meet Your Neighbor": "Help Alex carry the boxes upstairs.",
+        "Morning at the Café": "Say yes and watch the backpack until Mia comes back.",
+        "First Day at Work": "Stay a little longer and help the traveller book a new ticket.",
+        "A Walk to the Market": "Say yes and promise to help at the flower stall on Saturday.",
+        "The River Festival": "Call Alex and Mia and invite them to share the empty table.",
+    }
+
+
+def test_the_decisions_are_listed_in_the_order_they_were_made(client, db_session, story_player):
+    play_through(client, db_session, story_player, say_yes_in=SAY_YES_TO_EVERYTHING)
+
+    ending = client.get("/api/story/ending", headers=story_player).json()
+
+    titles = [d["quest_title"] for d in ending["decisions"]]
+    assert titles[0] == "Meet Your Neighbor"
+    # The festival decision can only be made after the market walk opened the festival
+    assert titles.index("A Walk to the Market") < titles.index("The River Festival")
+
+
+def test_helping_only_the_neighbours_at_home_reaches_home_at_last(client, db_session, story_player):
+    last = play_through(client, db_session, story_player, say_yes_in=NEIGHBOUR_DECISIONS)
+
+    statuses = quest_statuses(client, story_player)
+    assert statuses["the_flat_viewing"] == statuses["the_missing_backpack"] == "completed"
+    assert statuses["the_river_festival"] == "locked"
+    assert last["ending"]["slug"] == "home_at_last"
+    assert client.get("/api/story/ending", headers=story_player).json()["quests_completed"] == 7
+
+
+def test_skipping_the_festival_party_still_reaches_home_at_last(client, db_session, story_player):
+    # Everything but the festival invitation: the best ending needs it, Home at Last does not
+    say_yes = SAY_YES_TO_EVERYTHING - {"the_river_festival"}
+
+    last = play_through(client, db_session, story_player, say_yes_in=say_yes)
+
+    assert set(quest_statuses(client, story_player).values()) == {"completed"}
+    assert last["ending"]["slug"] == "home_at_last"
+
+
+def test_helping_only_at_work_reaches_a_place_in_the_city(client, db_session, story_player):
+    last = play_through(client, db_session, story_player, say_yes_in={"first_day_at_work"})
+
+    statuses = quest_statuses(client, story_player)
+    assert statuses["the_flat_viewing"] == statuses["the_missing_backpack"] == "locked"
+    assert statuses["first_day_at_work"] == "completed"
+    assert last["ending"]["slug"] == "a_place_in_the_city"
+    ending = client.get("/api/story/ending", headers=story_player).json()
+    assert ending["title"] == "A Place in the City"
     assert ending["quests_completed"] == 5
-    assert ending["xp"] == 50 + 60 + 80 + 100 + 120
-    assert [(d["quest_title"], d["choice"]) for d in ending["decisions"]] == [
-        ("Meet Your Neighbor", "Help Alex carry the boxes upstairs."),
-        ("Morning at the Café", "Say yes and watch the backpack until Mia comes back."),
-    ]
 
 
 def test_the_ending_names_the_skill_that_improved_most(client, db_session, story_player):
-    play_through(client, db_session, story_player, help_neighbours=False)
+    play_through(client, db_session, story_player)
     add_results(db_session, EMAIL, "meet_your_neighbor", (PS, True), (PS, True), (QF, True), (QF, False))
 
     ending = client.get("/api/story/ending", headers=story_player).json()
@@ -366,18 +434,21 @@ def test_the_ending_names_the_skill_that_improved_most(client, db_session, story
     assert ending["most_improved_skill"]["score"] > 50
 
 
-def test_saying_no_skips_two_quests_and_reaches_new_in_town(client, db_session, story_player):
-    last = play_through(client, db_session, story_player, help_neighbours=False)
+def test_saying_no_to_everyone_skips_three_quests_and_reaches_new_in_town(client, db_session, story_player):
+    last = play_through(client, db_session, story_player)
 
-    statuses = {q["slug"]: q["status"] for q in client.get("/api/quests", headers=story_player).json()}
+    statuses = quest_statuses(client, story_player)
     assert statuses["the_flat_viewing"] == statuses["the_missing_backpack"] == "locked"
+    assert statuses["the_river_festival"] == "locked"
     assert last["ending"]["slug"] == "new_in_town"
     ending = client.get("/api/story/ending", headers=story_player).json()
-    assert ending["quests_completed"] == 3 and ending["most_improved_skill"] is None
-    assert [d["choice"] for d in ending["decisions"]] == [
+    assert ending["quests_completed"] == 5 and ending["most_improved_skill"] is None
+    assert {d["choice"] for d in ending["decisions"]} == {
         "Say you are too tired after the journey.",
         "Say sorry, you are in a hurry.",
-    ]
+        "Politely ask the traveller to come back tomorrow morning.",
+        "Say sorry, you already have plans this weekend.",
+    }
 
 
 def test_only_the_last_quest_ends_the_story(client, db_session, story_player):
@@ -391,7 +462,7 @@ def test_only_the_last_quest_ends_the_story(client, db_session, story_player):
 
 
 def test_after_the_ending_the_story_is_closed(client, db_session, story_player):
-    play_through(client, db_session, story_player, help_neighbours=False)
+    play_through(client, db_session, story_player)
     starter = quest_by_slug(db_session, "meet_your_neighbor")
     payload = {"quest_id": starter.id, "decision_id": "help_alex_move", "option_id": "help"}
 
@@ -401,7 +472,7 @@ def test_after_the_ending_the_story_is_closed(client, db_session, story_player):
 
 
 def test_a_reset_opens_the_story_again(client, db_session, story_player):
-    play_through(client, db_session, story_player, help_neighbours=False)
+    play_through(client, db_session, story_player)
 
     client.post("/api/player/reset", headers=story_player)
 

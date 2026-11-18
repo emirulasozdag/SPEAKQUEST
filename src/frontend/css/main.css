@@ -22,7 +22,10 @@
   --sq-office-tint: #d9e3f8;
   --sq-office-hover: #2f51a8;
   --sq-office-pressed: #284690;
+  --sq-market: #b8396b;
+  --sq-market-tint: #f7dbe6;
   --sq-park: #b9dec8;
+  --sq-stone: #c9c2b6;
   /* The five skill lines on the progress chart, told apart by colour and by the legend */
   --sq-series-1: #3a62c9;
   --sq-series-2: #c2412d;
@@ -103,6 +106,7 @@
 .sq-cafe { --sq-line-color: var(--sq-cafe); --sq-tint: var(--sq-cafe-tint); }
 .sq-apartment { --sq-line-color: var(--sq-apartment); --sq-tint: var(--sq-apartment-tint); }
 .sq-office { --sq-line-color: var(--sq-office); --sq-tint: var(--sq-office-tint); }
+.sq-market { --sq-line-color: var(--sq-market); --sq-tint: var(--sq-market-tint); }
 
 body {
   font-size: var(--sq-text-base);
@@ -502,6 +506,13 @@ span.sq-avatar {
 .sq-map .sq-ground { fill: var(--sq-apartment-tint); }
 .sq-map .sq-park { fill: var(--sq-park); }
 .sq-map .sq-water { fill: var(--sq-office-tint); }
+
+.sq-map .sq-bridge {
+  fill: none;
+  stroke: var(--sq-stone);
+  stroke-width: 14;
+  stroke-linecap: round;
+}
 
 .sq-map .sq-road {
   fill: none;

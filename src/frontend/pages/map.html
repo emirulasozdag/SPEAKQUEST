@@ -24,14 +24,16 @@
     <div class="row g-4">
       <div class="col-lg-8">
         <div class="sq-panel">
-          <svg class="sq-map" viewBox="0 0 800 480" role="group" aria-labelledby="map-title">
-            <title id="map-title">City map: Linden Street and the city centre</title>
-            <rect class="sq-ground" width="800" height="480" />
-            <path class="sq-water" d="M0 425c120-20 220 20 340 0s240-25 460 5V480H0z" />
+          <svg class="sq-map" viewBox="0 0 800 600" role="group" aria-labelledby="map-title">
+            <title id="map-title">City map: Linden Street, the city centre and the river</title>
+            <rect class="sq-ground" width="800" height="600" />
+            <path class="sq-water" d="M0 548c120-20 220 20 340 0s240-25 460 5V600H0z" />
             <circle class="sq-park" cx="200" cy="80" r="52" />
             <circle class="sq-park" cx="262" cy="104" r="34" />
-            <path class="sq-road" d="M-20 300H820M330 -20V420" />
-            <path class="sq-road-line" d="M0 300H800M330 0V410" />
+            <path class="sq-road" d="M-20 300H820M330 -20V540" />
+            <path class="sq-road-line" d="M0 300H800M330 0V530" />
+            <!-- The old stone bridge at the end of the market -->
+            <path class="sq-bridge" d="M692 562q44-36 88 0" />
 
             <a class="sq-place sq-apartment" href="#place-detail" data-location="apartment" aria-label="Linden House">
               <g class="sq-building">
@@ -73,6 +75,27 @@
                 <rect x="570" y="326" width="190" height="62" rx="14" />
                 <text x="665" y="352" text-anchor="middle">Bright Path Travel</text>
                 <text class="sq-place-status" x="665" y="375" text-anchor="middle" data-place-status>Loading…</text>
+              </g>
+            </a>
+
+            <a class="sq-place sq-market" href="#place-detail" data-location="market" aria-label="Riverside Market">
+              <g class="sq-building">
+                <!-- Three market stalls with striped awnings, flowers and fruit on the tables -->
+                <g fill="#7a3b1d"><rect x="392" y="470" width="6" height="56" /><rect x="474" y="470" width="6" height="56" /><rect x="486" y="470" width="6" height="56" /><rect x="568" y="470" width="6" height="56" /><rect x="580" y="470" width="6" height="56" /><rect x="662" y="470" width="6" height="56" /></g>
+                <path d="M384 448h104l-8 24h-88z" fill="#b8396b" />
+                <path d="M478 448h104l-8 24h-88z" fill="#c47812" />
+                <path d="M572 448h104l-8 24h-88z" fill="#2f8a5f" />
+                <path d="M410 448l-3 24M436 448v24M462 448l3 24M504 448l-3 24M530 448v24M556 448l3 24M598 448l-3 24M624 448v24M650 448l3 24" stroke="#fff6e9" stroke-width="8" />
+                <g fill="#fff6e9"><rect x="388" y="500" width="96" height="14" rx="3" /><rect x="482" y="500" width="96" height="14" rx="3" /><rect x="576" y="500" width="96" height="14" rx="3" /></g>
+                <g fill="#b8396b"><circle cx="408" cy="494" r="7" /><circle cx="426" cy="491" r="7" /><circle cx="444" cy="494" r="7" /></g>
+                <g fill="#f2b632"><circle cx="462" cy="493" r="7" /><circle cx="417" cy="484" r="5" /></g>
+                <g fill="#c2412d"><circle cx="506" cy="494" r="6" /><circle cx="520" cy="494" r="6" /><circle cx="534" cy="494" r="6" /><circle cx="513" cy="485" r="6" /><circle cx="527" cy="485" r="6" /></g>
+                <g fill="#3a62c9"><rect x="596" y="484" width="12" height="16" rx="2" /><rect x="612" y="480" width="12" height="20" rx="2" /><rect x="628" y="486" width="12" height="14" rx="2" /><rect x="644" y="482" width="12" height="18" rx="2" /></g>
+              </g>
+              <g class="sq-place-label">
+                <rect x="105" y="448" width="200" height="62" rx="14" />
+                <text x="205" y="474" text-anchor="middle">Riverside Market</text>
+                <text class="sq-place-status" x="205" y="497" text-anchor="middle" data-place-status>Loading…</text>
               </g>
             </a>
           </svg>

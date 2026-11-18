@@ -166,7 +166,7 @@ def test_progress_of_a_new_player(client):
         "xp_into_level": 0,
         "xp_needed_for_next": 50,
         "completed_quests": 0,
-        "total_quests": 5,
+        "total_quests": 8,
         "last_activity_at": None,
         "weakest_skill": None,
     }

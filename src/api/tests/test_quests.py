@@ -68,7 +68,7 @@ def test_a_new_player_sees_all_quests_and_can_start_only_the_first(client, heade
 
     assert response.status_code == 200
     quests = response.json()
-    assert len(quests) == 5
+    assert len(quests) == 8
     assert [q["chapter"] for q in quests] == sorted(q["chapter"] for q in quests)
     statuses = {q["slug"]: q["status"] for q in quests}
     assert statuses.pop(STARTER) == "available"
